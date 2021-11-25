@@ -1,0 +1,254 @@
+/* 
+#mainBody 
+	#container
+		#header
+			#user
+				img
+				#userLabel
+				#userBtn
+			#userMenu
+		.side
+			.top
+				#dbmsTree
+			.bottom
+				#include
+		.content
+			.top
+				#centerTabs
+					.tab
+						#scriptToolbar
+						#scriptBody
+							#script
+			.bottom
+				#console
+					#consoleTabs
+						.tab
+							#dbmsOutput	
+Public
+EasyUI
+*/
+#mainBody {
+	display: flex;
+	justify-content: center;
+}
+
+
+#container {
+	width:90vw;
+	height: 90vh;
+}
+
+
+#header {
+	width:100%;
+	height:60px;
+	display: flex;
+    align-items: center;
+    justify-content: flex-end;
+}
+
+
+#user {
+	min-width:200px;
+	width:auto;
+	height:90%;
+    border: 0.2px solid #95B8E7;
+    border-radius: 15px;
+}
+#user:hover {
+	background-color:#f9f9f9;
+}
+#user .l-btn-left {
+	width:100%;
+	height:100%;
+}
+#user .l-btn-left .l-btn-text {
+	width:100%;
+	height:100%;
+	display: flex;
+	display: flex;
+    align-items: center;
+}
+#user img {
+	height: 90%;
+	width:auto;
+	margin-left:10px;
+}
+#userLabel {
+	font-size: 20px;
+	margin-left:10px;
+}
+#userBtn {
+	margin-left:auto;
+	margin-right:10px;
+	height: 73%;
+	width:50px;
+	display:flex;
+	flex-direction: column;
+    align-items: center;
+    justify-content: space-evenly;
+	
+}
+#userBtn span {
+	width:30px;
+	height: 2px;
+	border:1px solid #95B8E7;
+	border-radius: 1px;
+	background-color: #95B8E7;
+}
+#userMenu {
+	width:300px;
+	border:1px solid #95B8E7;
+	background-color: #fff;
+}
+#userMenu .menu-line {
+	border: none;
+}
+
+
+.side {
+	width: 30%;
+	overflow-y: hidden;
+}
+#include {
+	border-top: 1px solid #95B8E7;
+}
+.content {
+	width: 70%;
+}
+
+#scriptToolbar {
+	padding:3px;
+    background-color: #fff8e063
+}
+#scriptBody {
+	overflow:hidden;
+	height: 94%;
+}
+#script {
+	width:100%;
+	height:97%;
+	resize:none;
+	font-size:20px;
+	border:1px solid #95B8E7;
+	outline-color: #95B8E7;
+}
+
+
+.top {
+	height: 65%;
+	overflow-y:auto;
+}
+
+
+.bottom {
+	height: 35%;
+	overflow-y:hidden;
+}
+.bottom #include {
+	height: 100%;
+}
+.bottom .tabs-panels {
+	height:calc(100% - 34px);
+}
+.bottom .datagrid table tr, td {
+	border-right: none !important;
+	border-left: 0.1px solid #ccc !important;
+}
+
+#console {
+	height: 100%;
+}
+
+#consoleTabs {
+	height: 100%;
+}
+
+/* Public */
+table * {
+	vertical-align: middle;
+}
+
+/* EasyUI */
+/* panel */
+.panel {
+	background-color: #fff;
+}
+.panel-header {
+	background: linear-gradient(to bottom,#fff 0,#fff 100%);
+}
+
+.panel-title {
+	color: #000;
+}
+
+.panel-body {
+	height: 100%;
+}
+
+
+/* tab */
+.tabs-header {
+	background-color: #fff;
+}
+.tabs-title {
+	color: #000;
+}
+.tabs-inner {
+	background-color: #fff !important;
+	background: linear-gradient(to bottom,#fff 0,#fff 100%) !important;
+}
+.tabs-panels .panel {
+	height: 100%;
+}
+.tabs-panels .panel .tab{
+	height: 100%;
+}
+.tabs-panels .panel-body {
+	overflow: hidden;
+}
+.tabs-scroller-left{
+	background: #fff url('/resources/img/tabs_icons.png') no-repeat 1px center;
+	height:32px !important;
+}
+.tabs-scroller-right {
+	background: #fff url('/resources/img/tabs_icons.png') no-repeat -15px center;
+	height:32px !important;
+}
+
+
+/* datagrid */
+.datagrid-wrap {
+	width: 100% !important;
+	height: 100% !important;
+}
+.datagrid-wrap .datagrid-view {
+	width: 100% !important;
+	height: 100% !important;
+}
+.datagrid-wrap .datagrid-view2 {
+	width: 100% !important;
+	height: 100% !important;
+}
+.datagrid-wrap .datagrid-view .datagrid-header{
+	width: 100% !important;
+	height: 32px !important;
+	background: linear-gradient(to bottom,#fff 0,#fff 100%) !important;
+}
+.datagrid-wrap .datagrid-view .datagrid-header .datagrid-header-inner{
+	height: 100%;
+}
+.datagrid-wrap .datagrid-view .datagrid-header .datagrid-header-inner .datagrid-htable{
+	height: 32px !important;
+}
+.datagrid-wrap .datagrid-view .datagrid-body{
+	overflow: auto !important;
+	width: 100% !important;
+	height: calc(100% - 32px) !important;
+}
+.datagrid-wrap .datagrid-view .datagrid-body .datagrid-row {
+	height: 25px !important;
+}
+.datagrid-wrap .datagrid-view .datagrid-body .datagrid-cell {
+	font-size: 12px;
+}
