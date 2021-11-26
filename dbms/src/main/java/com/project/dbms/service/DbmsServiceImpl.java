@@ -12,14 +12,10 @@ import org.springframework.stereotype.Service;
 import com.project.dbms.dto.LoadObjectDTO;
 import com.project.dbms.dto.ObjectDTO;
 import com.project.dbms.dto.TreeDTO;
-import com.project.dbms.mapper.DbmsMapper;
 import com.project.dbms.sql.DbmsSQL;
 
 @Service
 public class DbmsServiceImpl implements DbmsService {
-
-	@Autowired
-	private DbmsMapper dbmsMapper;
 
 	@Autowired
 	private DbmsSQL dbmsSQL;
@@ -34,8 +30,7 @@ public class DbmsServiceImpl implements DbmsService {
 		if (userService.getSessionDbId() == null) {
 			return null;
 		}
-		//return dbmsSQL.allSchemas();
-		return dbmsMapper.allSchemas();
+		return dbmsSQL.allSchemas();
 	}
 
 	// 스키마 내부 항목 불러오기
@@ -92,13 +87,15 @@ public class DbmsServiceImpl implements DbmsService {
 	public List<TreeDTO> objectInfo(ObjectDTO object) {
 		// 뒤에 붙은 S 빼고 보내기
 		object.setObject(object.getObject().substring(0, object.getObject().length() - 1));
-		return dbmsMapper.objectInfo(object);
+
+		return dbmsSQL.objectInfo(object);
 	}
 
 	// 테이블 정보 불러오기
 	@Override
 	public Map<String, Object> loadObject(LoadObjectDTO dto) {
 		Map<String, Object> map = new HashMap<>();
+
 		if (userService.getSessionDbId() != null) {
 			if (dto.getObjectType().equals("TABLE")) {
 				List<Map<String, Object>> rows = dbmsSQL.loadObjectTable(dto);
@@ -228,11 +225,11 @@ public class DbmsServiceImpl implements DbmsService {
 	public List<Map<String, Object>> schemaDetailsExtents(String schema) {
 		return dbmsSQL.schemaDetailsExtents(schema);
 	}
-	
+
 	// 현재 SQL 한줄 실행
 	@Override
 	public Map<String, Object> runCurrentSQL(String sql, int cursor) {
-		if(userService.getSessionDbId() == null) {
+		if (userService.getSessionDbId() == null) {
 			return null;
 		}
 		sql = sql.replace("\r", "").replace("\n", "").replace("\t", "");
@@ -258,7 +255,7 @@ public class DbmsServiceImpl implements DbmsService {
 	// 전체 SQL문 실행
 	@Override
 	public List<Map<String, Object>> runAllSQL(String sqls) {
-		if(userService.getSessionDbId() == null) {
+		if (userService.getSessionDbId() == null) {
 			return null;
 		}
 		sqls = sqls.replace("\r", "").replace("\n", "").replace("\t", "");

@@ -17,6 +17,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import com.project.dbms.dto.LoadObjectDTO;
+import com.project.dbms.dto.ObjectDTO;
 import com.project.dbms.dto.TreeDTO;
 import com.project.dbms.service.UserServiceImpl;
 
@@ -33,6 +34,42 @@ public class DbmsSQL {
 	// 125 Tibero 서버
 	@Value("${spring.datasource.url}")
 	private String url;
+	
+	// 전체 스키마 리스트 조회
+	public List<TreeDTO> allSchemas() {
+		// ID는 SCHEMA로 고정
+		String sql = "SELECT 'SCHEMA' AS ID, USERNAME AS TEXT, 'schema' AS iconCls "
+				+ "FROM ALL_USERS ORDER BY USERNAME";
+
+		List<TreeDTO> list = new ArrayList<TreeDTO>();
+		
+		Connection conn = null;
+		PreparedStatement pre = null;
+		ResultSet result = null;
+		
+		try {
+			Class.forName(driver);
+			conn = DriverManager.getConnection(url, userService.getSessionDbId(), userService.getSessionDbPw());
+			pre = conn.prepareStatement(sql);
+			result = pre.executeQuery();
+			TreeDTO tree;
+			while(result.next()) {
+				tree = new TreeDTO();
+				tree.setId(result.getString(1));
+				tree.setText(result.getString(2));
+				tree.setIconCls(result.getString(3));
+				list.add(tree);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			if(result != null) try {conn.close();} catch(SQLException se) {}
+			if(pre != null) try {conn.close();} catch(SQLException se) {}
+			if(conn != null) try {conn.close();} catch(SQLException se) {}
+		}
+		
+		return list;
+	}
 	
 	// 스키마 항목 카운트 조회
 	public TreeDTO schemaInfo(String owner, String objectType) {
@@ -75,6 +112,46 @@ public class DbmsSQL {
 		}
 		
 		return tree;
+	}
+	
+	// 오브젝트 항목 조회
+	public List<TreeDTO> objectInfo(ObjectDTO dto) {
+		String sql = "SELECT OBJECT_TYPE, OBJECT_NAME FROM all_objects WHERE OWNER = ? AND OBJECT_TYPE = ?";
+		String iconCls = "tree-" + dto.getObject().toLowerCase();
+		
+		List<TreeDTO> list = new ArrayList<TreeDTO>();
+		TreeDTO tree = null;
+		
+		Connection conn = null;
+		PreparedStatement pre = null;
+		ResultSet result = null;
+		
+		try {
+			Class.forName(driver);
+			conn = DriverManager.getConnection(url, userService.getSessionDbId(), userService.getSessionDbPw());
+			pre = conn.prepareStatement(sql);
+			pre.setString(1, dto.getId());
+			pre.setString(2, dto.getObject());
+			result = pre.executeQuery();
+			
+			while(result.next()) {
+				
+				tree = new TreeDTO();
+				tree.setId(result.getString(1));
+				tree.setText(result.getString(2));
+				tree.setIconCls(iconCls);
+				
+				list.add(tree);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			if(result != null) try {conn.close();} catch(SQLException se) {}
+			if(pre != null) try {conn.close();} catch(SQLException se) {}
+			if(conn != null) try {conn.close();} catch(SQLException se) {}
+		}
+		
+		return list;
 	}
 	
 	// Table 불러오기
