@@ -397,8 +397,6 @@ public class DbmsSQL {
 			conn = DriverManager.getConnection(url, userService.getSessionDbId(), userService.getSessionDbPw());
 			pre = conn.prepareStatement(sql);
 			
-			
-			
 			// SELECT 일 경우
 			if(type.equals("SELECT")) {
 				result = pre.executeQuery();
@@ -425,11 +423,12 @@ public class DbmsSQL {
 			} else {
 				int count = pre.executeUpdate();
 				long stopTime = System.nanoTime();
-				double time = (double) (stopTime - startTime) / 1000000000;
+				double time = (double) (stopTime - startTime) / 1000000;
 				row = new LinkedHashMap<>();
 				
 				row.put("Row", index);
 				row.put("ExecutionTime", time);
+				// 결과에 따라 row 등록
 				if (type.equals("CREATE") || type.equals("DROP") || type.equals("ALTER") || type.equals("TRUNCATE")) {
 					row.put("DbmsOutput", type.toLowerCase() + " " + sql.split(" ")[1].toLowerCase() + ".");
 				} else if(type.equals("INSERT") || type.equals("UPDATE") || type.equals("DELETE")){
@@ -443,7 +442,7 @@ public class DbmsSQL {
 		// 에러 발생시 에러메세지 추가
 		} catch (Exception e) {
 			long stopTime = System.nanoTime();
-			double time = (double) (stopTime - startTime) / 1000000000;
+			double time = (double) (stopTime - startTime) / 1000000;
 			row = new LinkedHashMap<>();
 			row.put("Row", index);
 			row.put("DbmsOutput", e.getMessage());

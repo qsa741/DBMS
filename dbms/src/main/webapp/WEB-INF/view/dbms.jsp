@@ -95,7 +95,7 @@
 										<tr>
 											<th data-options="field:'Row',width:'100px'">Row</th>
 											<th data-options="field:'DbmsOutput',width:'350px'">Dbms Output</th>
-											<th data-options="field:'ExecutionTime'">Execution Time</th>
+											<th data-options="field:'ExecutionTime'">Execution Time (ms)</th>
 										</tr>
 									</thead>
 								</table>
