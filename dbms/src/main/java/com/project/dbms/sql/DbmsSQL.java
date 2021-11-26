@@ -38,7 +38,7 @@ public class DbmsSQL {
 	// 전체 스키마 리스트 조회
 	public List<TreeDTO> allSchemas() {
 		// ID는 SCHEMA로 고정
-		String sql = "SELECT 'SCHEMA' AS ID, USERNAME AS TEXT, 'schema' AS iconCls "
+		String sql = "SELECT 'SCHEMA' AS ID, USERNAME AS TEXT, 'tree-schema' AS iconCls "
 				+ "FROM ALL_USERS ORDER BY USERNAME";
 
 		List<TreeDTO> list = new ArrayList<TreeDTO>();
