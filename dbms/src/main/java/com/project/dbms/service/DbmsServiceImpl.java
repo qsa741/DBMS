@@ -216,6 +216,12 @@ public class DbmsServiceImpl implements DbmsService {
 		return dbmsSQL.schemaDetailsSystemPrivileges(schema);
 	}
 
+	// 스키마 디테일 Extends 테이블 검색
+	@Override
+	public List<Map<String, Object>> schemaDetailsExtents(String schema) {
+		return dbmsSQL.schemaDetailsExtents(schema);
+	}
+	
 	// 현재 SQL 한줄 실행
 	@Override
 	public Map<String, Object> runCurrentSQL(String sql, int cursor) {

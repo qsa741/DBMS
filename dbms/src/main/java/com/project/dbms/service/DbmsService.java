@@ -33,6 +33,9 @@ public interface DbmsService {
 	// 스키마 디테일 정보 검색
 	public List<Map<String, Object>> schemaDetailsSystemPrivileges(String schema);
 
+	// 스키마 디테일 정보 검색
+	public List<Map<String, Object>> schemaDetailsExtents(String schema);
+
 	// SQL 한줄 실행
 	public Map<String, Object> runCurrentSQL(String sql, int cursor);
 	

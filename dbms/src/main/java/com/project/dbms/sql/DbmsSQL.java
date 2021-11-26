@@ -37,7 +37,7 @@ public class DbmsSQL {
 	// 전체 스키마 리스트 조회
 	public List<TreeDTO> allSchemas() {
 		// ID는 SCHEMA로 고정
-		String sql = "SELECT 'SCHEMA' AS ID, USERNAME AS TEXT, 'tree-folder' AS iconCls "
+		String sql = "SELECT 'SCHEMA' AS ID, USERNAME AS TEXT, 'schema' AS iconCls "
 				+ "FROM ALL_USERS ORDER BY USERNAME";
 
 		List<TreeDTO> list = new ArrayList<TreeDTO>();
@@ -372,6 +372,56 @@ public class DbmsSQL {
 		return list;
 	}
 	
+	// 스키마 디테일 Extends 조회
+	public List<Map<String, Object>> schemaDetailsExtents(String schema) {
+		String sql = "SELECT SEGMENT_TYPE AS TABLESPACE, '' AS SEGMENT_NAME, SEGMENT_NAME AS OBJECT_NAME, '' AS FILE_ID, '' AS BLOCK_ID, BLOCKS FROM user_extents ORDER BY SEGMENT_NAME";
+		String grant = getGrant();
+		if(grant.equals("DBA")) {
+			sql = "SELECT SEGMENT_TYPE AS TABLESPACE, '' AS SEGMENT_NAME, SEGMENT_NAME AS OBJECT_NAME, FILE_ID, BLOCK_ID, BLOCKS FROM dba_extents WHERE OWNER = ? ORDER BY SEGMENT_NAME";
+		}
+		List<Map<String, Object>> list = new ArrayList<Map<String,Object>>();
+		
+		Connection conn = null;
+		PreparedStatement pre = null;
+		ResultSet result = null;
+		try {
+			Class.forName(driver);
+			conn = DriverManager.getConnection(url, userService.getSessionDbId(), userService.getSessionDbPw());
+			pre = conn.prepareStatement(sql);
+			if(grant.equals("DBA")) {
+				pre.setString(1, schema);
+			} 
+			
+			result = pre.executeQuery();
+			
+			ResultSetMetaData metaData = result.getMetaData();
+			int size = metaData.getColumnCount();
+			String col;
+			
+			Map<String, Object> map;
+			while(result.next()) {
+				map = new LinkedHashMap<>();
+				for (int i = 0; i < size; i++) {
+					col = metaData.getColumnName(i + 1);
+					map.put(col, result.getString(col));
+				}
+				list.add(map);
+			}
+			// 권한이 DBA가 아니고 ID와 스키마가 다를경우 빈칸으로 리턴
+			if(!grant.equals("DBA") && !schema.equals(userService.getSessionDbId().toUpperCase())) {
+				list = new ArrayList<Map<String,Object>>();
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			if(result != null) try {conn.close();} catch(SQLException se) {}
+			if(pre != null) try {conn.close();} catch(SQLException se) {}
+			if(conn != null) try {conn.close();} catch(SQLException se) {}
+		}
+		
+		return list;
+	}
+	
 	// SQL 한줄 실행
 	@SuppressWarnings("finally")
 	public Map<String, Object> runCurrentSQL(String sql, String type, int index) {
@@ -428,7 +478,7 @@ public class DbmsSQL {
 				
 				row.put("Row", index);
 				row.put("ExecutionTime", time);
-				// 결과에 따라 row 등록
+				// 결과에 따라 row 등록 DDL DML DCL
 				if (type.equals("CREATE") || type.equals("DROP") || type.equals("ALTER") || type.equals("TRUNCATE")) {
 					row.put("DbmsOutput", type.toLowerCase() + " " + sql.split(" ")[1].toLowerCase() + ".");
 				} else if(type.equals("INSERT") || type.equals("UPDATE") || type.equals("DELETE")){

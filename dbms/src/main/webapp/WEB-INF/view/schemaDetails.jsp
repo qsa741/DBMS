@@ -19,6 +19,9 @@
 			$('#schemaDetailsSystemPrivileges').datagrid({
 				url : '/dbms/schemaDetailsSystemPrivileges?schema=' + $('#dbmsTree').tree('getSelected').text
 			});
+			$('#schemaDetailsExtents').datagrid({
+				url : '/dbms/schemaDetailsExtents?schema=' + $('#dbmsTree').tree('getSelected').text
+			});
 		}
 	});
 </script>
@@ -91,12 +94,12 @@
          <table id="schemaDetailsExtents" class="easyui-datagrid" data-options="singleSelect:'true'">
     		<thead>
     			<tr>
-    				<th data-options="field:'tablespace'">Tablespace</th>
-    				<th data-options="field:'segmentName'">Segment Name</th>
-    				<th data-options="field:'objectName'">Object Name</th>
-    				<th data-options="field:'fileId'">File ID</th>
-    				<th data-options="field:'blockId'">Block ID</th>
-    				<th data-options="field:'blocks'">#Blocks</th>
+    				<th data-options="field:'TABLESPACE'">Tablespace</th>
+    				<th data-options="field:'SEGMENT_NAME'">Segment Name</th>
+    				<th data-options="field:'OBJECT_NAME'">Object Name</th>
+    				<th data-options="field:'FILE_ID'">File ID</th>
+    				<th data-options="field:'BLOCK_ID'">Block ID</th>
+    				<th data-options="field:'BLOCKS'">#Blocks</th>
     			</tr>
     		</thead>
     	</table>

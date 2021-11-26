@@ -71,6 +71,12 @@ public class DbmsRestController {
 	public List<Map<String, Object>> schemaDetailsSystemPrivileges(String schema) {
 		return dbmsService.schemaDetailsSystemPrivileges(schema);
 	}
+
+	// 스키마 디테일 Extends 정보 불러오기
+	@RequestMapping("/schemaDetailsExtents")
+	public List<Map<String, Object>> schemaDetailsExtends(String schema) {
+		return dbmsService.schemaDetailsExtents(schema);
+	}
 	
 	// DB 커넥션 테스트
 	@RequestMapping("/connectionTest")
