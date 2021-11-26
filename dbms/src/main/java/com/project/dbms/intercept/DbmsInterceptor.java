@@ -6,6 +6,7 @@ import javax.servlet.http.HttpSession;
 
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
+@SuppressWarnings("deprecation")
 public class DbmsInterceptor extends HandlerInterceptorAdapter {
 
 	private String url;

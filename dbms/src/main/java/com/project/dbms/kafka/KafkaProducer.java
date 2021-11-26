@@ -12,6 +12,7 @@ public class KafkaProducer {
 	
 	private final KafkaTemplate<String, String> kafkaTemplate;
 	
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@Autowired
 	public KafkaProducer(KafkaTemplate kafkaTemplate) {
 		this.kafkaTemplate = kafkaTemplate;
