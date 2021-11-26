@@ -34,55 +34,22 @@ public class DbmsSQL {
 	@Value("${spring.datasource.url}")
 	private String url;
 	
-	// 전체 스키마 리스트 조회
-	public List<TreeDTO> allSchemas() {
-		// ID는 SCHEMA로 고정
-		String sql = "SELECT 'SCHEMA' AS ID, USERNAME AS TEXT, 'schema' AS iconCls "
-				+ "FROM ALL_USERS ORDER BY USERNAME";
-
-		List<TreeDTO> list = new ArrayList<TreeDTO>();
-		
-		Connection conn = null;
-		PreparedStatement pre = null;
-		ResultSet result = null;
-		
-		try {
-			Class.forName(driver);
-			conn = DriverManager.getConnection(url, userService.getSessionDbId(), userService.getSessionDbPw());
-			pre = conn.prepareStatement(sql);
-			result = pre.executeQuery();
-			TreeDTO tree;
-			while(result.next()) {
-				tree = new TreeDTO();
-				tree.setId(result.getString(1));
-				tree.setText(result.getString(2));
-				tree.setIconCls(result.getString(3));
-				list.add(tree);
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		} finally {
-			if(result != null) try {conn.close();} catch(SQLException se) {}
-			if(pre != null) try {conn.close();} catch(SQLException se) {}
-			if(conn != null) try {conn.close();} catch(SQLException se) {}
-		}
-		
-		return list;
-	}
-
 	// 스키마 항목 카운트 조회
 	public TreeDTO schemaInfo(String owner, String objectType) {
 		String sql = "SELECT COUNT(*) FROM all_objects WHERE OWNER = ? AND OBJECT_TYPE = ?";
 		
 		TreeDTO tree = new TreeDTO();
+		tree.setIconCls("tree-schemaInfo");
 		
 		Connection conn = null;
 		PreparedStatement pre = null;
 		ResultSet result = null;
+		
 		if(objectType.equals("PVM")) {
 			tree.setId("PVM");
 			tree.setText("Pvm (4)");
 			tree.setState("closed");
+			
 			return tree;
 		}
 		try {

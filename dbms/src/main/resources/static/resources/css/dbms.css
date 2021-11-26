@@ -110,6 +110,25 @@ EasyUI
 	width: 30%;
 	overflow-y: hidden;
 }
+
+#dbmsTree {
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+#dbmsTree .tree-schema {
+	background: url('/resources/img/tree-schema.png') no-repeat center/100%;
+}
+#dbmsTree .tree-schemaInfo {
+	background: url('/resources/img/tree_icons.png') no-repeat -208px 0;
+}
+#dbmsTree .tree-table {
+	background: url('/resources/img/tree-table.png') no-repeat center/90%;
+}
+
 #include {
 	border-top: 1px solid #95B8E7;
 }

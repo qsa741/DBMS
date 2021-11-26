@@ -7,8 +7,9 @@
 	<!-- 모든 스키마 불러오기 -->
 	<select id="allSchemas" resultType="TreeDTO">
 		SELECT 'SCHEMA' AS ID,
-		USERNAME
-		AS TEXT, 'tree-folder' AS iconCls FROM ALL_USERS ORDER BY
+		USERNAME AS TEXT,
+		'tree-schema' AS iconCls
+		FROM ALL_USERS ORDER BY
 		USERNAME;
 	</select>
 
@@ -92,9 +93,11 @@
 	<!-- 오브젝트 불러오기 -->
 	<select id="objectInfo" parameterType="ObjectDTO"
 		resultType="TreeDTO">
-		select object_type AS ID, object_name AS TEXT from
+		select object_type AS ID, object_name AS TEXT, 'tree-table'
+		AS iconCls from
 		all_objects where owner = #{id} and
-		object_type = #{object};
+		object_type =
+		#{object};
 	</select>
 
 	<!-- 테이블 정보 불러오기 -->
@@ -132,24 +135,5 @@
 		resultType="String">
 		select user from dual;
 	</select>
-
-	<select id="schemaDetailsInfo" parameterType="String"
-		resultType="java.util.LinkedHashMap">
-		select * from all_users where username = #{value};
-	</select>
-
-	<select id="mySchemaDetailsInfo"
-		resultType="java.util.LinkedHashMap">
-		select username, user_id, account_status, NVL2(LOCK_DATE,
-		LOCK_DATE, '1700-01-01') AS LOCK_DATE, NVL2(EXPIRY_DATE, EXPIRY_DATE,
-		'1700-01-01') AS
-		EXPIRY_DATE, DEFAULT_TABLESPACE, CREATED from
-		user_users;
-	</select>
-
-	<select id="schemaDetailsRoleGrants" resultType="java.util.LinkedHashMap">
-		select * from user_role_privs;
-	</select>
-	
 
 </mapper>

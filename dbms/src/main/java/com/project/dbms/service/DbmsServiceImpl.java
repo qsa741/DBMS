@@ -30,10 +30,12 @@ public class DbmsServiceImpl implements DbmsService {
 	// 모든 스키마 정보 불러오기
 	@Override
 	public List<TreeDTO> getAllSchemas() {
+		// 세션이 없을때 null 리턴
 		if (userService.getSessionDbId() == null) {
 			return null;
 		}
-		return dbmsSQL.allSchemas();
+		//return dbmsSQL.allSchemas();
+		return dbmsMapper.allSchemas();
 	}
 
 	// 스키마 내부 항목 불러오기
@@ -84,6 +86,7 @@ public class DbmsServiceImpl implements DbmsService {
 	// 오브젝트 불러오기
 	@Override
 	public List<TreeDTO> objectInfo(ObjectDTO object) {
+		// 뒤에 붙은 S 빼고 보내기
 		object.setObject(object.getObject().substring(0, object.getObject().length() - 1));
 		return dbmsMapper.objectInfo(object);
 	}
