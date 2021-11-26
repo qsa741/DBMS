@@ -47,9 +47,13 @@ public class DbmsServiceImpl implements DbmsService {
 		TreeDTO view = dbmsSQL.schemaInfo(schema, "VIEW");
 		TreeDTO synonym = dbmsSQL.schemaInfo(schema, "SYNONYM");
 		TreeDTO function = dbmsSQL.schemaInfo(schema, "FUNCTION");
+		function.setIconCls("tree-function");
 		TreeDTO procedure = dbmsSQL.schemaInfo(schema, "PROCEDURE");
-		TreeDTO pvmpackage = dbmsSQL.schemaInfo(schema, "PACKAGE");
+		procedure.setIconCls("tree-procedure");
+		TreeDTO pvmPackage = dbmsSQL.schemaInfo(schema, "PACKAGE");
+		pvmPackage.setIconCls("tree-package");
 		TreeDTO type = dbmsSQL.schemaInfo(schema, "TYPE");
+		type.setIconCls("tree-type");
 		TreeDTO trigger = dbmsSQL.schemaInfo(schema, "TRIGGER");
 		TreeDTO index = dbmsSQL.schemaInfo(schema, "INDEX");
 		TreeDTO sequence = dbmsSQL.schemaInfo(schema, "SEQUENCE");
@@ -63,7 +67,7 @@ public class DbmsServiceImpl implements DbmsService {
 		List<TreeDTO> pvmChildren = new ArrayList<TreeDTO>();
 		pvmChildren.add(function);
 		pvmChildren.add(procedure);
-		pvmChildren.add(pvmpackage);
+		pvmChildren.add(pvmPackage);
 		pvmChildren.add(type);
 		pvm.setChildren(pvmChildren);
 

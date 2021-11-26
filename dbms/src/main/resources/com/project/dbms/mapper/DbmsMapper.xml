@@ -93,11 +93,54 @@
 	<!-- 오브젝트 불러오기 -->
 	<select id="objectInfo" parameterType="ObjectDTO"
 		resultType="TreeDTO">
-		select object_type AS ID, object_name AS TEXT, 'tree-table'
-		AS iconCls from
-		all_objects where owner = #{id} and
-		object_type =
-		#{object};
+		select object_type AS ID, object_name AS TEXT
+		<if test="object == 'TABLE'">		
+			,'tree-table' AS iconCls 
+		</if>
+		<if test="object == 'VIEW'">
+			,'tree-view' AS iconCls 
+		</if>
+		<if test="object == 'SYNONYM'">
+			,'tree-synonym' AS iconCls 
+		</if>
+		<if test="object == 'FUNCTION'">
+			,'tree-function' AS iconCls 
+		</if>
+		<if test="object == 'PROCEDURE'">
+			,'tree-procedure' AS iconCls 
+		</if>
+		<if test="object == 'PACKAGE'">
+			,'tree-package' AS iconCls 
+		</if>
+		<if test="object == 'TYPE'">
+			,'tree-type' AS iconCls 
+		</if>
+		<if test="object == 'TRIGGER'">
+			,'tree-trigger' AS iconCls 
+		</if>
+		<if test="object == 'INDEX'">
+			,'tree-index' AS iconCls 
+		</if>
+		<if test="object == 'SEQUENCE'">
+			,'tree-sequence' AS iconCls 
+		</if>
+		<if test="object == 'DBLINK'">
+			,'tree-dblink' AS iconCls 
+		</if>
+		<if test="object == 'MVIEW'">
+			,'tree-mview' AS iconCls 
+		</if>
+		<if test="object == 'MVIEWLOG'">
+			,'tree-mviewlog' AS iconCls 
+		</if>
+		<if test="object == 'JOB'">
+			,'tree-job' AS iconCls 
+		</if>
+		<if test="object == 'LIBRARY'">
+			,'tree-library' AS iconCls 
+		</if>
+		from all_objects where owner = #{id} and
+		object_type = #{object};
 	</select>
 
 	<!-- 테이블 정보 불러오기 -->

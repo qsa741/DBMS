@@ -120,13 +120,43 @@ EasyUI
   user-select: none;
 }
 #dbmsTree .tree-schema {
-	background: url('/resources/img/tree-schema.png') no-repeat center/100%;
+	background: url('/resources/img/tree-schema.png') no-repeat center/80%;
 }
 #dbmsTree .tree-schemaInfo {
 	background: url('/resources/img/tree_icons.png') no-repeat -208px 0;
 }
 #dbmsTree .tree-table {
-	background: url('/resources/img/tree-table.png') no-repeat center/90%;
+	background: url('/resources/img/tree-table.png') no-repeat center/80%;
+}
+#dbmsTree .tree-view {
+	background: url('/resources/img/tree-view.png') no-repeat center/80%;
+}
+#dbmsTree .tree-synonym {
+	background: url('/resources/img/tree-synonym.png') no-repeat center/80%;
+}
+#dbmsTree .tree-function {
+	background: url('/resources/img/tree-function.png') no-repeat center/80%;
+}
+#dbmsTree .tree-procedure {
+	background: url('/resources/img/tree-procedure.png') no-repeat center/80%;
+}
+#dbmsTree .tree-package {
+	background: url('/resources/img/tree-package.png') no-repeat center/80%;
+}
+#dbmsTree .tree-type {
+	background: url('/resources/img/tree-type.png') no-repeat center/80%;
+}
+#dbmsTree .tree-trigger {
+	background: url('/resources/img/tree-trigger.png') no-repeat center/80%;
+}
+#dbmsTree .tree-sequence {
+	background: url('/resources/img/tree-synonym.png') no-repeat center/80%;
+}
+#dbmsTree .tree-job {
+	background: url('/resources/img/tree-job.png') no-repeat center/80%;
+}
+#dbmsTree .tree-index {
+	background: url('/resources/img/tree-index.png') no-repeat center/80%;
 }
 
 #include {
