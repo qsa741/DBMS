@@ -132,14 +132,17 @@ public class DbmsServiceImpl implements DbmsService {
 		childColumn.setId("COLUMNS");
 		childColumn.setText("Column (" + column.size() + ")");
 		childColumn.setState("closed");
+		childColumn.setIconCls("tree-column");
 		TreeDTO childConstraint = new TreeDTO();
 		childConstraint.setId("CONSTRAINTS");
 		childConstraint.setText("Constraint (" + constraint.size() + ")");
 		childConstraint.setState("closed");
+		childConstraint.setIconCls("tree-constraint");
 		TreeDTO childIndex = new TreeDTO();
 		childIndex.setId("INDEXS");
 		childIndex.setText("Index (" + index.size() + ")");
 		childIndex.setState("closed");
+		childIndex.setIconCls("tree-index");
 
 		List<TreeDTO> colTreeList = new ArrayList<>();
 		List<TreeDTO> conTreeList = new ArrayList<>();
@@ -148,11 +151,12 @@ public class DbmsServiceImpl implements DbmsService {
 		for (Map<String, Object> c : column) {
 			TreeDTO tree = new TreeDTO();
 			tree.setId("COLUMN");
-			String str = (String) c.get("COLUMN_NAME") + " : " + (String) c.get("DATA_TYPE");
+			tree.setIconCls("tree-column");
+			String text = (String) c.get("COLUMN_NAME") + " : " + (String) c.get("DATA_TYPE");
 			if (c.get("DATA_TYPE").equals("VARCHAR")) {
-				str += " (" + c.get("DATA_LENGTH") + ")";
+				text += " (" + c.get("DATA_LENGTH") + ")";
 			}
-			tree.setText(str);
+			tree.setText(text);
 			colTreeList.add(tree);
 		}
 		childColumn.setChildren(colTreeList);
@@ -161,6 +165,7 @@ public class DbmsServiceImpl implements DbmsService {
 			for (Map<String, Object> c : constraint) {
 				TreeDTO tree = new TreeDTO();
 				tree.setId("CONSTRAINT");
+				tree.setIconCls("tree-constraint");
 				tree.setText((String) c.get("CONSTRAINT_NAME"));
 				conTreeList.add(tree);
 			}
@@ -171,6 +176,7 @@ public class DbmsServiceImpl implements DbmsService {
 			for (Map<String, Object> i : index) {
 				TreeDTO tree = new TreeDTO();
 				tree.setId("INDEX");
+				tree.setIconCls("tree-index");
 				tree.setText((String) i.get("INDEX_NAME"));
 				idxTreeList.add(tree);
 			}

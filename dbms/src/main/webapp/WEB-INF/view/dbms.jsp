@@ -62,18 +62,18 @@
 			</div>
 		</div>
 		<div class="easyui-layout" style="width:100%;height:100%;">
-			<div class="side" data-options="region:'west',title:'Schema'">
-				<div class="top">
+			<div class="side easyui-layout" data-options="region:'west',title:'Schema',split:true">
+				<div class="top" data-options="region:'center',split:true">
 					<ul id="dbmsTree" class="easyui-tree">
 					</ul>
 				</div>
-				<div class="bottom">
+				<div class="bottom" data-options="region:'south',split:true">
 					<div id="include">
 					</div>
 				</div>
 			</div>
-			<div class="content" data-options="region:'center'">
-				<div class="top">
+			<div class="content easyui-layout" data-options="region:'center',split:true">
+				<div class="top"  data-options="region:'center',split:true">
 					<div id="centerTabs" class="easyui-tabs">
 						<div class="tab" title="Script" style="display:none;">
 							<div id="scriptToolbar">
@@ -86,7 +86,7 @@
 						</div>
 					</div>
 				</div>
-				<div class="bottom">
+				<div class="bottom" data-options="region:'south',split:true">
 					<div id="console">
 						<div id="consoleTabs" class="easyui-tabs" style="width:100%;">
 							<div class="tab" title="DBMS_OUTPUT" style="display:none;">

@@ -158,14 +158,23 @@ EasyUI
 #dbmsTree .tree-index {
 	background: url('/resources/img/tree-index.png') no-repeat center/80%;
 }
+#dbmsTree .tree-column {
+	background: url('/resources/img/tree-column.png') no-repeat center/40%;
+}
+#dbmsTree .tree-constraint {
+	background: url('/resources/img/tree-constraint.png') no-repeat center/80%;
+}
 
 #include {
 	border-top: 1px solid #95B8E7;
 }
+
 .content {
 	width: 70%;
 }
-
+.content .tabs-header {
+	border: none;
+}
 #scriptToolbar {
 	padding:3px;
     background-color: #fff8e063
@@ -185,12 +194,14 @@ EasyUI
 
 
 .top {
+	width: 100% !important;
 	height: 65%;
 	overflow-y:auto;
 }
 
 
 .bottom {
+	width: 100% !important;
 	height: 35%;
 	overflow-y:hidden;
 }
@@ -210,6 +221,7 @@ EasyUI
 }
 
 #consoleTabs {
+	width: 100% !important;
 	height: 100%;
 }
 
@@ -232,12 +244,25 @@ table * {
 }
 
 .panel-body {
+	width: 100% !important;
 	height: 100%;
+} 
+
+.panel .layout-panel {
+	width: 100% !important;
 }
 
+/* layout */
+.layout-split-west {
+	border-right: 5px solid #fff;
+}
+.layout-split-south {
+	border-top: 5px solid #fff;
+}
 
 /* tab */
 .tabs-header {
+	width: 100% !important;
 	background-color: #fff;
 }
 .tabs-title {
@@ -247,11 +272,16 @@ table * {
 	background-color: #fff !important;
 	background: linear-gradient(to bottom,#fff 0,#fff 100%) !important;
 }
+.tabs-panels {
+	width: 100% !important;
+}
 .tabs-panels .panel {
+	width: 100% !important;
 	height: 100%;
 }
 .tabs-panels .panel .tab{
 	height: 100%;
+	width: 100% !important;
 }
 .tabs-panels .panel-body {
 	overflow: hidden;
@@ -264,8 +294,9 @@ table * {
 	background: #fff url('/resources/img/tabs_icons.png') no-repeat -15px center;
 	height:32px !important;
 }
-
-
+.tabs-wrap {
+	width: calc(100% - 36px) !important;
+}
 /* datagrid */
 .datagrid-wrap {
 	width: 100% !important;
