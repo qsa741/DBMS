@@ -6,4 +6,8 @@ public interface NetworkService {
 
 	public void saveUser(JSONObject data) throws Exception;
 	
+	public boolean networkCheck(String agentNetwork);
+	
+	public void settingUserAction() throws Exception ;
+	
 }

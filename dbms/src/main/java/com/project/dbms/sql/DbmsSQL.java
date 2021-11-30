@@ -35,6 +35,13 @@ public class DbmsSQL {
 	@Value("${spring.datasource.url}")
 	private String url;
 	
+	@Value("${spring.datasource.username")
+	private String username;
+	
+	@Value("${spring.datasource.password")
+	private String password;
+	
+	
 	// 전체 스키마 리스트 조회
 	public List<TreeDTO> allSchemas() {
 		// ID는 SCHEMA로 고정
@@ -63,8 +70,8 @@ public class DbmsSQL {
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
-			if(result != null) try {conn.close();} catch(SQLException se) {}
-			if(pre != null) try {conn.close();} catch(SQLException se) {}
+			if(result != null) try {result.close();} catch(SQLException se) {}
+			if(pre != null) try {pre.close();} catch(SQLException se) {}
 			if(conn != null) try {conn.close();} catch(SQLException se) {}
 		}
 		
@@ -106,8 +113,8 @@ public class DbmsSQL {
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
-			if(result != null) try {conn.close();} catch(SQLException se) {}
-			if(pre != null) try {conn.close();} catch(SQLException se) {}
+			if(result != null) try {result.close();} catch(SQLException se) {}
+			if(pre != null) try {pre.close();} catch(SQLException se) {}
 			if(conn != null) try {conn.close();} catch(SQLException se) {}
 		}
 		
@@ -146,8 +153,8 @@ public class DbmsSQL {
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
-			if(result != null) try {conn.close();} catch(SQLException se) {}
-			if(pre != null) try {conn.close();} catch(SQLException se) {}
+			if(result != null) try {result.close();} catch(SQLException se) {}
+			if(pre != null) try {pre.close();} catch(SQLException se) {}
 			if(conn != null) try {conn.close();} catch(SQLException se) {}
 		}
 		
@@ -184,8 +191,8 @@ public class DbmsSQL {
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
-			if(result != null) try {conn.close();} catch(SQLException se) {}
-			if(pre != null) try {conn.close();} catch(SQLException se) {}
+			if(result != null) try {result.close();} catch(SQLException se) {}
+			if(pre != null) try {pre.close();} catch(SQLException se) {}
 			if(conn != null) try {conn.close();} catch(SQLException se) {}
 		}
 		
@@ -233,8 +240,8 @@ public class DbmsSQL {
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
-			if(result != null) try {conn.close();} catch(SQLException se) {}
-			if(pre != null) try {conn.close();} catch(SQLException se) {}
+			if(result != null) try {result.close();} catch(SQLException se) {}
+			if(pre != null) try {pre.close();} catch(SQLException se) {}
 			if(conn != null) try {conn.close();} catch(SQLException se) {}
 		}
 		
@@ -283,8 +290,8 @@ public class DbmsSQL {
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
-			if(result != null) try {conn.close();} catch(SQLException se) {}
-			if(pre != null) try {conn.close();} catch(SQLException se) {}
+			if(result != null) try {result.close();} catch(SQLException se) {}
+			if(pre != null) try {pre.close();} catch(SQLException se) {}
 			if(conn != null) try {conn.close();} catch(SQLException se) {}
 		}
 		
@@ -315,8 +322,8 @@ public class DbmsSQL {
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
-			if(result != null) try {conn.close();} catch(SQLException se) {}
-			if(pre != null) try {conn.close();} catch(SQLException se) {}
+			if(result != null) try {result.close();} catch(SQLException se) {}
+			if(pre != null) try {pre.close();} catch(SQLException se) {}
 			if(conn != null) try {conn.close();} catch(SQLException se) {}
 		}
 		
@@ -359,8 +366,8 @@ public class DbmsSQL {
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
-			if(result != null) try {conn.close();} catch(SQLException se) {}
-			if(pre != null) try {conn.close();} catch(SQLException se) {}
+			if(result != null) try {result.close();} catch(SQLException se) {}
+			if(pre != null) try {pre.close();} catch(SQLException se) {}
 			if(conn != null) try {conn.close();} catch(SQLException se) {}
 		}
 		
@@ -408,8 +415,8 @@ public class DbmsSQL {
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
-			if(result != null) try {conn.close();} catch(SQLException se) {}
-			if(pre != null) try {conn.close();} catch(SQLException se) {}
+			if(result != null) try {result.close();} catch(SQLException se) {}
+			if(pre != null) try {pre.close();} catch(SQLException se) {}
 			if(conn != null) try {conn.close();} catch(SQLException se) {}
 		}
 		
@@ -458,8 +465,8 @@ public class DbmsSQL {
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
-			if(result != null) try {conn.close();} catch(SQLException se) {}
-			if(pre != null) try {conn.close();} catch(SQLException se) {}
+			if(result != null) try {result.close();} catch(SQLException se) {}
+			if(pre != null) try {pre.close();} catch(SQLException se) {}
 			if(conn != null) try {conn.close();} catch(SQLException se) {}
 		}
 		
@@ -546,8 +553,8 @@ public class DbmsSQL {
 			
 		// 에러 메세지를 보내기위해 finally에서 return
 		} finally {
-			if(result != null) try {conn.close();} catch(SQLException se) {}
-			if(pre != null) try {conn.close();} catch(SQLException se) {}
+			if(result != null) try {result.close();} catch(SQLException se) {}
+			if(pre != null) try {pre.close();} catch(SQLException se) {}
 			if(conn != null) try {conn.close();} catch(SQLException se) {}
 			
 			map.put("data", data);
@@ -558,22 +565,21 @@ public class DbmsSQL {
 	
 	// 카프카로 받은 데이터 스케줄러 테이블에 저장
 	public void userSchedulerSave(String data) throws Exception {
-		
 		String sql = "insert into userScheduler values(USERS_SEQ.NEXTVAL, \'" + data 
-				+ "\', null, 'N')";
+				+ "\', sysdate, 'N')";
 		
 		Connection conn = null;
 		PreparedStatement pre = null;
 		try {
 			Class.forName(driver);
-			conn = DriverManager.getConnection(url, "tester", "tester");
+			conn = DriverManager.getConnection(url, username, password);
 			pre = conn.prepareStatement(sql);
 			pre.executeUpdate();
 			
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
-			if(pre != null) try {conn.close();} catch(SQLException se) {}
+			if(pre != null) try {pre.close();} catch(SQLException se) {}
 			if(conn != null) try {conn.close();} catch(SQLException se) {}
 		}
 		

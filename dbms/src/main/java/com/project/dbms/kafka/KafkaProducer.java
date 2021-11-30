@@ -7,8 +7,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class KafkaProducer {
 	
-	private static final String TOPIC = "saveUser";
-	private static final String TOPIC2 = "dbmsTopic";
+	private static final String TOPIC = "userTopic";
 	
 	private final KafkaTemplate<String, String> kafkaTemplate;
 	
@@ -22,7 +21,7 @@ public class KafkaProducer {
 		this.kafkaTemplate.send(TOPIC, msg);
 	}
 	
-	public void sendDBMS(String msg) {
-		this.kafkaTemplate.send(TOPIC2, msg);
+	public void userAction(String data) {
+		this.kafkaTemplate.send("actionTopic", data);
 	}
 }

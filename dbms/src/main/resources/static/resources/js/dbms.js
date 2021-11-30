@@ -161,7 +161,7 @@ function getTableChildren(node) {
 	if (node.id == 'TABLE' && node.children == null) {
 		var root = $('#dbmsTree').tree('getRoot', node.target);
 		$.ajax({
-			ur: '/dbms/getTableChildren',
+			url: '/dbms/getTableChildren',
 			data: {
 				schema: root.text,
 				objectType: node.id,

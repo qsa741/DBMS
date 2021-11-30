@@ -11,6 +11,7 @@
 	<script type="text/javascript" src="/resources/easyui/plugins/jquery.draggable.js"></script>
 	<script type="text/javascript" src="/resources/easyui/plugins/jquery.droppable.js"></script>
 	<script type="text/javascript" src="/resources/easyui/plugins/jquery.datagrid.js"></script>
+	<script type="text/javascript" src="/resources/easyui/plugins/jquery.dialog.js"></script>
 	<script type="text/javascript" src="/resources/easyui/plugins/jquery.panel.js"></script>
 	<script type="text/javascript" src="/resources/easyui/plugins/jquery.resizable.js"></script>
 	<script type="text/javascript" src="/resources/easyui/plugins/jquery.linkbutton.js"></script>
@@ -52,6 +53,7 @@
 			<div id="userMenu">
 				<c:if test="${sessionScope.JYSESSION != null}">
 					<div onclick="window.location='/dbms/signOut'">로그아웃</div>
+					<div onclick="$('#drawer').drawer('expand');">그래프</div>
 					<div onclick="window.location='/dbms/modifyUser'">회원정보 수정</div>
 					<div onclick="window.location='/dbms/deleteUser'">회원 탈퇴</div>
 				</c:if>
@@ -103,6 +105,10 @@
 						</div>
 					</div>
 				</div>
+			</div>
+		</div>
+		<div id="drawer" class="easyui-drawer" style="width:250px">
+			<div>
 			</div>
 		</div>
 	</div>

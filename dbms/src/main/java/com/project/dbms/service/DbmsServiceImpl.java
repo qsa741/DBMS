@@ -128,16 +128,21 @@ public class DbmsServiceImpl implements DbmsService {
 		List<Map<String, Object>> index = dbmsSQL.selectTableChild("index", dto);
 		List<Map<String, Object>> constraint = dbmsSQL.selectTableChild("constraint", dto);
 
+		// Column Tree Node 세팅
 		TreeDTO childColumn = new TreeDTO();
 		childColumn.setId("COLUMNS");
 		childColumn.setText("Column (" + column.size() + ")");
 		childColumn.setState("closed");
 		childColumn.setIconCls("tree-column");
+		
+		// Constraint Tree Node 세팅
 		TreeDTO childConstraint = new TreeDTO();
 		childConstraint.setId("CONSTRAINTS");
 		childConstraint.setText("Constraint (" + constraint.size() + ")");
 		childConstraint.setState("closed");
 		childConstraint.setIconCls("tree-constraint");
+		
+		// Index Tree Node 세팅
 		TreeDTO childIndex = new TreeDTO();
 		childIndex.setId("INDEXS");
 		childIndex.setText("Index (" + index.size() + ")");
@@ -148,6 +153,7 @@ public class DbmsServiceImpl implements DbmsService {
 		List<TreeDTO> conTreeList = new ArrayList<>();
 		List<TreeDTO> idxTreeList = new ArrayList<>();
 
+		// Column은 한개 이상 필수로 존재하므로 바로 for문 실행
 		for (Map<String, Object> c : column) {
 			TreeDTO tree = new TreeDTO();
 			tree.setId("COLUMN");
@@ -242,14 +248,12 @@ public class DbmsServiceImpl implements DbmsService {
 		String[] array = sql.split(";");
 		int count = 0;
 		// 커서의 위치 계산 후 SQL문 실행
-		for (int i = 0; i < sql.length(); i++) {
+		for (int i = 1; i < sql.length(); i++) {
 			if (i == cursor) {
 				break;
 			}
-			if (i != 0) {
-				if (sql.charAt(i - 1) == ';') {
-					count++;
-				}
+			if (sql.charAt(i - 1) == ';') {
+				count++;
 			}
 		}
 
