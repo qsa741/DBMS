@@ -83,6 +83,27 @@ $(document).ready(function() {
 		}
 	});
 
+	// 차트 초기값 세팅
+	setChartYears();
+
+	// 차트 콤보박스 Change 이벤트 세팅
+	$('#mChartCombobox').combobox({
+		onChange: function(data) {
+			selectMChartYear(data);
+		}
+	});
+	$('#dChartYearCombobox').combobox({
+		onChange: function(data) {
+			selectDChartYear(data);
+		}
+	});
+	$('#dChartMonthCombobox').combobox({
+		onChange: function(data) {
+			selectDChartMonth(data);
+		}
+	});
+
+
 });
 
 // 스키마 하위 목록 불러오기
@@ -95,7 +116,7 @@ function getSchemaInfo(node) {
 			},
 			dataType: 'json',
 			success: function(data) {
-				if(data == null) {
+				if (data == null) {
 					sessionOut();
 				} else {
 					$('#dbmsTree').tree('append', {
@@ -120,7 +141,7 @@ function getObjectInfo(node) {
 			},
 			dataType: 'json',
 			success: function(data) {
-				if(data == null) {
+				if (data == null) {
 					sessionOut();
 				} else {
 					$('#dbmsTree').tree('append', {
@@ -169,7 +190,7 @@ function getTableChildren(node) {
 			},
 			dataType: 'json',
 			success: function(data) {
-				if(data == null) {
+				if (data == null) {
 					sessionOut();
 				} else {
 					$('#dbmsTree').tree('append', {
@@ -233,7 +254,7 @@ function scriptResult(data) {
 	// SQL문이 SELECT일때
 	if (data.type == 'SELECT') {
 		consoleAddTab(data);
-	// SELECT 외 다른 명령어 처리
+		// SELECT 외 다른 명령어 처리
 	} else {
 		dbmsOutput(data.data);
 	}
@@ -281,6 +302,158 @@ function dbmsOutput(data) {
 // 세션이 사라지면 로그인페이지로 유도
 function sessionOut() {
 	alert('세션이 만료되었습니다. 로그인이 필요합니다.');
-	window.location='/dbms/signOut';
+	window.location = '/dbms/signOut';
 }
 
+// ActionData 테이블에 존재하는 연도 가져오기
+function setChartYears() {
+	$.ajax({
+		url: '/dbms/getChartYears',
+		success: function(data) {
+			var values = $('#mChartCombobox').combobox('getData');
+			for (var i = 0; i < data.length; i++) {
+				values.push({ value: data[i], text: data[i] });
+				if (i == 0) {
+					selectMChartYear(data[i]);
+					selectDChartYear(data[i]);
+					setChartMonth(data[i]);
+				}
+			}
+			$('#mChartCombobox').combobox('loadData', values);
+			$('#dChartYearCombobox').combobox('loadData', values);
+		}
+	});
+}
+
+// ActionData 테이블에 존재하는 연도별 월 가져오기
+function setChartMonth(year) {
+	$.ajax({
+		url: '/dbms/getChartMonth',
+		data: {
+			year: year
+		},
+		dataType: 'json',
+		success: function(data) {
+			var values = $('#dChartMonthCombobox').combobox('clear');;
+			for (var i = 0; i < data.length; i++) {
+				values.push({ value: data[i], text: data[i] });
+				if (i == 0) {
+					selectDChartMonth(data[i]);
+				}
+			}
+			$('#dChartMonthCombobox').combobox('loadData', values);
+		}
+	});
+}
+
+// mChart에서 연도 선택시 실행
+function selectMChartYear(year) {
+	$('#mChartCombobox').combobox('setValue', year);
+	$('#mChartCombobox').combobox('setText', year);
+	setMChart(year);
+}
+
+// dChart에서 연도 선택시 실행
+function selectDChartYear(year) {
+	$('#dChartYearCombobox').combobox('setValue', year);
+	$('#dChartYearCombobox').combobox('setText', year);
+	setChartMonth(year);
+	var month = $('#dChartMonthCombobox').combobox('getValue');
+	setDChart(year, month);
+}
+
+// dChart에서 월 선택시 실행
+function selectDChartMonth(month) {
+	$('#dChartMonthCombobox').combobox('setValue', month);
+	$('#dChartMonthCombobox').combobox('setText', month);
+	var year = $('#dChartYearCombobox').combobox('getValue');
+	setDChart(year, month);
+
+}
+
+// mChart 정보 불러오기
+function setMChart(year) {
+	$.ajax({
+		url: '/dbms/setMChart',
+		data: {
+			year: year
+		},
+		dataType: 'json',
+		success: function(data) {
+			var config = {
+				type: 'line',
+				data: data,
+				options: {
+					maintainAspectRatio: false,
+					plugins: {
+						title: {
+							display: true,
+							text: 'USERS 월별 통계'
+						}
+					},
+					scales: {
+						x: {
+							title: {
+								display: true,
+								text: '월별'
+							}
+						},
+						y: {
+							title: {
+								display: true,
+								text: '카운트'
+							}
+						}
+					}
+				}
+			}
+			$('#mChart').empty();
+			$('#mChart').append('<canvas></canvas>');
+			new Chart($('#mChart canvas'), config);
+		}
+	});
+}
+
+// dChart 정보 불러오기
+function setDChart(year, month) {
+	$.ajax({
+		url: '/dbms/setDChart',
+		data: {
+			year: year,
+			month: month
+		},
+		dataType: 'json',
+		success: function(data) {
+			var config = {
+				type: 'line',
+				data: data,
+				options: {
+					maintainAspectRatio: false,
+					plugins: {
+						title: {
+							display: true,
+							text: 'USERS 일별 통계'
+						}
+					},
+					scales: {
+						x: {
+							title: {
+								display: true,
+								text: '일별'
+							}
+						},
+						y: {
+							title: {
+								display: true,
+								text: '카운트'
+							}
+						}
+					}
+				}
+			}
+			$('#dChart').empty();
+			$('#dChart').append('<canvas></canvas>');
+			new Chart($('#dChart canvas'), config);
+		}
+	});
+}

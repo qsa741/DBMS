@@ -14,6 +14,7 @@ import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.configurationprocessor.json.JSONObject;
 import org.springframework.stereotype.Service;
 
 import com.project.dbms.dto.LoadObjectDTO;
@@ -27,11 +28,10 @@ public class DbmsSQL {
 	@Autowired
 	private UserServiceImpl userService;
 	
-	// Tibero driver
+	// Tibero driver, url, username, password
 	@Value("${spring.datasource.driver-class-name}")
 	private String driver;
 	
-	// 125 Tibero 서버
 	@Value("${spring.datasource.url}")
 	private String url;
 	
@@ -583,6 +583,150 @@ public class DbmsSQL {
 			if(conn != null) try {conn.close();} catch(SQLException se) {}
 		}
 		
+	}
+	
+	// ActionData에 존재하는 연도 가져오기
+	public List<String> getChartYears() {
+		List<String> list = new ArrayList<String>();
+		
+		String sql = "select year from ACTIONDATA group by year order by year desc";
+		
+		Connection conn = null;
+		PreparedStatement pre = null;
+		ResultSet result = null;
+		try {
+			Class.forName(driver);
+			conn = DriverManager.getConnection(url, username, password);
+			pre = conn.prepareStatement(sql);
+			result = pre.executeQuery();
+			
+			while(result.next()) {
+				list.add(result.getString(1));
+			}
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			if(result != null) try {result.close();} catch(SQLException se) {}
+			if(pre != null) try {pre.close();} catch(SQLException se) {}
+			if(conn != null) try {conn.close();} catch(SQLException se) {}
+		}
+		
+		return list;
+	}
+	
+	// 연도에 해당하는 ActionData에 존재하는 월 가져오기
+	public List<String> getChartMonth(String year) {
+		List<String> list = new ArrayList<String>();
+		
+		String sql = "select month from (select * from ACTIONDATA where year = ?) group by month order by month desc";
+		
+		Connection conn = null;
+		PreparedStatement pre = null;
+		ResultSet result = null;
+		try {
+			Class.forName(driver);
+			conn = DriverManager.getConnection(url, username, password);
+			pre = conn.prepareStatement(sql);
+			pre.setString(1, year);
+			result = pre.executeQuery();
+			
+			while(result.next()) {
+				list.add(result.getString(1));
+			}
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			if(result != null) try {result.close();} catch(SQLException se) {}
+			if(pre != null) try {pre.close();} catch(SQLException se) {}
+			if(conn != null) try {conn.close();} catch(SQLException se) {}
+		}
+		
+		return list;
+	}
+	
+	// year와 action에 해당하는 ACTIONDATA 데이터 Json 리스트로 반환
+	public List<JSONObject> getActionData(String year, String action) {
+		List<JSONObject> list = new ArrayList<JSONObject>();
+		
+		String sql = "select * from ACTIONDATA where action = ? and year = ? order by 1 desc, 2, 3, 4";
+		
+		Connection conn = null;
+		PreparedStatement pre = null;
+		ResultSet result = null;
+		try {
+			Class.forName(driver);
+			conn = DriverManager.getConnection(url, username, password);
+			pre = conn.prepareStatement(sql);
+			pre.setString(1, action);
+			pre.setString(2, year);
+			result = pre.executeQuery();
+			
+			ResultSetMetaData metaData = result.getMetaData();
+			int size = metaData.getColumnCount();
+			String col;
+			
+			JSONObject json;
+			while(result.next()) {
+				json = new JSONObject();
+				for (int i = 0; i < size; i++) {
+					col = metaData.getColumnName(i + 1);
+					json.put(col, result.getString(col));
+				}
+				list.add(json);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			if(result != null) try {result.close();} catch(SQLException se) {}
+			if(pre != null) try {pre.close();} catch(SQLException se) {}
+			if(conn != null) try {conn.close();} catch(SQLException se) {}
+		}
+		
+		return list;
+	}
+	
+	// year, month, action에 해당하는 데이터 Json 리스트로 반환
+	public List<JSONObject> getActionData(String year, String month, String action) {
+		List<JSONObject> list = new ArrayList<JSONObject>();
+		
+		String sql = "select * from ACTIONDATA where action = ? and year = ? and month = ? order by 1 desc, 2, 3, 4";
+		
+		Connection conn = null;
+		PreparedStatement pre = null;
+		ResultSet result = null;
+		try {
+			Class.forName(driver);
+			conn = DriverManager.getConnection(url, username, password);
+			pre = conn.prepareStatement(sql);
+			pre.setString(1, action);
+			pre.setString(2, year);
+			pre.setString(3, month);
+			result = pre.executeQuery();
+			
+			ResultSetMetaData metaData = result.getMetaData();
+			int size = metaData.getColumnCount();
+			String col;
+			
+			JSONObject json;
+			while(result.next()) {
+				json = new JSONObject();
+				for (int i = 0; i < size; i++) {
+					col = metaData.getColumnName(i + 1);
+					json.put(col, result.getString(col));
+				}
+				list.add(json);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			if(result != null) try {result.close();} catch(SQLException se) {}
+			if(pre != null) try {pre.close();} catch(SQLException se) {}
+			if(conn != null) try {conn.close();} catch(SQLException se) {}
+		}
+		
+		return list;
 	}
 	
 	

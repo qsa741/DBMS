@@ -19,11 +19,10 @@ import org.springframework.stereotype.Service;
 @Service
 public class SchedulerSQL {
 
-	// Tibero driver
+	// Tibero driver, url, username, password
 	@Value("${spring.datasource.driver-class-name}")
 	private String driver;
 	
-	// 125 Tibero 서버
 	@Value("${spring.datasource.url}")
 	private String url;
 	
@@ -34,27 +33,51 @@ public class SchedulerSQL {
 	private String password;
 	
 	// Action 데이터 저장
+	@SuppressWarnings("resource")
 	public void saveActionData(String action, JSONObject json) {
-		String sql = "insert into ACTIONDATA values(?,?,?,?,?)";
-
+		String select = "select * from ACTIONDATA where year = ? and month = ? and day = ? and action = ?";
+		String insert = "insert into ACTIONDATA values(?,?,?,?,?, sysdate)";
+		String update = "update ACTIONDATA set count = ? where year = ? and month = ? and day = ?";
 		Connection conn = null;
 		PreparedStatement pre = null;
+		ResultSet rs = null;
 		
 		try {
 			Class.forName(driver);
 			conn = DriverManager.getConnection(url, username, password);
-			pre = conn.prepareStatement(sql);
+			
+			// 해당 일에 데이터가 있는지 확인
+			pre = conn.prepareStatement(select);
 			pre.setString(1, json.getString("year"));
 			pre.setString(2, json.getString("month"));
 			pre.setString(3, json.getString("day"));
 			pre.setString(4, action);
-			pre.setInt(5, json.getInt("count"));
+			
+			rs = pre.executeQuery();
+			
+			// 데이터가 있다면 Update, 없다면 Insert
+			if(rs.next()) {
+				pre = conn.prepareStatement(update);
+				pre.setInt(1, json.getInt("count"));
+				pre.setString(2, json.getString("year"));
+				pre.setString(3, json.getString("month"));
+				pre.setString(4, json.getString("day"));
+				pre.setString(5, action);
+			} else {
+				pre = conn.prepareStatement(insert);
+				pre.setString(1, json.getString("year"));
+				pre.setString(2, json.getString("month"));
+				pre.setString(3, json.getString("day"));
+				pre.setString(4, action);
+				pre.setInt(5, json.getInt("count"));
+			}
 			
 			pre.executeUpdate();
 			
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
+			if (rs != null) try {rs.close();} catch (SQLException se) {}
 			if (pre != null) try {pre.close();} catch (SQLException se) {}
 			if (conn != null)try {conn.close();} catch (SQLException se) {}
 		}

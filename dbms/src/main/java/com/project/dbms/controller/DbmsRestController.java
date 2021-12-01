@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.configurationprocessor.json.JSONObject;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -96,4 +97,27 @@ public class DbmsRestController {
 		return dbmsService.runAllSQL(sqls);
 	}
 	
+	// mChart 차트 정보 가져오기
+	@RequestMapping("/setMChart")
+	public Map<String, Object> setMChart(String year) throws Exception{
+		return dbmsService.mChartInfo(year);
+	}
+	
+	// dChart 차트 정보 가져오기
+	@RequestMapping("/setDChart")
+	public Map<String, Object> setDChart(String year, String month) throws Exception{
+		return dbmsService.dChartInfo(year, month);
+	}
+	
+	// 차트 연도 가져오기
+	@RequestMapping("/getChartYears")
+	public List<String> getChartYears() {
+		return dbmsService.getChartYears();
+	}
+	
+	// 차트 월 가져오기
+	@RequestMapping("/getChartMonth")
+	public List<String> getChartMonth(String year) {
+		return dbmsService.getChartMonth(year);
+	}
 }
