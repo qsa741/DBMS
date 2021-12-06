@@ -69,7 +69,6 @@ public class DbmsSQL {
 		ResultSet result = null;
 
 		Class.forName(driver);
-//		conn = DriverManager.getConnection(url, sessionService.getSessionDbId(), sessionService.getSessionDbPw());
 		conn = DriverManager.getConnection(url, dto.getDbId(), dto.getDbPw());
 		pre = conn.prepareStatement(sql);
 		result = pre.executeQuery();
@@ -110,7 +109,6 @@ public class DbmsSQL {
 		}
 
 		Class.forName(driver);
-//		conn = DriverManager.getConnection(url, sessionService.getSessionDbId(), sessionService.getSessionDbPw());
 		conn = DriverManager.getConnection(url, dto.getDbId(), dto.getDbPw());
 		pre = conn.prepareStatement(sql);
 		pre.setString(1, owner);
@@ -145,7 +143,6 @@ public class DbmsSQL {
 		ResultSet result = null;
 
 		Class.forName(driver);
-//		conn = DriverManager.getConnection(url, sessionService.getSessionDbId(), sessionService.getSessionDbPw());
 		conn = DriverManager.getConnection(url, dbDto.getDbId(), dbDto.getDbPw());
 		pre = conn.prepareStatement(sql);
 		pre.setString(1, dto.getId());
@@ -179,7 +176,6 @@ public class DbmsSQL {
 		ResultSet result = null;
 
 		Class.forName(driver);
-//		conn = DriverManager.getConnection(url, sessionService.getSessionDbId(), sessionService.getSessionDbPw());
 		conn = DriverManager.getConnection(url, dbDto.getDbId(), dbDto.getDbPw());
 		pre = conn.prepareStatement(sql);
 		result = pre.executeQuery();
@@ -225,7 +221,6 @@ public class DbmsSQL {
 		ResultSet result = null;
 
 		Class.forName(driver);
-//		conn = DriverManager.getConnection(url, sessionService.getSessionDbId(), sessionService.getSessionDbPw());
 		conn = DriverManager.getConnection(url, dbDto.getDbId(), dbDto.getDbPw());
 		pre = conn.prepareStatement(sql);
 		pre.setString(1, dto.getSchema());
@@ -260,7 +255,6 @@ public class DbmsSQL {
 			sql = "SELECT USERNAME, USER_ID, ACCOUNT_STATUS, LOCK_DATE, EXPIRY_DATE, DEFAULT_TABLESPACE, CREATED "
 					+ "FROM dba_users WHERE USERNAME = ?";
 			// 권한이 DBA가 아닐때 자기 자신 조회시 추가 정보있음
-//		} else if (schema.equals(sessionService.getSessionDbId().toUpperCase())) {
 		} else if (schema.equals(dto.getDbId().toUpperCase())) {
 			sql = "SELECT * FROM USER_USERS WHERE USERNAME = ?";
 		}
@@ -272,7 +266,6 @@ public class DbmsSQL {
 		ResultSet result = null;
 
 		Class.forName(driver);
-//		conn = DriverManager.getConnection(url, sessionService.getSessionDbId(), sessionService.getSessionDbPw());
 		conn = DriverManager.getConnection(url, dto.getDbId(), dto.getDbPw());
 		pre = conn.prepareStatement(sql);
 		pre.setString(1, schema);
@@ -312,7 +305,6 @@ public class DbmsSQL {
 		ResultSet result = null;
 
 		Class.forName(driver);
-//		conn = DriverManager.getConnection(url, sessionService.getSessionDbId(), sessionService.getSessionDbPw());
 		conn = DriverManager.getConnection(url, dto.getDbId(), dto.getDbPw());
 		pre = conn.prepareStatement(sql);
 		result = pre.executeQuery();
@@ -348,7 +340,6 @@ public class DbmsSQL {
 		ResultSet result = null;
 
 		Class.forName(driver);
-//		conn = DriverManager.getConnection(url, sessionService.getSessionDbId(), sessionService.getSessionDbPw());
 		conn = DriverManager.getConnection(url, dto.getDbId(), dto.getDbPw());
 		pre = conn.prepareStatement(sql);
 		pre.setString(1, schema);
@@ -391,7 +382,6 @@ public class DbmsSQL {
 		ResultSet result = null;
 
 		Class.forName(driver);
-//		conn = DriverManager.getConnection(url, sessionService.getSessionDbId(), sessionService.getSessionDbPw());
 		conn = DriverManager.getConnection(url, dto.getDbId(), dto.getDbPw());
 		pre = conn.prepareStatement(sql);
 		pre.setString(1, schema);
@@ -438,7 +428,6 @@ public class DbmsSQL {
 		ResultSet result = null;
 
 		Class.forName(driver);
-		//conn = DriverManager.getConnection(url, sessionService.getSessionDbId(), sessionService.getSessionDbPw());
 		conn = DriverManager.getConnection(url, dto.getDbId(), dto.getDbPw());
 		pre = conn.prepareStatement(sql);
 		if (grant.equals("DBA")) {
@@ -461,7 +450,6 @@ public class DbmsSQL {
 			list.add(map);
 		}
 		// 권한이 DBA가 아니고 ID와 스키마가 다를경우 빈칸으로 리턴
-//		if (!grant.equals("DBA") && !schema.equals(sessionService.getSessionDbId().toUpperCase())) {
 		if (!grant.equals("DBA") && !schema.equals(dto.getDbId().toUpperCase())) {
 			list = new ArrayList<Map<String, Object>>();
 		}
@@ -476,9 +464,14 @@ public class DbmsSQL {
 	// 테이블 디테일 Table 조회
 	public Map<String, Object> tableDetailsTable(String table, String schema, DbDTO dto)
 			throws ClassNotFoundException, SQLException {
-		String sql = "select TABLE_NAME AS NAME, OWNER, PCT_FREE, INI_TRANS, LOGGING"
-				+ ", NUM_ROWS, BLOCKS, AVG_ROW_LEN, SIMPLE_SIZE, LAST_ANALYZED, DURATION, BUFFER_POOL"
-				+ ", TABLESPACE_NAME, COMPRESSION, IOT_TYPE, MAX_EXTENTS" + " from ALL_TABLES where ";
+//		String sql = "select TABLE_NAME AS NAME, OWNER, PCT_FREE, INI_TRANS, LOGGING"
+//				+ ", NUM_ROWS, BLOCKS, AVG_ROW_LEN, SIMPLE_SIZE, LAST_ANALYZED, DURATION, BUFFER_POOL"
+//				+ ", TABLESPACE_NAME, COMPRESSION, IOT_TYPE, MAX_EXTENTS" 
+//				+ " from ALL_TABLES where OWNER = ? and TABLE_NAME = ?";
+		
+		System.out.println(schema);
+		System.out.println(table);
+		String sql = "select * from ALL_TABLES where owner = ? and table_name = ?";
 
 		Map<String, Object> map = new LinkedHashMap<>();
 
@@ -487,10 +480,10 @@ public class DbmsSQL {
 		ResultSet result = null;
 
 		Class.forName(driver);
-//		conn = DriverManager.getConnection(url, sessionService.getSessionDbId(), sessionService.getSessionDbPw());
 		conn = DriverManager.getConnection(url, dto.getDbId(), dto.getDbPw());
 		pre = conn.prepareStatement(sql);
 		pre.setString(1, schema);
+		pre.setString(2, table);
 		result = pre.executeQuery();
 
 		ResultSetMetaData metaData = result.getMetaData();
@@ -501,12 +494,8 @@ public class DbmsSQL {
 			map = new LinkedHashMap<>();
 			for (int i = 0; i < size; i++) {
 				col = metaData.getColumnName(i + 1);
-				// 날짜형식 YYYY-MM-DD 로 고정
-				if (col.equals("CREATED")) {
-					map.put(col, result.getString(col).substring(0, 10));
-				} else {
-					map.put(col, result.getString(col));
-				}
+				map.put(col, result.getString(col));
+				System.out.println(col);
 			}
 		}
 
@@ -624,7 +613,6 @@ public class DbmsSQL {
 	public void userSchedulerSave(String data) throws Exception {
 		String sql = "insert into userScheduler values(USERS_SEQ.NEXTVAL, \'" + data + "\', sysdate, 'N')";
 
-		System.out.println("sql");
 		Connection conn = null;
 		PreparedStatement pre = null;
 
@@ -632,7 +620,6 @@ public class DbmsSQL {
 		conn = DriverManager.getConnection(url, username, password);
 		pre = conn.prepareStatement(sql);
 		pre.executeUpdate();
-		System.out.println("last");
 		pre.close();
 		conn.close();
 

@@ -246,12 +246,12 @@ public class DbmsServiceImpl implements DbmsService {
 		return dbmsSQL.schemaDetailsExtents(schema, dto);
 	}
 
+	// 테이블 디테일 Table 테이블 검색
 	@Override
 	public Map<String, Object> tableDetailsTable(String table, String schema, DbDTO dto) throws ClassNotFoundException, SQLException {
 		Map<String, Object> info = new HashMap<String, Object>();
 		Map<String, Object> result = new HashMap<String, Object>();
 		List<Map<String, Object>> rows = new ArrayList<Map<String, Object>>();
-
 		info = dbmsSQL.tableDetailsTable(table, schema, dto);
 
 		Set<String> parameters = info.keySet();
@@ -263,13 +263,12 @@ public class DbmsServiceImpl implements DbmsService {
 		}
 		result.put("rows", rows);
 		
-		return null;
+		return result;
 	}
 	
 	// 현재 SQL 한줄 실행
 	@Override
 	public Map<String, Object> runCurrentSQL(String sql, int cursor, DbDTO dto) {
-//		if (sessionService.getSessionDbId() == null) {
 		if (dto.getDbId() == null) {
 			return null;
 		}
@@ -294,7 +293,6 @@ public class DbmsServiceImpl implements DbmsService {
 	// 전체 SQL문 실행
 	@Override
 	public List<Map<String, Object>> runAllSQL(String sqls, DbDTO dto) {
-//		if (sessionService.getSessionDbId() == null) {
 		if (dto.getDbId() == null) {
 			return null;
 		}
