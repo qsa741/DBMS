@@ -1,6 +1,7 @@
 package com.jySystem.dbms.controller;
 
 import java.sql.SQLException;
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +22,30 @@ public class TableDetailRestController {
 	public Map<String, Object> tableDetailsTable(String table, String schema, DbDTO dto)
 			throws ClassNotFoundException, SQLException {
 		return dbmsService.tableDetailsTable(table, schema, dto);
+	}
+	
+	@RequestMapping("/tableDetailsColumns")
+	public List<Map<String, Object>> tableDetailsColumns(String table, String schema, DbDTO dto)
+			throws ClassNotFoundException, SQLException {
+		return dbmsService.tableDetailsColumns(table, schema, dto);
+	}
+	
+	@RequestMapping("/tableDetailsIndexesTop")
+	public List<Map<String, Object>> tableDetailsIndexesTop(String table, String schema, DbDTO dto)
+			throws ClassNotFoundException, SQLException {
+		return dbmsService.tableDetailsIndexesTop(table, schema, dto);
+	}
+	
+	@RequestMapping("/tableDetailsIndexesBottom")
+	public Map<String, Object> tableDetailsIndexesBottom(String indexName, DbDTO dto)
+			throws ClassNotFoundException, SQLException {
+		return dbmsService.tableDetailsIndexesBottom(indexName, dto);
+	}
+	
+	@RequestMapping("/tableDetailsConstraints")
+	public List<Map<String, Object>> tableDetailsConstraints(String table, String schema, DbDTO dto)
+			throws ClassNotFoundException, SQLException {
+		return dbmsService.tableDetailsConstraints(table, schema, dto);
 	}
 
 }

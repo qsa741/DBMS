@@ -35,7 +35,7 @@ public class DbmsServiceImpl implements DbmsService {
 	@Override
 	public List<TreeDTO> getAllSchemas(DbDTO dto) throws ClassNotFoundException, SQLException {
 		// DB 아이디가 없을때 null 리턴
-		if (dto.getDbId() == null) {
+		if (dto.getDbId().equals("")) {
 			return null;
 		}
 		return dbmsSQL.allSchemas(dto);
@@ -174,7 +174,7 @@ public class DbmsServiceImpl implements DbmsService {
 			colTreeList.add(tree);
 		}
 		childColumn.setChildren(colTreeList);
-
+		
 		if (constraint.size() > 0) {
 			for (Map<String, Object> c : constraint) {
 				TreeDTO tree = new TreeDTO();
@@ -266,9 +266,61 @@ public class DbmsServiceImpl implements DbmsService {
 		return result;
 	}
 	
+	// 테이블 디테일 Columns 테이블 검색
+	@Override
+	public List<Map<String, Object>> tableDetailsColumns(String table, String schema, DbDTO dto)
+			throws ClassNotFoundException, SQLException {
+		return dbmsSQL.tableDetailsColumns(table, schema, dto);
+	}
+
+	// 테이블 디테일 Indexes Top 테이블 검색
+	@Override
+	public List<Map<String, Object>> tableDetailsIndexesTop(String table, String schema, DbDTO dto)
+			throws ClassNotFoundException, SQLException {
+		return dbmsSQL.tableDetailsIndexesTop(table, schema, dto);
+	}
+	
+	// 테이블 디테일 Indexes Bottom 테이블 검색
+	@Override
+	public Map<String, Object> tableDetailsIndexesBottom(String indexName, DbDTO dto)
+			throws ClassNotFoundException, SQLException {
+		Map<String, Object> info = new HashMap<String, Object>();
+		Map<String, Object> result = new HashMap<String, Object>();
+		List<Map<String, Object>> rows = new ArrayList<Map<String, Object>>();
+		info = dbmsSQL.tableDetailsIndexesBottom(indexName, dto);
+
+		Set<String> parameters = info.keySet();
+		for (String s : parameters) {
+			Map<String, Object> map = new HashMap<String, Object>();
+			map.put("VALUE", info.get(s));
+			s = s.replace("_", " ");
+			String parameter = s.substring(0,1) + s.substring(1).toLowerCase();
+			map.put("PARAMETER", parameter);
+			rows.add(map);
+		}
+		result.put("rows", rows);
+		
+		return result;
+	}
+	
+	// 테이블 디테일 Constraints 테이블 검색
+	@Override
+	public List<Map<String, Object>> tableDetailsConstraints(String table, String schema, DbDTO dto)
+			throws ClassNotFoundException, SQLException {
+		return dbmsSQL.tableDetailsConstraints(table, schema, dto);
+	}
+	
+	// 인덱스 디테일 Columns 테이블 검색
+	@Override
+	public List<Map<String, Object>> indexDetailsColumns(String indexName, DbDTO dto)
+			throws ClassNotFoundException, SQLException {
+		return dbmsSQL.indexDetailsColumns(indexName, dto);
+	}
+	
+	
 	// 현재 SQL 한줄 실행
 	@Override
-	public Map<String, Object> runCurrentSQL(String sql, int cursor, DbDTO dto) {
+	public Map<String, Object> runCurrentSQL(String sql, int cursor, DbDTO dto) throws SQLException{
 		if (dto.getDbId() == null) {
 			return null;
 		}
@@ -292,7 +344,7 @@ public class DbmsServiceImpl implements DbmsService {
 
 	// 전체 SQL문 실행
 	@Override
-	public List<Map<String, Object>> runAllSQL(String sqls, DbDTO dto) {
+	public List<Map<String, Object>> runAllSQL(String sqls, DbDTO dto) throws SQLException {
 		if (dto.getDbId() == null) {
 			return null;
 		}

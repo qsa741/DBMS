@@ -48,7 +48,27 @@ public interface DbmsService {
 	// 테이블 디테일 정보 검색
 	public Map<String, Object> tableDetailsTable(String table, String schema, DbDTO dto)
 			throws ClassNotFoundException, SQLException;
+	
+	// 테이블 디테일 정보 검색
+	public List<Map<String, Object>> tableDetailsColumns(String table, String schema, DbDTO dto)
+			throws ClassNotFoundException, SQLException;
 
+	// 테이블 디테일 정보 검색
+	public List<Map<String, Object>> tableDetailsIndexesTop(String table, String schema, DbDTO dto)
+			throws ClassNotFoundException, SQLException;
+	
+	// 테이블 디테일 정보 검색
+	public Map<String, Object> tableDetailsIndexesBottom(String indexName, DbDTO dto)
+			throws ClassNotFoundException, SQLException;
+	
+	// 테이블 디테일 정보 검색
+	public List<Map<String, Object>> tableDetailsConstraints(String table, String schema, DbDTO dto)
+			throws ClassNotFoundException, SQLException;
+
+	// 인덱스 디테일 정보 검색
+	public List<Map<String, Object>> indexDetailsColumns(String indexName, DbDTO dto)
+			throws ClassNotFoundException, SQLException;
+	
 	// SQL 한줄 실행
 	public Map<String, Object> runCurrentSQL(String sql, int cursor, DbDTO dto) throws ClassNotFoundException, SQLException;
 

@@ -1,5 +1,6 @@
 package com.jySystem.common.scheduler;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -23,6 +24,7 @@ public class ScheduleServiceImpl implements ScheduleService {
 	@Scheduled(cron = "0 0 10 * * *")
 	@Override
 	public void settingUserAction() throws Exception {
+		System.out.println(new Date().toString() + " / Setting User Action Scheduler Execute");
 		networkService.settingUserAction();
 	}
 
@@ -30,6 +32,7 @@ public class ScheduleServiceImpl implements ScheduleService {
 	@Scheduled(cron = "0 5 10 * * *")
 	@Override
 	public void saveActionData() throws Exception {
+		System.out.println(new Date().toString() + " / Save Action Data Scheduler Execute");
 		List<Map<String, Object>> list = schedulerSQL.actionScheduler();
 		Map<String, Object> map;
 		

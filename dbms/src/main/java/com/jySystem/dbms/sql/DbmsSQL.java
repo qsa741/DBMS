@@ -209,9 +209,9 @@ public class DbmsSQL {
 			sql = "SELECT OWNER, TABLE_NAME, COLUMN_NAME, DATA_TYPE, DATA_LENGTH "
 					+ "FROM all_tab_columns WHERE OWNER = ? AND TABLE_NAME = ?";
 		} else if (type.equals("index")) {
-			sql = "SELECT * FROM all_ind_columns WHERE INDEX_OWNER = ? AND TABLE_NAME = ?";
+			sql = "SELECT INDEX_NAME FROM (SELECT * FROM all_ind_columns WHERE INDEX_OWNER = ? AND TABLE_NAME = ?) GROUP BY INDEX_NAME";
 		} else {
-			sql = "SELECT * FROM all_cons_columns WHERE OWNER = ? AND TABLE_NAME =?";
+			sql = "SELECT CONSTRAINT_NAME FROM (SELECT * FROM all_cons_columns WHERE OWNER = ? AND TABLE_NAME = ?) GROUP BY CONSTRAINT_NAME";
 		}
 
 		List<Map<String, Object>> list = new ArrayList<>();
@@ -246,6 +246,36 @@ public class DbmsSQL {
 		conn.close();
 
 		return list;
+	}
+	
+	// 현재 내 권한 조회
+	public String getGrant(DbDTO dto) throws ClassNotFoundException, SQLException {
+		String sql = "SELECT GRANTED_ROLE FROM user_role_privs";
+		String grant = null;
+		
+		Connection conn = null;
+		PreparedStatement pre = null;
+		ResultSet result = null;
+		
+		Class.forName(driver);
+		conn = DriverManager.getConnection(url, dto.getDbId(), dto.getDbPw());
+		pre = conn.prepareStatement(sql);
+		result = pre.executeQuery();
+		
+		while (result.next()) {
+			grant = result.getString(1);
+			// DBA 권한이 있을때 빠져나오기
+			if (grant.equals("DBA")) {
+				break;
+			}
+			grant = "CONNECT";
+		}
+		
+		result.close();
+		pre.close();
+		conn.close();
+		
+		return grant;
 	}
 
 	// 스키마 디테일 Info 조회
@@ -293,36 +323,6 @@ public class DbmsSQL {
 		conn.close();
 
 		return map;
-	}
-
-	// 현재 내 권한 조회
-	public String getGrant(DbDTO dto) throws ClassNotFoundException, SQLException {
-		String sql = "SELECT GRANTED_ROLE FROM user_role_privs";
-		String grant = null;
-
-		Connection conn = null;
-		PreparedStatement pre = null;
-		ResultSet result = null;
-
-		Class.forName(driver);
-		conn = DriverManager.getConnection(url, dto.getDbId(), dto.getDbPw());
-		pre = conn.prepareStatement(sql);
-		result = pre.executeQuery();
-
-		while (result.next()) {
-			grant = result.getString(1);
-			// DBA 권한이 있을때 빠져나오기
-			if (grant.equals("DBA")) {
-				break;
-			}
-			grant = "CONNECT";
-		}
-
-		result.close();
-		pre.close();
-		conn.close();
-
-		return grant;
 	}
 
 	// 스키마 디테일 Role Grants 조회
@@ -464,16 +464,11 @@ public class DbmsSQL {
 	// 테이블 디테일 Table 조회
 	public Map<String, Object> tableDetailsTable(String table, String schema, DbDTO dto)
 			throws ClassNotFoundException, SQLException {
-//		String sql = "select TABLE_NAME AS NAME, OWNER, PCT_FREE, INI_TRANS, LOGGING"
-//				+ ", NUM_ROWS, BLOCKS, AVG_ROW_LEN, SIMPLE_SIZE, LAST_ANALYZED, DURATION, BUFFER_POOL"
-//				+ ", TABLESPACE_NAME, COMPRESSION, IOT_TYPE, MAX_EXTENTS" 
-//				+ " from ALL_TABLES where OWNER = ? and TABLE_NAME = ?";
+		String sql = "select T.TABLE_NAME AS NAME, C.COMMENTS, T.OWNER, T.PCT_FREE, T.INI_TRANS, T.LOGGING, T.NUM_ROWS, T.BLOCKS, T.AVG_ROW_LEN, "
+				+ "T.SAMPLE_SIZE, T.LAST_ANALYZED, T.DURATION, T.BUFFER_POOL, T.TABLESPACE_NAME, T.COMPRESSION, T.IOT_TYPE, T.MAX_EXTENTS "
+				+ " from ALL_TABLES T, ALL_TAB_COMMENTS C where T.OWNER = ? and T.TABLE_NAME = ?";
 		
-		System.out.println(schema);
-		System.out.println(table);
-		String sql = "select * from ALL_TABLES where owner = ? and table_name = ?";
-
-		Map<String, Object> map = new LinkedHashMap<>();
+		Map<String, Object> map = null;
 
 		Connection conn = null;
 		PreparedStatement pre = null;
@@ -495,7 +490,6 @@ public class DbmsSQL {
 			for (int i = 0; i < size; i++) {
 				col = metaData.getColumnName(i + 1);
 				map.put(col, result.getString(col));
-				System.out.println(col);
 			}
 		}
 
@@ -505,10 +499,232 @@ public class DbmsSQL {
 
 		return map;
 	}
+	
+	// 테이블 디테일 Columns 조회
+	public List<Map<String, Object>> tableDetailsColumns(String table, String schema, DbDTO dto)
+			throws ClassNotFoundException, SQLException {
+		String pkSQL = "select acc.column_name from all_constraints ac, all_cons_columns acc "
+				+ "where ac.owner = ? and ac.table_name = ? and ac.con_type = 'PRIMARY KEY' and ac.constraint_name = acc.constraint_name";
+		
+		String sql = "select TC.COLUMN_NAME, TC.COLUMN_ID, TC.DATA_TYPE, TC.NULLABLE, TC.DATA_DEFAULT, CC.COMMENTS "
+				+ "from all_tab_columns TC, all_col_comments CC "
+				+ "where TC.TABLE_NAME = CC.TABLE_NAME and TC.COLUMN_NAME = CC.COLUMN_NAME and TC.owner = ? and TC.TABLE_NAME = ? "
+				+ "order by 2";
+		
+		List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();
+		List<String> pkList = new ArrayList<String>();
+		
+		Map<String, Object> map = new LinkedHashMap<>();
+		
+		Connection conn = null;
+		PreparedStatement pre = null;
+		ResultSet result = null;
+		
+		Class.forName(driver);
+		conn = DriverManager.getConnection(url, dto.getDbId(), dto.getDbPw());
+		
+		// PK 목록 구하기
+		pre = conn.prepareStatement(pkSQL);
+		pre.setString(1, schema);
+		pre.setString(2, table);
+		result = pre.executeQuery();
+		
+		while(result.next()) {
+			pkList.add(result.getString(1));
+		}
+		
+		pre = conn.prepareStatement(sql);
+		pre.setString(1, schema);
+		pre.setString(2, table);
+		result = pre.executeQuery();
+		
+		ResultSetMetaData metaData = result.getMetaData();
+		int size = metaData.getColumnCount();
+		String col;
+		
+		while (result.next()) {
+			map = new LinkedHashMap<>();
+			for (int i = 0; i < size; i++) {
+				col = metaData.getColumnName(i + 1);
+				map.put(col, result.getString(col));
+				if(i == 0) {
+					if(pkList.contains(result.getString(col))) {
+						map.put("PK", "Y");
+					} else {
+						map.put("PK", "");
+					}
+				}
+			}
+			list.add(map);
+		}
+		
+		result.close();
+		pre.close();
+		conn.close();
+		
+		return list;
+	}
+	
+	// 테이블 디테일 Index Top 조회
+	public List<Map<String, Object>> tableDetailsIndexesTop(String table, String schema, DbDTO dto)
+			throws ClassNotFoundException, SQLException {
+		String sql = "select * from all_cons_columns ACC, all_indexes AI "
+				+ "where ACC.owner = ? and ACC.TABLE_NAME = ? and ACC.constraint_name = AI.index_name";
+		
+		List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();
+		
+		Map<String, Object> map = new LinkedHashMap<>();
+		
+		Connection conn = null;
+		PreparedStatement pre = null;
+		ResultSet result = null;
+		
+		Class.forName(driver);
+		conn = DriverManager.getConnection(url, dto.getDbId(), dto.getDbPw());
+		pre = conn.prepareStatement(sql);
+		pre.setString(1, schema);
+		pre.setString(2, table);
+		result = pre.executeQuery();
+		
+		ResultSetMetaData metaData = result.getMetaData();
+		int size = metaData.getColumnCount();
+		String col;
+		
+		while (result.next()) {
+			map = new LinkedHashMap<>();
+			for (int i = 0; i < size; i++) {
+				col = metaData.getColumnName(i + 1);
+				map.put(col, result.getString(col));
+			}
+			list.add(map);
+		}
+		
+		result.close();
+		pre.close();
+		conn.close();
+		
+		return list;
+	}
+	
+	// 테이블 디테일 Index Bottom 조회
+	public Map<String, Object> tableDetailsIndexesBottom(String indexName, DbDTO dto)
+			throws ClassNotFoundException, SQLException {
+		String sql = "select UNIQUENESS, INDEX_NAME, INDEX_TYPE, TABLE_OWNER, TABLE_NAME, TABLE_TYPE, TABLESPACE_NAME, INI_TRANS, PCT_FREE, INITIAL_EXTENT, NEXT_EXTENT, DISTINCT_KEYS "
+				+ " from all_indexes where INDEX_NAME = ?";
+		
+		Map<String, Object> map = new LinkedHashMap<>();
+		
+		Connection conn = null;
+		PreparedStatement pre = null;
+		ResultSet result = null;
+		
+		Class.forName(driver);
+		conn = DriverManager.getConnection(url, dto.getDbId(), dto.getDbPw());
+		pre = conn.prepareStatement(sql);
+		pre.setString(1, indexName);
+		result = pre.executeQuery();
+		
+		ResultSetMetaData metaData = result.getMetaData();
+		int size = metaData.getColumnCount();
+		String col;
+		
+		while (result.next()) {
+			for (int i = 0; i < size; i++) {
+				col = metaData.getColumnName(i + 1);
+				map.put(col, result.getString(col));
+			}
+		}
+		
+		result.close();
+		pre.close();
+		conn.close();
+		
+		return map;
+	}
+	
+	// 테이블 디테일 Index Top 조회
+	public List<Map<String, Object>> tableDetailsConstraints(String table, String schema, DbDTO dto)
+			throws ClassNotFoundException, SQLException {
+		String sql = "select ACC.CONSTRAINT_NAME, AC.CON_TYPE, ACC.COLUMN_NAME, ACC.POSITION, AC.DELETE_RULE, AC.R_CONSTRAINT_NAME, AC.SEARCH_CONDITION, AC.R_OWNER "
+				+ "from ALL_CONS_COLUMNS ACC, ALL_CONSTRAINTS AC where ACC.OWNER = ? and ACC.TABLE_NAME = ? and ACC.CONSTRAINT_NAME = AC.CONSTRAINT_NAME "
+				+ "order by ACC.CONSTRAINT_NAME";
+		
+		List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();
+		
+		Map<String, Object> map = new LinkedHashMap<>();
+		
+		Connection conn = null;
+		PreparedStatement pre = null;
+		ResultSet result = null;
+		
+		Class.forName(driver);
+		conn = DriverManager.getConnection(url, dto.getDbId(), dto.getDbPw());
+		pre = conn.prepareStatement(sql);
+		pre.setString(1, schema);
+		pre.setString(2, table);
+		result = pre.executeQuery();
+		
+		ResultSetMetaData metaData = result.getMetaData();
+		int size = metaData.getColumnCount();
+		String col;
+		
+		while (result.next()) {
+			map = new LinkedHashMap<>();
+			for (int i = 0; i < size; i++) {
+				col = metaData.getColumnName(i + 1);
+				map.put(col, result.getString(col));
+			}
+			list.add(map);
+		}
+		
+		result.close();
+		pre.close();
+		conn.close();
+		
+		return list;
+	}
 
+	// 인덱스 디테일 Columns 조회
+	public List<Map<String, Object>> indexDetailsColumns(String indexName, DbDTO dto)
+			throws ClassNotFoundException, SQLException {
+		String sql = "select * from all_ind_columns WHERE index_name = ?";
+		
+		List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();
+		Map<String, Object> map = new LinkedHashMap<>();
+		
+		Connection conn = null;
+		PreparedStatement pre = null;
+		ResultSet result = null;
+		
+		Class.forName(driver);
+		conn = DriverManager.getConnection(url, dto.getDbId(), dto.getDbPw());
+		pre = conn.prepareStatement(sql);
+		pre.setString(1, indexName);
+		result = pre.executeQuery();
+		
+		ResultSetMetaData metaData = result.getMetaData();
+		int size = metaData.getColumnCount();
+		String col;
+		
+		while (result.next()) {
+			for (int i = 0; i < size; i++) {
+				col = metaData.getColumnName(i + 1);
+				map.put(col, result.getString(col));
+			}
+			list.add(map);
+		}
+		
+		result.close();
+		pre.close();
+		conn.close();
+		
+		return list;
+	}
+	
+	
 	// SQL 한줄 실행
 	@SuppressWarnings("finally")
-	public Map<String, Object> runCurrentSQL(String sql, String type, int index, DbDTO dto) {
+	public Map<String, Object> runCurrentSQL(String sql, String type, int index, DbDTO dto) throws SQLException {
 
 		Map<String, Object> map = new HashMap<String, Object>();
 		List<Map<String, Object>> data = new ArrayList<Map<String, Object>>();
@@ -526,17 +742,19 @@ public class DbmsSQL {
 		PreparedStatement pre = null;
 		ResultSet result = null;
 
+		int size = 0;
 		long startTime = System.nanoTime();
 		try {
 			Class.forName(driver);
 			conn = DriverManager.getConnection(url, dto.getDbId(), dto.getDbPw());
 			pre = conn.prepareStatement(sql);
-
+			
+			
 			// SELECT 일 경우
 			if (type.equals("SELECT")) {
 				result = pre.executeQuery();
 				ResultSetMetaData metaData = result.getMetaData();
-				int size = metaData.getColumnCount();
+				size = metaData.getColumnCount();
 				String col;
 				String[] cols = new String[size];
 
@@ -582,27 +800,18 @@ public class DbmsSQL {
 			row.put("Row", index);
 			row.put("DbmsOutput", e.getMessage());
 			row.put("ExecutionTime", time);
-
+			
 			data.add(row);
 
 			// 에러 메세지를 보내기위해 finally에서 return
 		} finally {
 			if (result != null)
-				try {
-					result.close();
-				} catch (SQLException se) {
-				}
+				result.close();
 			if (pre != null)
-				try {
-					pre.close();
-				} catch (SQLException se) {
-				}
+				pre.close();
 			if (conn != null)
-				try {
-					conn.close();
-				} catch (SQLException se) {
-				}
-
+				conn.close();
+			map.put("size", size);
 			map.put("data", data);
 
 			return map;
