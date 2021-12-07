@@ -722,6 +722,40 @@ public class DbmsSQL {
 		return list;
 	}
 	
+	// 시퀀스 디테일 Info 조회
+	public Map<String, Object> sequenceDetailsInfo(String sequenceName, DbDTO dto) throws SQLException, ClassNotFoundException {
+	String sql = "select INCREMENT_BY, MIN_VALUE, MAX_VALUE, CYCLE_FLAG, LAST_NUMBER, CACHE_SIZE, ORDER_FLAG from all_sequences WHERE sequence_name = ?";
+		
+		Map<String, Object> map = null;
+		
+		Connection conn = null;
+		PreparedStatement pre = null;
+		ResultSet result = null;
+		
+		Class.forName(driver);
+		conn = DriverManager.getConnection(url, dto.getDbId(), dto.getDbPw());
+		pre = conn.prepareStatement(sql);
+		pre.setString(1, sequenceName);
+		result = pre.executeQuery();
+		
+		ResultSetMetaData metaData = result.getMetaData();
+		int size = metaData.getColumnCount();
+		String col;
+		
+		while (result.next()) {
+			map = new LinkedHashMap<>();
+			for (int i = 0; i < size; i++) {
+				col = metaData.getColumnName(i + 1);
+				map.put(col, result.getString(col));
+			}
+		}
+		
+		result.close();
+		pre.close();
+		conn.close();
+		
+		return map;
+	}
 	
 	// SQL 한줄 실행
 	@SuppressWarnings("finally")

@@ -69,6 +69,9 @@ public interface DbmsService {
 	public List<Map<String, Object>> indexDetailsColumns(String indexName, DbDTO dto)
 			throws ClassNotFoundException, SQLException;
 	
+	// 스키마 디테일 정보 검색
+	public Map<String, Object> sequenceDetailsInfo(String sequenceName, DbDTO dto) throws ClassNotFoundException, SQLException;
+	
 	// SQL 한줄 실행
 	public Map<String, Object> runCurrentSQL(String sql, int cursor, DbDTO dto) throws ClassNotFoundException, SQLException;
 

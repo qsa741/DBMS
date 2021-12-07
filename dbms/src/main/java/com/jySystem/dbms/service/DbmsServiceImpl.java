@@ -257,8 +257,10 @@ public class DbmsServiceImpl implements DbmsService {
 		Set<String> parameters = info.keySet();
 		for (String s : parameters) {
 			Map<String, Object> map = new HashMap<String, Object>();
-			map.put("PARAMETER", s);
 			map.put("VALUE", info.get(s));
+			s = s.replace("_", " ");
+			String parameter = s.substring(0,1) + s.substring(1).toLowerCase();
+			map.put("PARAMETER", parameter);
 			rows.add(map);
 		}
 		result.put("rows", rows);
@@ -317,6 +319,28 @@ public class DbmsServiceImpl implements DbmsService {
 		return dbmsSQL.indexDetailsColumns(indexName, dto);
 	}
 	
+	// 시퀀스 디테일 Info 테이블 검색
+	@Override
+	public Map<String, Object> sequenceDetailsInfo(String sequenceName, DbDTO dto)
+			throws ClassNotFoundException, SQLException {
+		Map<String, Object> info = new HashMap<String, Object>();
+		Map<String, Object> result = new HashMap<String, Object>();
+		List<Map<String, Object>> rows = new ArrayList<Map<String, Object>>();
+		info = dbmsSQL.sequenceDetailsInfo(sequenceName, dto);
+
+		Set<String> parameters = info.keySet();
+		for (String s : parameters) {
+			Map<String, Object> map = new HashMap<String, Object>();
+			map.put("VALUE", info.get(s));
+			s = s.replace("_", " ");
+			String parameter = s.substring(0,1) + s.substring(1).toLowerCase();
+			map.put("PARAMETER", parameter);
+			rows.add(map);
+		}
+		result.put("rows", rows);
+		
+		return result;
+	}
 	
 	// 현재 SQL 한줄 실행
 	@Override
