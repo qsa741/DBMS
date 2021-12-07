@@ -690,7 +690,7 @@ public class DbmsSQL {
 		String sql = "select * from all_ind_columns WHERE index_name = ?";
 		
 		List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();
-		Map<String, Object> map = new LinkedHashMap<>();
+		Map<String, Object> map = null;
 		
 		Connection conn = null;
 		PreparedStatement pre = null;
@@ -707,6 +707,7 @@ public class DbmsSQL {
 		String col;
 		
 		while (result.next()) {
+			map = new LinkedHashMap<>();
 			for (int i = 0; i < size; i++) {
 				col = metaData.getColumnName(i + 1);
 				map.put(col, result.getString(col));
