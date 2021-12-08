@@ -147,14 +147,18 @@ public class DbmsServiceImpl implements DbmsService {
 		TreeDTO childConstraint = new TreeDTO();
 		childConstraint.setId("CONSTRAINTS");
 		childConstraint.setText("Constraint (" + constraint.size() + ")");
-		childConstraint.setState("closed");
+		if(constraint.size() != 0) {
+			childConstraint.setState("closed");
+		}
 		childConstraint.setIconCls("tree-constraint");
 		
 		// Index Tree Node 세팅
 		TreeDTO childIndex = new TreeDTO();
 		childIndex.setId("INDEXS");
 		childIndex.setText("Index (" + index.size() + ")");
-		childIndex.setState("closed");
+		if(index.size() != 0) {
+			childIndex.setState("closed");
+		}
 		childIndex.setIconCls("tree-index");
 
 		List<TreeDTO> colTreeList = new ArrayList<>();
@@ -416,7 +420,7 @@ public class DbmsServiceImpl implements DbmsService {
 		
 		// 디자인 관련 초기값 생성자로 세팅
 		ChartDataSetDTO createDataSet = new ChartDataSetDTO("Create","white","red",2);
-		ChartDataSetDTO readDataSet = new ChartDataSetDTO("Read","white","yellow",2);
+		ChartDataSetDTO readDataSet = new ChartDataSetDTO("Read","white","orange",2);
 		ChartDataSetDTO updateDataSet = new ChartDataSetDTO("Update","white","blue",2);
 		ChartDataSetDTO deleteDataSet = new ChartDataSetDTO("Delete","white","black",2);
 		
@@ -500,7 +504,7 @@ public class DbmsServiceImpl implements DbmsService {
 		
 		// 디자인 관련 초기값 생성자로 세팅
 		ChartDataSetDTO createDataSet = new ChartDataSetDTO("Create","white","red",2);
-		ChartDataSetDTO readDataSet = new ChartDataSetDTO("Read","white","yellow",2);
+		ChartDataSetDTO readDataSet = new ChartDataSetDTO("Read","white","orange",2);
 		ChartDataSetDTO updateDataSet = new ChartDataSetDTO("Update","white","blue",2);
 		ChartDataSetDTO deleteDataSet = new ChartDataSetDTO("Delete","white","black",2);
 		

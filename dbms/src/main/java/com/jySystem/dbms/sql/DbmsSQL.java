@@ -51,7 +51,8 @@ public class DbmsSQL {
 		} catch (Exception e) {
 			result = false;
 		} finally {
-			conn.close();
+			if(conn != null)
+				conn.close();
 			return result;
 		}
 	}
@@ -79,6 +80,7 @@ public class DbmsSQL {
 			tree.setId(result.getString(1));
 			tree.setText(result.getString(2));
 			tree.setIconCls(result.getString(3));
+			tree.setState("closed");
 			list.add(tree);
 		}
 
@@ -121,6 +123,9 @@ public class DbmsSQL {
 			String substr1 = objectType.substring(0, 1);
 			String substr2 = objectType.substring(1);
 			tree.setText(substr1 + substr2.toLowerCase() + " (" + result.getInt(1) + ")");
+			if(result.getInt(1) != 0) {
+				tree.setState("closed");
+			}
 		}
 
 		result.close();
@@ -155,7 +160,9 @@ public class DbmsSQL {
 			tree.setId(result.getString(1));
 			tree.setText(result.getString(2));
 			tree.setIconCls(iconCls);
-
+			if(result.getString(1).equals("TABLE")) {
+				tree.setState("closed");
+			}
 			list.add(tree);
 		}
 
