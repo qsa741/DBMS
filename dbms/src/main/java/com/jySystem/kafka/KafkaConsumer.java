@@ -17,7 +17,7 @@ public class KafkaConsumer {
 
 	@Value("${action.agent.id}")
 	private String actionAgentId;
-
+	
 	@Autowired
 	private NetworkServiceImpl networkService;
 
@@ -41,5 +41,4 @@ public class KafkaConsumer {
 			kafkaService.saveActionData(json);
 		}
 	}
-
 }

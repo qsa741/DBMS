@@ -346,6 +346,28 @@ public class DbmsServiceImpl implements DbmsService {
 		return result;
 	}
 	
+	// 뷰 디테일 Columns 테이블 검색
+	@Override
+	public List<Map<String, Object>> viewDetailsColumns(String schema, String viewName, DbDTO dto)
+			throws ClassNotFoundException, SQLException {
+		return dbmsSQL.viewDetailsColumns(schema, viewName, dto);
+	} 
+	
+	// 뷰 디테일 Columns 테이블 검색
+	@Override
+	public List<Map<String, Object>> viewDetailsScript(String schema, String viewName, DbDTO dto)
+			throws ClassNotFoundException, SQLException {
+		return dbmsSQL.viewDetailsScript(schema, viewName, dto);
+	} 
+	
+	// 펀션 디테일 Code 테이블 검색
+	@Override
+	public List<Map<String, Object>> detailsCode(String schema, String name, DbDTO dto, String type)
+			throws ClassNotFoundException, SQLException {
+		return dbmsSQL.detailsCode(schema, name, dto, type);
+	} 
+	
+	
 	// 현재 SQL 한줄 실행
 	@Override
 	public Map<String, Object> runCurrentSQL(String sql, int cursor, DbDTO dto) throws SQLException{

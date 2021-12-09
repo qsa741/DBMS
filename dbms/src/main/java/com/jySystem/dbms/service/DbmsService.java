@@ -72,6 +72,18 @@ public interface DbmsService {
 	// 스키마 디테일 정보 검색
 	public Map<String, Object> sequenceDetailsInfo(String sequenceName, DbDTO dto) throws ClassNotFoundException, SQLException;
 	
+	// 뷰 디테일 정보 검색
+	public List<Map<String, Object>> viewDetailsColumns(String schema, String viewName, DbDTO dto)
+			throws ClassNotFoundException, SQLException;
+
+	// 뷰 디테일 정보 검색
+	public List<Map<String, Object>> viewDetailsScript(String schema, String viewName, DbDTO dto)
+			throws ClassNotFoundException, SQLException;
+	
+	// 펑션 디테일 정보 검색
+	public List<Map<String, Object>> detailsCode(String schema, String name, DbDTO dto, String type)
+			throws ClassNotFoundException, SQLException;
+	
 	// SQL 한줄 실행
 	public Map<String, Object> runCurrentSQL(String sql, int cursor, DbDTO dto) throws ClassNotFoundException, SQLException;
 
