@@ -18,30 +18,35 @@ public class TableDetailRestController {
 	@Autowired
 	private DbmsServiceImpl dbmsService;
 
+	// TABLE 디테일 TABLE 조회
 	@RequestMapping("/tableDetailsTable")
 	public Map<String, Object> tableDetailsTable(String table, String schema, DbDTO dto)
 			throws ClassNotFoundException, SQLException {
 		return dbmsService.tableDetailsTable(table, schema, dto);
 	}
 	
+	// TABLE 디테일 COLUMNS 조회
 	@RequestMapping("/tableDetailsColumns")
 	public List<Map<String, Object>> tableDetailsColumns(String table, String schema, DbDTO dto)
 			throws ClassNotFoundException, SQLException {
 		return dbmsService.tableDetailsColumns(table, schema, dto);
 	}
 	
+	// TABLE 디테일 INDEXES TOP 조회
 	@RequestMapping("/tableDetailsIndexesTop")
 	public List<Map<String, Object>> tableDetailsIndexesTop(String table, String schema, DbDTO dto)
 			throws ClassNotFoundException, SQLException {
 		return dbmsService.tableDetailsIndexesTop(table, schema, dto);
 	}
 	
+	// TABLE 디테일 INDEXES BOTTOM 조회
 	@RequestMapping("/tableDetailsIndexesBottom")
 	public Map<String, Object> tableDetailsIndexesBottom(String indexName, DbDTO dto)
 			throws ClassNotFoundException, SQLException {
 		return dbmsService.tableDetailsIndexesBottom(indexName, dto);
 	}
 	
+	// TABLE 디테일 CONSTRAINTS 조회
 	@RequestMapping("/tableDetailsConstraints")
 	public List<Map<String, Object>> tableDetailsConstraints(String table, String schema, DbDTO dto)
 			throws ClassNotFoundException, SQLException {

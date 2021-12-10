@@ -18,6 +18,7 @@ public class TriggerDetailsRestController {
 	@Autowired
 	private DbmsServiceImpl dbmsService;
 	
+	// TRIGGER 디테일 SOURCE 조회
 	@RequestMapping("/triggerDetailsSource")
 	public List<Map<String, Object>> triggerDetailsSource(String schema, String triggerName, DbDTO dto) throws ClassNotFoundException, SQLException {
 		return dbmsService.detailsCode(schema, triggerName, dto, "TRIGGER");

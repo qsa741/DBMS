@@ -54,7 +54,7 @@ public class SchedulerSQL {
 
 		rs = pre.executeQuery();
 
-		// 데이터가 있다면 Update, 없다면 Insert
+		// 데이터가 있으면 Update, 없으면 Insert
 		if (rs.next()) {
 			pre = conn.prepareStatement(update);
 			pre.setInt(1, json.getInt("count"));

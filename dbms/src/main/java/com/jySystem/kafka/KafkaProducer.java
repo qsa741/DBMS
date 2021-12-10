@@ -7,8 +7,6 @@ import org.springframework.stereotype.Service;
 @Service
 public class KafkaProducer {
 	
-	private static final String TOPIC = "userTopic";
-	
 	private final KafkaTemplate<String, String> kafkaTemplate;
 	
 	@SuppressWarnings({ "rawtypes", "unchecked" })
@@ -17,11 +15,11 @@ public class KafkaProducer {
 		this.kafkaTemplate = kafkaTemplate;
 	}
 	
-	public void sendSSO(String msg) {
-		this.kafkaTemplate.send(TOPIC, msg);
+	public void sendUserSave(String msg) {
+		this.kafkaTemplate.send("userTopic", msg);
 	}
 	
-	public void userAction(String data) {
+	public void sendUserAction(String data) {
 		this.kafkaTemplate.send("actionTopic", data);
 	}
 }

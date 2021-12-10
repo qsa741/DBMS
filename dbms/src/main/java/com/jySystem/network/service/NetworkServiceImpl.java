@@ -54,11 +54,11 @@ public class NetworkServiceImpl implements NetworkService{
 			dbmsSQL.userSchedulerSave((String) data.get("data"));
 		} else if(data.get("type").equals("KAFKA")) {
 			JSONObject json = new JSONObject();
-			json.put("id", saveAgentId);
+			json.put("id", saveAgentId + "-02");
 			json.put("data", (String) data.get("data"));
 			json.put("time", new Date().toString());
 			
-			this.producer.sendSSO(json.toString());
+			this.producer.sendUserSave(json.toString());
 		}
 	}
 	
@@ -74,6 +74,6 @@ public class NetworkServiceImpl implements NetworkService{
 		}
 		json.put("time", new Date().toString());
 		
-		this.producer.userAction(json.toString());
+		this.producer.sendUserAction(json.toString());
 	}
 }

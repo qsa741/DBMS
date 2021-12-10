@@ -18,11 +18,13 @@ public class IndexDetailRestController {
 	@Autowired
 	private DbmsServiceImpl dbmsService;
 	
+	// INDEX 디테일 INDEX 조회
 	@RequestMapping("/indexDetailsIndex")
 	public Map<String, Object> indexDetailsIndex(String indexName, DbDTO dto) throws ClassNotFoundException, SQLException {
 		return dbmsService.tableDetailsIndexesBottom(indexName, dto);
 	}
 	
+	// INDEX 디테일 COLUMNS 조회
 	@RequestMapping("/indexDetailsColumns")
 	public List<Map<String, Object>> indexDetailsColumns(String indexName, DbDTO dto) throws ClassNotFoundException, SQLException {
 		return dbmsService.indexDetailsColumns(indexName, dto);

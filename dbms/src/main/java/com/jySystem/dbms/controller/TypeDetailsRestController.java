@@ -18,6 +18,7 @@ public class TypeDetailsRestController {
 	@Autowired
 	private DbmsServiceImpl dbmsService;
 	
+	// TYPE 디테일 CODE 조회
 	@RequestMapping("/typeDetailsCode")
 	public List<Map<String, Object>> typeDetailsCode(String schema, String typeName, DbDTO dto) throws ClassNotFoundException, SQLException {
 		return dbmsService.detailsCode(schema, typeName, dto, "TYPE");

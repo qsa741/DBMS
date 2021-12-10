@@ -60,8 +60,7 @@ public class DbmsSQL {
 	// 전체 스키마 리스트 조회
 	public List<TreeDTO> allSchemas(DbDTO dto) throws ClassNotFoundException, SQLException {
 		// ID는 SCHEMA로 고정
-		String sql = "SELECT 'SCHEMA' AS ID, USERNAME AS TEXT, 'tree-schema' AS iconCls "
-				+ "FROM ALL_USERS ORDER BY USERNAME";
+		String sql = "SELECT USERNAME AS TEXT FROM ALL_USERS ORDER BY USERNAME";
 
 		List<TreeDTO> list = new ArrayList<TreeDTO>();
 
@@ -77,9 +76,9 @@ public class DbmsSQL {
 
 		while (result.next()) {
 			tree = new TreeDTO();
-			tree.setId(result.getString(1));
-			tree.setText(result.getString(2));
-			tree.setIconCls(result.getString(3));
+			tree.setId("SCHEMA");
+			tree.setText(result.getString(1));
+			tree.setIconCls("tree-schema");
 			tree.setState("closed");
 			list.add(tree);
 		}
@@ -557,6 +556,7 @@ public class DbmsSQL {
 				col = metaData.getColumnName(i + 1);
 				map.put(col, result.getString(col));
 				if (i == 0) {
+					// Column이 PK일 경우 Y로 지정
 					if (pkList.contains(result.getString(col))) {
 						map.put("PK", "Y");
 					} else {
@@ -806,30 +806,30 @@ public class DbmsSQL {
 
 		return list;
 	}
-	
+
 	// 뷰 디테일 Script 조회
 	public List<Map<String, Object>> viewDetailsScript(String schema, String viewName, DbDTO dto)
 			throws ClassNotFoundException, SQLException {
 		String sql = "select TEXT from ALL_VIEWS where owner = ? and view_name = ?";
-		
+
 		List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();
 		Map<String, Object> map = null;
-		
+
 		Connection conn = null;
 		PreparedStatement pre = null;
 		ResultSet result = null;
-		
+
 		Class.forName(driver);
 		conn = DriverManager.getConnection(url, dto.getDbId(), dto.getDbPw());
 		pre = conn.prepareStatement(sql);
 		pre.setString(1, schema);
 		pre.setString(2, viewName);
 		result = pre.executeQuery();
-		
+
 		ResultSetMetaData metaData = result.getMetaData();
 		int size = metaData.getColumnCount();
 		String col;
-		
+
 		while (result.next()) {
 			map = new LinkedHashMap<>();
 			for (int i = 0; i < size; i++) {
@@ -838,27 +838,26 @@ public class DbmsSQL {
 			}
 			list.add(map);
 		}
-		
+
 		result.close();
 		pre.close();
 		conn.close();
-		
+
 		return list;
 	}
 
-	
 	// function, package, type, package body, undefined, trigger, type body 디테일 Code 조회
 	public List<Map<String, Object>> detailsCode(String schema, String name, DbDTO dto, String type)
 			throws ClassNotFoundException, SQLException {
 		String sql = "select * from all_source where owner = ? and type = ? and name = ? order by line";
-		
+
 		List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();
 		Map<String, Object> map = null;
-		
+
 		Connection conn = null;
 		PreparedStatement pre = null;
 		ResultSet result = null;
-		
+
 		Class.forName(driver);
 		conn = DriverManager.getConnection(url, dto.getDbId(), dto.getDbPw());
 		pre = conn.prepareStatement(sql);
@@ -866,11 +865,11 @@ public class DbmsSQL {
 		pre.setString(2, type);
 		pre.setString(3, name);
 		result = pre.executeQuery();
-		
+
 		ResultSetMetaData metaData = result.getMetaData();
 		int size = metaData.getColumnCount();
 		String col;
-		
+
 		while (result.next()) {
 			map = new LinkedHashMap<>();
 			for (int i = 0; i < size; i++) {
@@ -879,14 +878,14 @@ public class DbmsSQL {
 			}
 			list.add(map);
 		}
-		
+
 		result.close();
 		pre.close();
 		conn.close();
-		
+
 		return list;
 	}
-	
+
 	// SQL 한줄 실행
 	@SuppressWarnings("finally")
 	public Map<String, Object> runCurrentSQL(String sql, String type, int index, DbDTO dto) throws SQLException {
@@ -936,7 +935,7 @@ public class DbmsSQL {
 
 				map.put("cols", cols);
 
-				// 그 외 명령어일 경우
+			// 그 외 명령어일 경우
 			} else {
 				int count = pre.executeUpdate();
 				long stopTime = System.nanoTime();
@@ -945,6 +944,7 @@ public class DbmsSQL {
 
 				row.put("Row", index);
 				row.put("ExecutionTime", time);
+				
 				// 결과에 따라 row 등록 DDL DML DCL
 				if (type.equals("CREATE") || type.equals("DROP") || type.equals("ALTER") || type.equals("TRUNCATE")) {
 					row.put("DbmsOutput", type.toLowerCase() + " " + sql.split(" ")[1].toLowerCase() + ".");
@@ -956,7 +956,7 @@ public class DbmsSQL {
 				data.add(row);
 			}
 
-			// 에러 발생시 에러메세지 추가
+		// 에러 발생시 에러메세지 추가
 		} catch (Exception e) {
 			long stopTime = System.nanoTime();
 			double time = (double) (stopTime - startTime) / 1000000;
@@ -967,7 +967,7 @@ public class DbmsSQL {
 
 			data.add(row);
 
-			// 에러 메세지를 보내기위해 finally에서 return
+		// 에러 메세지를 보내기위해 finally에서 return
 		} finally {
 			if (result != null)
 				result.close();

@@ -18,6 +18,7 @@ public class FunctionDetailsRestController {
 	@Autowired
 	private DbmsServiceImpl dbmsService;
 	
+	// FUCTION 디테일 CODE 조회
 	@RequestMapping("/functionDetailsCode")
 	public List<Map<String, Object>> functionDetailsCode(String schema, String functionName, DbDTO dto) throws ClassNotFoundException, SQLException {
 		return dbmsService.detailsCode(schema, functionName, dto, "FUNCTION");

@@ -24,6 +24,7 @@ public class KafkaConsumer {
 	@Autowired
 	private KafkaServiceImpl kafkaService;
 
+	// 유저 정보 토픽(생성 / 수정)
 	@KafkaListener(topics = "userTopic", groupId = "dbms")
 	public void userTopic(String data) throws Exception {
 		JSONObject json = new JSONObject(data);
@@ -32,6 +33,7 @@ public class KafkaConsumer {
 		}
 	}
 
+	// 유저 활동 토픽 (C R U D)
 	@KafkaListener(topics = "actionTopic", groupId = "dbms")
 	public void userAction(String data) throws Exception {
 		JSONObject json = new JSONObject(data);
