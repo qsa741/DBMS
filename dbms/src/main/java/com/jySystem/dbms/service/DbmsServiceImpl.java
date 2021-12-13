@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.configurationprocessor.json.JSONObject;
 import org.springframework.stereotype.Service;
 
+import com.jySystem.common.config.SessionConfig;
 import com.jySystem.dbms.dto.ChartDataSetDTO;
 import com.jySystem.dbms.dto.DbDTO;
 import com.jySystem.dbms.dto.LoadObjectDTO;
@@ -25,47 +26,52 @@ public class DbmsServiceImpl implements DbmsService {
 	@Autowired
 	private DbmsSQL dbmsSQL;
 
+	private SessionConfig session = new SessionConfig();
+
 	// DB 커넥션 테스트
 	@Override
 	public boolean connectionTest(DbDTO dto) throws Exception {
 		return dbmsSQL.connectionTest(dto);
 	}
-	
+
 	// 모든 스키마 정보 불러오기
 	@Override
-	public List<TreeDTO> getAllSchemas(DbDTO dto) throws ClassNotFoundException, SQLException {
+	public List<TreeDTO> getAllSchemas(String userId) throws ClassNotFoundException, SQLException {
+		DbDTO db = session.getSessionID(userId);
+
 		// DB 아이디가 없을때 null 리턴
-		if (dto.getDbId().equals("")) {
+		if (db.getDbId() == null || db.getDbId().equals("")) {
 			return null;
 		}
-		return dbmsSQL.allSchemas(dto);
+		return dbmsSQL.allSchemas(db);
 	}
 
 	// 스키마 내부 항목 불러오기
 	@Override
-	public List<TreeDTO> schemaInfo(String schema, DbDTO dto) throws ClassNotFoundException, SQLException {
+	public List<TreeDTO> schemaInfo(String schema, String userId) throws ClassNotFoundException, SQLException {
 		List<TreeDTO> treeList = new ArrayList<TreeDTO>();
+		DbDTO db = session.getSessionID(userId);
 
-		TreeDTO table = dbmsSQL.schemaInfo(schema, dto, "TABLE");
-		TreeDTO view = dbmsSQL.schemaInfo(schema, dto, "VIEW");
-		TreeDTO synonym = dbmsSQL.schemaInfo(schema, dto, "SYNONYM");
-		TreeDTO function = dbmsSQL.schemaInfo(schema, dto, "FUNCTION");
+		TreeDTO table = dbmsSQL.schemaInfo(schema, "TABLE", db);
+		TreeDTO view = dbmsSQL.schemaInfo(schema, "VIEW", db);
+		TreeDTO synonym = dbmsSQL.schemaInfo(schema, "SYNONYM", db);
+		TreeDTO function = dbmsSQL.schemaInfo(schema, "FUNCTION", db);
 		function.setIconCls("tree-function");
-		TreeDTO procedure = dbmsSQL.schemaInfo(schema, dto, "PROCEDURE");
+		TreeDTO procedure = dbmsSQL.schemaInfo(schema, "PROCEDURE", db);
 		procedure.setIconCls("tree-procedure");
-		TreeDTO pvmPackage = dbmsSQL.schemaInfo(schema, dto, "PACKAGE");
+		TreeDTO pvmPackage = dbmsSQL.schemaInfo(schema, "PACKAGE", db);
 		pvmPackage.setIconCls("tree-package");
-		TreeDTO type = dbmsSQL.schemaInfo(schema, dto, "TYPE");
+		TreeDTO type = dbmsSQL.schemaInfo(schema, "TYPE", db);
 		type.setIconCls("tree-type");
-		TreeDTO trigger = dbmsSQL.schemaInfo(schema, dto, "TRIGGER");
-		TreeDTO index = dbmsSQL.schemaInfo(schema, dto, "INDEX");
-		TreeDTO sequence = dbmsSQL.schemaInfo(schema, dto, "SEQUENCE");
-		TreeDTO dbLink = dbmsSQL.schemaInfo(schema, dto, "DBLINK");
-		TreeDTO mView = dbmsSQL.schemaInfo(schema, dto, "MVIEW");
-		TreeDTO mViewLog = dbmsSQL.schemaInfo(schema, dto, "MVIEWLOG");
-		TreeDTO job = dbmsSQL.schemaInfo(schema, dto, "JOB");
-		TreeDTO library = dbmsSQL.schemaInfo(schema, dto, "LIBRARY");
-		TreeDTO pvm = dbmsSQL.schemaInfo(schema, dto, "PVM");
+		TreeDTO trigger = dbmsSQL.schemaInfo(schema, "TRIGGER", db);
+		TreeDTO index = dbmsSQL.schemaInfo(schema, "INDEX", db);
+		TreeDTO sequence = dbmsSQL.schemaInfo(schema, "SEQUENCE", db);
+		TreeDTO dbLink = dbmsSQL.schemaInfo(schema, "DBLINK", db);
+		TreeDTO mView = dbmsSQL.schemaInfo(schema, "MVIEW", db);
+		TreeDTO mViewLog = dbmsSQL.schemaInfo(schema, "MVIEWLOG", db);
+		TreeDTO job = dbmsSQL.schemaInfo(schema, "JOB", db);
+		TreeDTO library = dbmsSQL.schemaInfo(schema, "LIBRARY", db);
+		TreeDTO pvm = dbmsSQL.schemaInfo(schema, "PVM", db);
 
 		List<TreeDTO> pvmChildren = new ArrayList<TreeDTO>();
 		pvmChildren.add(function);
@@ -92,22 +98,26 @@ public class DbmsServiceImpl implements DbmsService {
 
 	// 오브젝트 불러오기
 	@Override
-	public List<TreeDTO> objectInfo(ObjectDTO object, DbDTO dto) throws ClassNotFoundException, SQLException {
+	public List<TreeDTO> objectInfo(ObjectDTO object, String userId) throws ClassNotFoundException, SQLException {
+		DbDTO db = session.getSessionID(userId);
+
 		// 뒤에 붙은 S 빼고 보내기
 		object.setObject(object.getObject().substring(0, object.getObject().length() - 1));
 
-		return dbmsSQL.objectInfo(object, dto);
+		return dbmsSQL.objectInfo(object, db);
 	}
 
 	// 테이블 정보 불러오기
 	@Override
-	public Map<String, Object> loadObject(LoadObjectDTO dto, DbDTO dbDto) throws ClassNotFoundException, SQLException {
+	public Map<String, Object> loadObject(LoadObjectDTO dto, String userId)
+			throws ClassNotFoundException, SQLException {
 		Map<String, Object> map = new HashMap<>();
+		DbDTO db = session.getSessionID(userId);
 
-		if (dbDto.getDbId() != null) {
+		if (db.getDbId() != null) {
 			if (dto.getObjectType().equals("TABLE")) {
-				List<Map<String, Object>> rows = dbmsSQL.loadObjectTable(dto, dbDto);
-				List<Map<String, Object>> column = dbmsSQL.selectTableChild("column", dto, dbDto);
+				List<Map<String, Object>> rows = dbmsSQL.loadObjectTable(dto, db);
+				List<Map<String, Object>> column = dbmsSQL.selectTableChild("column", dto, db);
 
 				List<String> columnName = new ArrayList<>();
 				for (Map<String, Object> c : column) {
@@ -129,12 +139,14 @@ public class DbmsServiceImpl implements DbmsService {
 
 	// 테이블 자식 정보 불러오기
 	@Override
-	public Map<String, Object> getTableChildren(LoadObjectDTO dto, DbDTO dbDto) throws ClassNotFoundException, SQLException {
+	public Map<String, Object> getTableChildren(LoadObjectDTO dto, String userId)
+			throws ClassNotFoundException, SQLException {
+		DbDTO db = session.getSessionID(userId);
 		Map<String, Object> map = new HashMap<String, Object>();
 		List<TreeDTO> children = new ArrayList<TreeDTO>();
-		List<Map<String, Object>> column = dbmsSQL.selectTableChild("column", dto, dbDto);
-		List<Map<String, Object>> index = dbmsSQL.selectTableChild("index", dto, dbDto);
-		List<Map<String, Object>> constraint = dbmsSQL.selectTableChild("constraint", dto, dbDto);
+		List<Map<String, Object>> column = dbmsSQL.selectTableChild("column", dto, db);
+		List<Map<String, Object>> index = dbmsSQL.selectTableChild("index", dto, db);
+		List<Map<String, Object>> constraint = dbmsSQL.selectTableChild("constraint", dto, db);
 
 		// Column Tree Node 세팅
 		TreeDTO childColumn = new TreeDTO();
@@ -142,21 +154,21 @@ public class DbmsServiceImpl implements DbmsService {
 		childColumn.setText("Column (" + column.size() + ")");
 		childColumn.setState("closed");
 		childColumn.setIconCls("tree-column");
-		
+
 		// Constraint Tree Node 세팅
 		TreeDTO childConstraint = new TreeDTO();
 		childConstraint.setId("CONSTRAINTS");
 		childConstraint.setText("Constraint (" + constraint.size() + ")");
-		if(constraint.size() != 0) {
+		if (constraint.size() != 0) {
 			childConstraint.setState("closed");
 		}
 		childConstraint.setIconCls("tree-constraint");
-		
+
 		// Index Tree Node 세팅
 		TreeDTO childIndex = new TreeDTO();
 		childIndex.setId("INDEXS");
 		childIndex.setText("Index (" + index.size() + ")");
-		if(index.size() != 0) {
+		if (index.size() != 0) {
 			childIndex.setState("closed");
 		}
 		childIndex.setIconCls("tree-index");
@@ -178,7 +190,7 @@ public class DbmsServiceImpl implements DbmsService {
 			colTreeList.add(tree);
 		}
 		childColumn.setChildren(colTreeList);
-		
+
 		if (constraint.size() > 0) {
 			for (Map<String, Object> c : constraint) {
 				TreeDTO tree = new TreeDTO();
@@ -212,13 +224,14 @@ public class DbmsServiceImpl implements DbmsService {
 
 	// 스키마 디테일 Info 데이터
 	@Override
-	public Map<String, Object> schemaDetailsInfo(String schema, DbDTO dto) throws ClassNotFoundException, SQLException {
-
+	public Map<String, Object> schemaDetailsInfo(String schema, String userId)
+			throws ClassNotFoundException, SQLException {
+		DbDTO db = session.getSessionID(userId);
 		Map<String, Object> info = new HashMap<String, Object>();
 		Map<String, Object> result = new HashMap<String, Object>();
 		List<Map<String, Object>> rows = new ArrayList<Map<String, Object>>();
 
-		info = dbmsSQL.schemaDetailsInfo(schema, dto);
+		info = dbmsSQL.schemaDetailsInfo(schema, db);
 
 		Set<String> parameters = info.keySet();
 		for (String s : parameters) {
@@ -234,144 +247,171 @@ public class DbmsServiceImpl implements DbmsService {
 
 	// 스키마 디테일 Role Grants 테이블 검색
 	@Override
-	public List<Map<String, Object>> schemaDetailsRoleGrants(String schema, DbDTO dto) throws ClassNotFoundException, SQLException {
-		return dbmsSQL.schemaDetailsRoleGrants(schema, dto);
+	public List<Map<String, Object>> schemaDetailsRoleGrants(String schema, String userId)
+			throws ClassNotFoundException, SQLException {
+		DbDTO db = session.getSessionID(userId);
+
+		return dbmsSQL.schemaDetailsRoleGrants(schema, db);
 	}
 
 	// 스키마 디테일 System Privileges 테이블 검색
 	@Override
-	public List<Map<String, Object>> schemaDetailsSystemPrivileges(String schema, DbDTO dto) throws ClassNotFoundException, SQLException {
-		return dbmsSQL.schemaDetailsSystemPrivileges(schema, dto);
+	public List<Map<String, Object>> schemaDetailsSystemPrivileges(String schema, String userId)
+			throws ClassNotFoundException, SQLException {
+		DbDTO db = session.getSessionID(userId);
+
+		return dbmsSQL.schemaDetailsSystemPrivileges(schema, db);
 	}
 
 	// 스키마 디테일 Extends 테이블 검색
 	@Override
-	public List<Map<String, Object>> schemaDetailsExtents(String schema, DbDTO dto) throws ClassNotFoundException, SQLException {
-		return dbmsSQL.schemaDetailsExtents(schema, dto);
+	public List<Map<String, Object>> schemaDetailsExtents(String schema, String userId)
+			throws ClassNotFoundException, SQLException {
+		DbDTO db = session.getSessionID(userId);
+
+		return dbmsSQL.schemaDetailsExtents(schema, db);
 	}
 
 	// 테이블 디테일 Table 테이블 검색
 	@Override
-	public Map<String, Object> tableDetailsTable(String table, String schema, DbDTO dto) throws ClassNotFoundException, SQLException {
+	public Map<String, Object> tableDetailsTable(String table, String schema, String userId)
+			throws ClassNotFoundException, SQLException {
+		DbDTO db = session.getSessionID(userId);
 		Map<String, Object> info = new HashMap<String, Object>();
 		Map<String, Object> result = new HashMap<String, Object>();
 		List<Map<String, Object>> rows = new ArrayList<Map<String, Object>>();
-		info = dbmsSQL.tableDetailsTable(table, schema, dto);
+		info = dbmsSQL.tableDetailsTable(table, schema, db);
 
 		Set<String> parameters = info.keySet();
 		for (String s : parameters) {
 			Map<String, Object> map = new HashMap<String, Object>();
 			map.put("VALUE", info.get(s));
 			s = s.replace("_", " ");
-			String parameter = s.substring(0,1) + s.substring(1).toLowerCase();
+			String parameter = s.substring(0, 1) + s.substring(1).toLowerCase();
 			map.put("PARAMETER", parameter);
 			rows.add(map);
 		}
 		result.put("rows", rows);
-		
+
 		return result;
 	}
-	
+
 	// 테이블 디테일 Columns 테이블 검색
 	@Override
-	public List<Map<String, Object>> tableDetailsColumns(String table, String schema, DbDTO dto)
+	public List<Map<String, Object>> tableDetailsColumns(String table, String schema, String userId)
 			throws ClassNotFoundException, SQLException {
-		return dbmsSQL.tableDetailsColumns(table, schema, dto);
+		DbDTO db = session.getSessionID(userId);
+
+		return dbmsSQL.tableDetailsColumns(table, schema, db);
 	}
 
 	// 테이블 디테일 Indexes Top 테이블 검색
 	@Override
-	public List<Map<String, Object>> tableDetailsIndexesTop(String table, String schema, DbDTO dto)
+	public List<Map<String, Object>> tableDetailsIndexesTop(String table, String schema, String userId)
 			throws ClassNotFoundException, SQLException {
-		return dbmsSQL.tableDetailsIndexesTop(table, schema, dto);
+		DbDTO db = session.getSessionID(userId);
+
+		return dbmsSQL.tableDetailsIndexesTop(table, schema, db);
 	}
-	
+
 	// 테이블 디테일 Indexes Bottom 테이블 검색
 	@Override
-	public Map<String, Object> tableDetailsIndexesBottom(String indexName, DbDTO dto)
+	public Map<String, Object> tableDetailsIndexesBottom(String indexName, String userId)
 			throws ClassNotFoundException, SQLException {
+		DbDTO db = session.getSessionID(userId);
 		Map<String, Object> info = new HashMap<String, Object>();
 		Map<String, Object> result = new HashMap<String, Object>();
 		List<Map<String, Object>> rows = new ArrayList<Map<String, Object>>();
-		info = dbmsSQL.tableDetailsIndexesBottom(indexName, dto);
+		info = dbmsSQL.tableDetailsIndexesBottom(indexName, db);
 
 		Set<String> parameters = info.keySet();
 		for (String s : parameters) {
 			Map<String, Object> map = new HashMap<String, Object>();
 			map.put("VALUE", info.get(s));
 			s = s.replace("_", " ");
-			String parameter = s.substring(0,1) + s.substring(1).toLowerCase();
+			String parameter = s.substring(0, 1) + s.substring(1).toLowerCase();
 			map.put("PARAMETER", parameter);
 			rows.add(map);
 		}
 		result.put("rows", rows);
-		
+
 		return result;
 	}
-	
+
 	// 테이블 디테일 Constraints 테이블 검색
 	@Override
-	public List<Map<String, Object>> tableDetailsConstraints(String table, String schema, DbDTO dto)
+	public List<Map<String, Object>> tableDetailsConstraints(String table, String schema, String userId)
 			throws ClassNotFoundException, SQLException {
-		return dbmsSQL.tableDetailsConstraints(table, schema, dto);
+		DbDTO db = session.getSessionID(userId);
+
+		return dbmsSQL.tableDetailsConstraints(table, schema, db);
 	}
-	
+
 	// 인덱스 디테일 Columns 테이블 검색
 	@Override
-	public List<Map<String, Object>> indexDetailsColumns(String indexName, DbDTO dto)
+	public List<Map<String, Object>> indexDetailsColumns(String indexName, String userId)
 			throws ClassNotFoundException, SQLException {
-		return dbmsSQL.indexDetailsColumns(indexName, dto);
+		DbDTO db = session.getSessionID(userId);
+
+		return dbmsSQL.indexDetailsColumns(indexName, db);
 	}
-	
+
 	// 시퀀스 디테일 Info 테이블 검색
 	@Override
-	public Map<String, Object> sequenceDetailsInfo(String sequenceName, DbDTO dto)
+	public Map<String, Object> sequenceDetailsInfo(String sequenceName, String userId)
 			throws ClassNotFoundException, SQLException {
+		DbDTO db = session.getSessionID(userId);
 		Map<String, Object> info = new HashMap<String, Object>();
 		Map<String, Object> result = new HashMap<String, Object>();
 		List<Map<String, Object>> rows = new ArrayList<Map<String, Object>>();
-		info = dbmsSQL.sequenceDetailsInfo(sequenceName, dto);
+		info = dbmsSQL.sequenceDetailsInfo(sequenceName, db);
 
 		Set<String> parameters = info.keySet();
 		for (String s : parameters) {
 			Map<String, Object> map = new HashMap<String, Object>();
 			map.put("VALUE", info.get(s));
 			s = s.replace("_", " ");
-			String parameter = s.substring(0,1) + s.substring(1).toLowerCase();
+			String parameter = s.substring(0, 1) + s.substring(1).toLowerCase();
 			map.put("PARAMETER", parameter);
 			rows.add(map);
 		}
 		result.put("rows", rows);
-		
+
 		return result;
 	}
-	
+
 	// 뷰 디테일 Columns 테이블 검색
 	@Override
-	public List<Map<String, Object>> viewDetailsColumns(String schema, String viewName, DbDTO dto)
+	public List<Map<String, Object>> viewDetailsColumns(String schema, String viewName, String userId)
 			throws ClassNotFoundException, SQLException {
-		return dbmsSQL.viewDetailsColumns(schema, viewName, dto);
-	} 
-	
+		DbDTO db = session.getSessionID(userId);
+
+		return dbmsSQL.viewDetailsColumns(schema, viewName, db);
+	}
+
 	// 뷰 디테일 Columns 테이블 검색
 	@Override
-	public List<Map<String, Object>> viewDetailsScript(String schema, String viewName, DbDTO dto)
+	public List<Map<String, Object>> viewDetailsScript(String schema, String viewName, String userId)
 			throws ClassNotFoundException, SQLException {
-		return dbmsSQL.viewDetailsScript(schema, viewName, dto);
-	} 
-	
+		DbDTO db = session.getSessionID(userId);
+
+		return dbmsSQL.viewDetailsScript(schema, viewName, db);
+	}
+
 	// 펀션 디테일 Code 테이블 검색
 	@Override
-	public List<Map<String, Object>> detailsCode(String schema, String name, DbDTO dto, String type)
+	public List<Map<String, Object>> detailsCode(String schema, String name, String type, String userId)
 			throws ClassNotFoundException, SQLException {
-		return dbmsSQL.detailsCode(schema, name, dto, type);
-	} 
-	
-	
+		DbDTO db = session.getSessionID(userId);
+
+		return dbmsSQL.detailsCode(schema, name, type, db);
+	}
+
 	// 현재 SQL 한줄 실행
 	@Override
-	public Map<String, Object> runCurrentSQL(String sql, int cursor, DbDTO dto) throws SQLException{
-		if (dto.getDbId() == null) {
+	public Map<String, Object> runCurrentSQL(String sql, int cursor, String userId) throws SQLException {
+		DbDTO db = session.getSessionID(userId);
+		if (db.getDbId() == null) {
 			return null;
 		}
 		sql = sql.replace("\r", "").replace("\n", "").replace("\t", "");
@@ -389,13 +429,14 @@ public class DbmsServiceImpl implements DbmsService {
 
 		String type = array[count].split(" ")[0].toUpperCase();
 
-		return dbmsSQL.runCurrentSQL(array[count], type, 1, dto);
+		return dbmsSQL.runCurrentSQL(array[count], type, 1, db);
 	}
 
 	// 전체 SQL문 실행
 	@Override
-	public List<Map<String, Object>> runAllSQL(String sqls, DbDTO dto) throws SQLException {
-		if (dto.getDbId() == null) {
+	public List<Map<String, Object>> runAllSQL(String sqls, String userId) throws SQLException {
+		DbDTO db = session.getSessionID(userId);
+		if (db.getDbId() == null) {
 			return null;
 		}
 		sqls = sqls.replace("\r", "").replace("\n", "").replace("\t", "");
@@ -409,52 +450,52 @@ public class DbmsServiceImpl implements DbmsService {
 			if (!type.equals("SELECT")) {
 				count++;
 			}
-			list.add(dbmsSQL.runCurrentSQL(sql, type, count, dto));
+			list.add(dbmsSQL.runCurrentSQL(sql, type, count, db));
 		}
 
 		return list;
 	}
-	
+
 	// 차트에 들어가는 연도 구하기
 	@Override
 	public List<String> getChartYears() throws ClassNotFoundException, SQLException {
 		return dbmsSQL.getChartYears();
 	}
-	
+
 	// 차트에 해당 연도 데이터가 있는 월 구하기
 	@Override
 	public List<String> getChartMonth(String year) throws ClassNotFoundException, SQLException {
 		return dbmsSQL.getChartMonth(year);
 	}
-	
+
 	// mChart 정보 세팅 : 선택된 연도 데이터 정리
 	@Override
 	public Map<String, Object> mChartInfo(String year) throws Exception {
 		Map<String, Object> result = new HashMap<String, Object>();
-		
+
 		// action별로 데이터 생성
 		List<JSONObject> create = dbmsSQL.getActionData(year, "C");
 		List<JSONObject> read = dbmsSQL.getActionData(year, "R");
 		List<JSONObject> update = dbmsSQL.getActionData(year, "U");
 		List<JSONObject> delete = dbmsSQL.getActionData(year, "D");
-		
-		String[] monthArray = {"01","02","03","04","05","06","07","08","09","10","11","12"};
-		
+
+		String[] monthArray = { "01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12" };
+
 		// 디자인 관련 초기값 생성자로 세팅
-		ChartDataSetDTO createDataSet = new ChartDataSetDTO("Create","white","red",2);
-		ChartDataSetDTO readDataSet = new ChartDataSetDTO("Read","white","orange",2);
-		ChartDataSetDTO updateDataSet = new ChartDataSetDTO("Update","white","blue",2);
-		ChartDataSetDTO deleteDataSet = new ChartDataSetDTO("Delete","white","black",2);
-		
+		ChartDataSetDTO createDataSet = new ChartDataSetDTO("가입", "white", "red", 2);
+		ChartDataSetDTO readDataSet = new ChartDataSetDTO("로그인", "white", "orange", 2);
+		ChartDataSetDTO updateDataSet = new ChartDataSetDTO("수정", "white", "blue", 2);
+		ChartDataSetDTO deleteDataSet = new ChartDataSetDTO("탈퇴", "white", "black", 2);
+
 		List<Map<String, Object>> data = new ArrayList<Map<String, Object>>();
 		data.add(mChartDataSet(create, createDataSet));
 		data.add(mChartDataSet(read, readDataSet));
 		data.add(mChartDataSet(update, updateDataSet));
 		data.add(mChartDataSet(delete, deleteDataSet));
-		
+
 		result.put("labels", monthArray);
 		result.put("datasets", data);
-		
+
 		return result;
 	}
 
@@ -463,109 +504,109 @@ public class DbmsServiceImpl implements DbmsService {
 	public Map<String, Object> mChartDataSet(List<JSONObject> list, ChartDataSetDTO dto) throws Exception {
 		// 1월 ~ 12월
 		int[] monthCount = new int[12];
-		
-		for(JSONObject json : list) {
+
+		for (JSONObject json : list) {
 			int month = json.getInt("MONTH") - 1;
 			monthCount[month] += json.getInt("COUNT");
 		}
-		
+
 		List<Integer> data = new ArrayList<Integer>();
-		
-		for(int num : monthCount) {
+
+		for (int num : monthCount) {
 			data.add(num);
 		}
-		
+
 		Map<String, Object> map = new HashMap<String, Object>();
 		map.put("label", dto.getLabel());
 		map.put("backgroundColor", dto.getBackgroundColor());
 		map.put("borderColor", dto.getBorderColor());
 		map.put("borderWidth", dto.getBorderWidth());
 		map.put("data", data);
-		
+
 		return map;
 	}
-	
+
 	// dChart 차트 정보 세팅
 	@Override
 	public Map<String, Object> dChartInfo(String year, String month) throws Exception {
 		Map<String, Object> result = new HashMap<String, Object>();
-		
+
 		// action별로 데이터 세팅
 		List<JSONObject> create = dbmsSQL.getActionData(year, month, "C");
 		List<JSONObject> read = dbmsSQL.getActionData(year, month, "R");
 		List<JSONObject> update = dbmsSQL.getActionData(year, month, "U");
 		List<JSONObject> delete = dbmsSQL.getActionData(year, month, "D");
-		
+
 		List<String> labels = new ArrayList<String>();
 		// 31일까지 있는 달
-		String[] monthArray = {"01", "03", "05", "07", "08", "10", "12"};
+		String[] monthArray = { "01", "03", "05", "07", "08", "10", "12" };
 		int day = 0;
-		
-		if(Arrays.stream(monthArray).anyMatch(month::equals)) {
+
+		if (Arrays.stream(monthArray).anyMatch(month::equals)) {
 			day = 31;
-		// 2월 (28일까지)
-		} else if(month.equals("02")){
+			// 2월 (28일까지)
+		} else if (month.equals("02")) {
 			day = 28;
 			// 윤년
-			if(Integer.parseInt(year)/4 == 0) {
+			if (Integer.parseInt(year) / 4 == 0) {
 				day += 1;
 			}
-		// 나머지 월
+			// 나머지 월
 		} else {
 			day = 30;
 		}
-		
+
 		// 1자리수의 숫자 앞에 "0" 추가
-		for(int i = 1; i <= day; i++) {
-			if(i/10.0 < 1) {
+		for (int i = 1; i <= day; i++) {
+			if (i / 10.0 < 1) {
 				labels.add("0" + i);
 			} else {
 				labels.add("" + i);
 			}
 		}
-		
+
 		// 디자인 관련 초기값 생성자로 세팅
-		ChartDataSetDTO createDataSet = new ChartDataSetDTO("Create","white","red",2);
-		ChartDataSetDTO readDataSet = new ChartDataSetDTO("Read","white","orange",2);
-		ChartDataSetDTO updateDataSet = new ChartDataSetDTO("Update","white","blue",2);
-		ChartDataSetDTO deleteDataSet = new ChartDataSetDTO("Delete","white","black",2);
-		
+		ChartDataSetDTO createDataSet = new ChartDataSetDTO("가입", "white", "red", 2);
+		ChartDataSetDTO readDataSet = new ChartDataSetDTO("로그인", "white", "orange", 2);
+		ChartDataSetDTO updateDataSet = new ChartDataSetDTO("수정", "white", "blue", 2);
+		ChartDataSetDTO deleteDataSet = new ChartDataSetDTO("탈퇴", "white", "black", 2);
+
 		List<Map<String, Object>> data = new ArrayList<Map<String, Object>>();
 		data.add(dChartDataSet(create, day, createDataSet));
 		data.add(dChartDataSet(read, day, readDataSet));
 		data.add(dChartDataSet(update, day, updateDataSet));
 		data.add(dChartDataSet(delete, day, deleteDataSet));
-		
+
 		result.put("labels", labels);
 		result.put("datasets", data);
-		
+
 		return result;
 	}
-	
+
 	// dChart에 들어갈 데이터 세팅
 	@Override
 	public Map<String, Object> dChartDataSet(List<JSONObject> list, int days, ChartDataSetDTO dto) throws Exception {
 		int[] dayCount = new int[days];
-		
-		for(JSONObject json : list) {
+
+		for (JSONObject json : list) {
 			int day = json.getInt("DAY") - 1;
 			dayCount[day] += json.getInt("COUNT");
 		}
-		
+
 		List<Integer> data = new ArrayList<Integer>();
-		
-		for(int num : dayCount) {
+
+		for (int num : dayCount) {
 			data.add(num);
 		}
-		
+
 		Map<String, Object> map = new HashMap<String, Object>();
 		map.put("label", dto.getLabel());
 		map.put("backgroundColor", dto.getBackgroundColor());
 		map.put("borderColor", dto.getBorderColor());
 		map.put("borderWidth", dto.getBorderWidth());
 		map.put("data", data);
-		
+
 		return map;
 	}
-	
+
 }

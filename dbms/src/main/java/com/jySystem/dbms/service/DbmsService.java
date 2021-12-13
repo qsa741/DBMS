@@ -18,77 +18,83 @@ public interface DbmsService {
 	public boolean connectionTest(DbDTO dto) throws Exception;
 
 	// 모든 스키마 가져오기
-	public List<TreeDTO> getAllSchemas(DbDTO dto) throws ClassNotFoundException, SQLException;
+	public List<TreeDTO> getAllSchemas(String userId) throws ClassNotFoundException, SQLException;
 
 	// 스키마 정보 가져오기
-	public List<TreeDTO> schemaInfo(String schema, DbDTO dto) throws ClassNotFoundException, SQLException;
+	public List<TreeDTO> schemaInfo(String schema, String userId) throws ClassNotFoundException, SQLException;
 
 	// 오브젝트 정보 가져오기
-	public List<TreeDTO> objectInfo(ObjectDTO object, DbDTO dbDto) throws ClassNotFoundException, SQLException;
+	public List<TreeDTO> objectInfo(ObjectDTO object, String userId) throws ClassNotFoundException, SQLException;
 
 	// 테이블 불러오기
-	public Map<String, Object> loadObject(LoadObjectDTO dto, DbDTO dbDto) throws ClassNotFoundException, SQLException;
+	public Map<String, Object> loadObject(LoadObjectDTO dto, String userId) throws ClassNotFoundException, SQLException;
 
 	// 테이블 자식 정보 불러오기
-	public Map<String, Object> getTableChildren(LoadObjectDTO dto, DbDTO dbDto) throws ClassNotFoundException, SQLException;
-
-	// 스키마 디테일 정보 검색
-	public Map<String, Object> schemaDetailsInfo(String schema, DbDTO dto) throws ClassNotFoundException, SQLException;
-
-	// 스키마 디테일 정보 검색
-	public List<Map<String, Object>> schemaDetailsRoleGrants(String schema, DbDTO dto) throws ClassNotFoundException, SQLException;
-
-	// 스키마 디테일 정보 검색
-	public List<Map<String, Object>> schemaDetailsSystemPrivileges(String schema, DbDTO dto)
+	public Map<String, Object> getTableChildren(LoadObjectDTO dto, String userId)
 			throws ClassNotFoundException, SQLException;
 
 	// 스키마 디테일 정보 검색
-	public List<Map<String, Object>> schemaDetailsExtents(String schema, DbDTO dto) throws ClassNotFoundException, SQLException;
-
-	// 테이블 디테일 정보 검색
-	public Map<String, Object> tableDetailsTable(String table, String schema, DbDTO dto)
-			throws ClassNotFoundException, SQLException;
-	
-	// 테이블 디테일 정보 검색
-	public List<Map<String, Object>> tableDetailsColumns(String table, String schema, DbDTO dto)
+	public Map<String, Object> schemaDetailsInfo(String schema, String userId)
 			throws ClassNotFoundException, SQLException;
 
-	// 테이블 디테일 정보 검색
-	public List<Map<String, Object>> tableDetailsIndexesTop(String table, String schema, DbDTO dto)
+	// 스키마 디테일 정보 검색
+	public List<Map<String, Object>> schemaDetailsRoleGrants(String schema, String userId)
 			throws ClassNotFoundException, SQLException;
-	
-	// 테이블 디테일 정보 검색
-	public Map<String, Object> tableDetailsIndexesBottom(String indexName, DbDTO dto)
+
+	// 스키마 디테일 정보 검색
+	public List<Map<String, Object>> schemaDetailsSystemPrivileges(String schema, String userId)
 			throws ClassNotFoundException, SQLException;
-	
+
+	// 스키마 디테일 정보 검색
+	public List<Map<String, Object>> schemaDetailsExtents(String schema, String userId)
+			throws ClassNotFoundException, SQLException;
+
 	// 테이블 디테일 정보 검색
-	public List<Map<String, Object>> tableDetailsConstraints(String table, String schema, DbDTO dto)
+	public Map<String, Object> tableDetailsTable(String table, String schema, String userId)
+			throws ClassNotFoundException, SQLException;
+
+	// 테이블 디테일 정보 검색
+	public List<Map<String, Object>> tableDetailsColumns(String table, String schema, String userId)
+			throws ClassNotFoundException, SQLException;
+
+	// 테이블 디테일 정보 검색
+	public List<Map<String, Object>> tableDetailsIndexesTop(String table, String schema, String userId)
+			throws ClassNotFoundException, SQLException;
+
+	// 테이블 디테일 정보 검색
+	public Map<String, Object> tableDetailsIndexesBottom(String indexName, String userId)
+			throws ClassNotFoundException, SQLException;
+
+	// 테이블 디테일 정보 검색
+	public List<Map<String, Object>> tableDetailsConstraints(String table, String schema, String userId)
 			throws ClassNotFoundException, SQLException;
 
 	// 인덱스 디테일 정보 검색
-	public List<Map<String, Object>> indexDetailsColumns(String indexName, DbDTO dto)
+	public List<Map<String, Object>> indexDetailsColumns(String indexName, String userId)
 			throws ClassNotFoundException, SQLException;
-	
+
 	// 스키마 디테일 정보 검색
-	public Map<String, Object> sequenceDetailsInfo(String sequenceName, DbDTO dto) throws ClassNotFoundException, SQLException;
-	
-	// 뷰 디테일 정보 검색
-	public List<Map<String, Object>> viewDetailsColumns(String schema, String viewName, DbDTO dto)
+	public Map<String, Object> sequenceDetailsInfo(String sequenceName, String userId)
 			throws ClassNotFoundException, SQLException;
 
 	// 뷰 디테일 정보 검색
-	public List<Map<String, Object>> viewDetailsScript(String schema, String viewName, DbDTO dto)
+	public List<Map<String, Object>> viewDetailsColumns(String schema, String viewName, String userId)
 			throws ClassNotFoundException, SQLException;
-	
+
+	// 뷰 디테일 정보 검색
+	public List<Map<String, Object>> viewDetailsScript(String schema, String viewName, String userId)
+			throws ClassNotFoundException, SQLException;
+
 	// 펑션 디테일 정보 검색
-	public List<Map<String, Object>> detailsCode(String schema, String name, DbDTO dto, String type)
+	public List<Map<String, Object>> detailsCode(String schema, String name, String type, String userId)
 			throws ClassNotFoundException, SQLException;
-	
+
 	// SQL 한줄 실행
-	public Map<String, Object> runCurrentSQL(String sql, int cursor, DbDTO dto) throws ClassNotFoundException, SQLException;
+	public Map<String, Object> runCurrentSQL(String sql, int cursor, String userId)
+			throws ClassNotFoundException, SQLException;
 
 	// SQL 전체 실행
-	public List<Map<String, Object>> runAllSQL(String sql, DbDTO dto) throws ClassNotFoundException, SQLException;
+	public List<Map<String, Object>> runAllSQL(String sql, String userId) throws ClassNotFoundException, SQLException;
 
 	// 차트 연도 가져오기
 	public List<String> getChartYears() throws ClassNotFoundException, SQLException;

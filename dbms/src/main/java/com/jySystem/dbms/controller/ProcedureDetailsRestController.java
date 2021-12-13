@@ -8,7 +8,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.jySystem.dbms.dto.DbDTO;
 import com.jySystem.dbms.service.DbmsServiceImpl;
 
 @RestController
@@ -17,10 +16,11 @@ public class ProcedureDetailsRestController {
 
 	@Autowired
 	private DbmsServiceImpl dbmsService;
-	
+
 	// PROCEDURE 디테일 CODE 조회
 	@RequestMapping("/procedureDetailsCode")
-	public List<Map<String, Object>> procedureDetailsCode(String schema, String procedureName, DbDTO dto) throws ClassNotFoundException, SQLException {
-		return dbmsService.detailsCode(schema, procedureName, dto, "PROCEDURE");
+	public List<Map<String, Object>> procedureDetailsCode(String schema, String procedureName, String userId)
+			throws ClassNotFoundException, SQLException {
+		return dbmsService.detailsCode(schema, procedureName, "PROCEDURE", userId);
 	}
 }

@@ -8,7 +8,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.jySystem.dbms.dto.DbDTO;
 import com.jySystem.dbms.service.DbmsServiceImpl;
 
 @RestController
@@ -17,10 +16,11 @@ public class TriggerDetailsRestController {
 
 	@Autowired
 	private DbmsServiceImpl dbmsService;
-	
+
 	// TRIGGER 디테일 SOURCE 조회
 	@RequestMapping("/triggerDetailsSource")
-	public List<Map<String, Object>> triggerDetailsSource(String schema, String triggerName, DbDTO dto) throws ClassNotFoundException, SQLException {
-		return dbmsService.detailsCode(schema, triggerName, dto, "TRIGGER");
+	public List<Map<String, Object>> triggerDetailsSource(String schema, String triggerName, String userId)
+			throws ClassNotFoundException, SQLException {
+		return dbmsService.detailsCode(schema, triggerName, "TRIGGER", userId);
 	}
 }

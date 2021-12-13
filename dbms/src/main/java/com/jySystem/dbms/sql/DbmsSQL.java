@@ -58,7 +58,7 @@ public class DbmsSQL {
 	}
 
 	// 전체 스키마 리스트 조회
-	public List<TreeDTO> allSchemas(DbDTO dto) throws ClassNotFoundException, SQLException {
+	public List<TreeDTO> allSchemas(DbDTO db) throws ClassNotFoundException, SQLException {
 		// ID는 SCHEMA로 고정
 		String sql = "SELECT USERNAME AS TEXT FROM ALL_USERS ORDER BY USERNAME";
 
@@ -69,7 +69,7 @@ public class DbmsSQL {
 		ResultSet result = null;
 
 		Class.forName(driver);
-		conn = DriverManager.getConnection(url, dto.getDbId(), dto.getDbPw());
+		conn = DriverManager.getConnection(url, db.getDbId(), db.getDbPw());
 		pre = conn.prepareStatement(sql);
 		result = pre.executeQuery();
 		TreeDTO tree;
@@ -80,6 +80,7 @@ public class DbmsSQL {
 			tree.setText(result.getString(1));
 			tree.setIconCls("tree-schema");
 			tree.setState("closed");
+			tree.setChildren(null);
 			list.add(tree);
 		}
 
@@ -91,7 +92,7 @@ public class DbmsSQL {
 	}
 
 	// 스키마 항목 카운트 조회
-	public TreeDTO schemaInfo(String owner, DbDTO dto, String objectType) throws ClassNotFoundException, SQLException {
+	public TreeDTO schemaInfo(String owner, String objectType, DbDTO db) throws ClassNotFoundException, SQLException {
 		String sql = "SELECT COUNT(*) FROM all_objects WHERE OWNER = ? AND OBJECT_TYPE = ?";
 
 		TreeDTO tree = new TreeDTO();
@@ -110,7 +111,7 @@ public class DbmsSQL {
 		}
 
 		Class.forName(driver);
-		conn = DriverManager.getConnection(url, dto.getDbId(), dto.getDbPw());
+		conn = DriverManager.getConnection(url, db.getDbId(), db.getDbPw());
 		pre = conn.prepareStatement(sql);
 		pre.setString(1, owner);
 		pre.setString(2, objectType);
@@ -124,6 +125,7 @@ public class DbmsSQL {
 			tree.setText(substr1 + substr2.toLowerCase() + " (" + result.getInt(1) + ")");
 			if (result.getInt(1) != 0) {
 				tree.setState("closed");
+				tree.setChildren(null);
 			}
 		}
 
@@ -135,7 +137,7 @@ public class DbmsSQL {
 	}
 
 	// 오브젝트 항목 조회
-	public List<TreeDTO> objectInfo(ObjectDTO dto, DbDTO dbDto) throws ClassNotFoundException, SQLException {
+	public List<TreeDTO> objectInfo(ObjectDTO dto, DbDTO db) throws ClassNotFoundException, SQLException {
 		String sql = "SELECT OBJECT_TYPE, OBJECT_NAME FROM all_objects WHERE OWNER = ? AND OBJECT_TYPE = ?";
 		String iconCls = "tree-" + dto.getObject().toLowerCase();
 
@@ -147,7 +149,7 @@ public class DbmsSQL {
 		ResultSet result = null;
 
 		Class.forName(driver);
-		conn = DriverManager.getConnection(url, dbDto.getDbId(), dbDto.getDbPw());
+		conn = DriverManager.getConnection(url, db.getDbId(), db.getDbPw());
 		pre = conn.prepareStatement(sql);
 		pre.setString(1, dto.getId());
 		pre.setString(2, dto.getObject());
@@ -173,7 +175,7 @@ public class DbmsSQL {
 	}
 
 	// Table 불러오기
-	public List<Map<String, Object>> loadObjectTable(LoadObjectDTO dto, DbDTO dbDto)
+	public List<Map<String, Object>> loadObjectTable(LoadObjectDTO dto, DbDTO db)
 			throws SQLException, ClassNotFoundException {
 		String sql = "SELECT * FROM " + dto.getSchema() + "." + dto.getObjectName();
 		List<Map<String, Object>> list = new ArrayList<>();
@@ -183,7 +185,7 @@ public class DbmsSQL {
 		ResultSet result = null;
 
 		Class.forName(driver);
-		conn = DriverManager.getConnection(url, dbDto.getDbId(), dbDto.getDbPw());
+		conn = DriverManager.getConnection(url, db.getDbId(), db.getDbPw());
 		pre = conn.prepareStatement(sql);
 		result = pre.executeQuery();
 
@@ -209,7 +211,7 @@ public class DbmsSQL {
 	}
 
 	// Table 하위 목록 조회 (column, constraint, index)
-	public List<Map<String, Object>> selectTableChild(String type, LoadObjectDTO dto, DbDTO dbDto)
+	public List<Map<String, Object>> selectTableChild(String type, LoadObjectDTO dto, DbDTO db)
 			throws ClassNotFoundException, SQLException {
 		String sql = "";
 		if (type.equals("column")) {
@@ -228,7 +230,7 @@ public class DbmsSQL {
 		ResultSet result = null;
 
 		Class.forName(driver);
-		conn = DriverManager.getConnection(url, dbDto.getDbId(), dbDto.getDbPw());
+		conn = DriverManager.getConnection(url, db.getDbId(), db.getDbPw());
 		pre = conn.prepareStatement(sql);
 		pre.setString(1, dto.getSchema());
 		pre.setString(2, dto.getObjectName());
@@ -256,7 +258,7 @@ public class DbmsSQL {
 	}
 
 	// 현재 내 권한 조회
-	public String getGrant(DbDTO dto) throws ClassNotFoundException, SQLException {
+	public String getGrant(DbDTO db) throws ClassNotFoundException, SQLException {
 		String sql = "SELECT GRANTED_ROLE FROM user_role_privs";
 		String grant = null;
 
@@ -265,7 +267,7 @@ public class DbmsSQL {
 		ResultSet result = null;
 
 		Class.forName(driver);
-		conn = DriverManager.getConnection(url, dto.getDbId(), dto.getDbPw());
+		conn = DriverManager.getConnection(url, db.getDbId(), db.getDbPw());
 		pre = conn.prepareStatement(sql);
 		result = pre.executeQuery();
 
@@ -286,13 +288,13 @@ public class DbmsSQL {
 	}
 
 	// 스키마 디테일 Info 조회
-	public Map<String, Object> schemaDetailsInfo(String schema, DbDTO dto) throws ClassNotFoundException, SQLException {
+	public Map<String, Object> schemaDetailsInfo(String schema, DbDTO db) throws ClassNotFoundException, SQLException {
 		String sql = "SELECT * FROM all_users WHERE USERNAME = ?";
-		if (getGrant(dto).equals("DBA")) {
+		if (getGrant(db).equals("DBA")) {
 			sql = "SELECT USERNAME, USER_ID, ACCOUNT_STATUS, LOCK_DATE, EXPIRY_DATE, DEFAULT_TABLESPACE, CREATED "
 					+ "FROM dba_users WHERE USERNAME = ?";
 			// 권한이 DBA가 아닐때 자기 자신 조회시 추가 정보있음
-		} else if (schema.equals(dto.getDbId().toUpperCase())) {
+		} else if (schema.equals(db.getDbId().toUpperCase())) {
 			sql = "SELECT * FROM USER_USERS WHERE USERNAME = ?";
 		}
 
@@ -303,7 +305,7 @@ public class DbmsSQL {
 		ResultSet result = null;
 
 		Class.forName(driver);
-		conn = DriverManager.getConnection(url, dto.getDbId(), dto.getDbPw());
+		conn = DriverManager.getConnection(url, db.getDbId(), db.getDbPw());
 		pre = conn.prepareStatement(sql);
 		pre.setString(1, schema);
 		result = pre.executeQuery();
@@ -333,10 +335,10 @@ public class DbmsSQL {
 	}
 
 	// 스키마 디테일 Role Grants 조회
-	public List<Map<String, Object>> schemaDetailsRoleGrants(String schema, DbDTO dto)
+	public List<Map<String, Object>> schemaDetailsRoleGrants(String schema, DbDTO db)
 			throws ClassNotFoundException, SQLException {
 		String sql = "SELECT * FROM user_role_privs WHERE GRANTEE = ?";
-		if (getGrant(dto).equals("DBA")) {
+		if (getGrant(db).equals("DBA")) {
 			sql = "SELECT * FROM dba_role_privs WHERE GRANTEE = ?";
 		}
 
@@ -347,7 +349,7 @@ public class DbmsSQL {
 		ResultSet result = null;
 
 		Class.forName(driver);
-		conn = DriverManager.getConnection(url, dto.getDbId(), dto.getDbPw());
+		conn = DriverManager.getConnection(url, db.getDbId(), db.getDbPw());
 		pre = conn.prepareStatement(sql);
 		pre.setString(1, schema);
 		result = pre.executeQuery();
@@ -375,10 +377,10 @@ public class DbmsSQL {
 	}
 
 	// 스키마 디테일 System Privileges 조회
-	public List<Map<String, Object>> schemaDetailsSystemPrivileges(String schema, DbDTO dto)
+	public List<Map<String, Object>> schemaDetailsSystemPrivileges(String schema, DbDTO db)
 			throws ClassNotFoundException, SQLException {
 		String sql = "SELECT PRIVILEGE, ADMIN_OPTION, USERNAME AS GRANTEE, 'USER' AS TYPE FROM user_sys_privs WHERE USERNAME = ?";
-		if (getGrant(dto).equals("DBA")) {
+		if (getGrant(db).equals("DBA")) {
 			sql = "SELECT PRIVILEGE, ADMIN_OPTION, GRANTEE, 'USER' AS TYPE FROM dba_sys_privs WHERE GRANTEE = ?";
 		}
 
@@ -389,7 +391,7 @@ public class DbmsSQL {
 		ResultSet result = null;
 
 		Class.forName(driver);
-		conn = DriverManager.getConnection(url, dto.getDbId(), dto.getDbPw());
+		conn = DriverManager.getConnection(url, db.getDbId(), db.getDbPw());
 		pre = conn.prepareStatement(sql);
 		pre.setString(1, schema);
 		result = pre.executeQuery();
@@ -422,10 +424,10 @@ public class DbmsSQL {
 	}
 
 	// 스키마 디테일 Extends 조회
-	public List<Map<String, Object>> schemaDetailsExtents(String schema, DbDTO dto)
+	public List<Map<String, Object>> schemaDetailsExtents(String schema, DbDTO db)
 			throws ClassNotFoundException, SQLException {
 		String sql = "SELECT SEGMENT_TYPE AS TABLESPACE, '' AS SEGMENT_NAME, SEGMENT_NAME AS OBJECT_NAME, '' AS FILE_ID, '' AS BLOCK_ID, BLOCKS FROM user_extents ORDER BY SEGMENT_NAME";
-		String grant = getGrant(dto);
+		String grant = getGrant(db);
 		if (grant.equals("DBA")) {
 			sql = "SELECT SEGMENT_TYPE AS TABLESPACE, '' AS SEGMENT_NAME, SEGMENT_NAME AS OBJECT_NAME, FILE_ID, BLOCK_ID, BLOCKS FROM dba_extents WHERE OWNER = ? ORDER BY SEGMENT_NAME";
 		}
@@ -436,7 +438,7 @@ public class DbmsSQL {
 		ResultSet result = null;
 
 		Class.forName(driver);
-		conn = DriverManager.getConnection(url, dto.getDbId(), dto.getDbPw());
+		conn = DriverManager.getConnection(url, db.getDbId(), db.getDbPw());
 		pre = conn.prepareStatement(sql);
 		if (grant.equals("DBA")) {
 			pre.setString(1, schema);
@@ -458,7 +460,7 @@ public class DbmsSQL {
 			list.add(map);
 		}
 		// 권한이 DBA가 아니고 ID와 스키마가 다를경우 빈칸으로 리턴
-		if (!grant.equals("DBA") && !schema.equals(dto.getDbId().toUpperCase())) {
+		if (!grant.equals("DBA") && !schema.equals(db.getDbId().toUpperCase())) {
 			list = new ArrayList<Map<String, Object>>();
 		}
 
@@ -470,7 +472,7 @@ public class DbmsSQL {
 	}
 
 	// 테이블 디테일 Table 조회
-	public Map<String, Object> tableDetailsTable(String table, String schema, DbDTO dto)
+	public Map<String, Object> tableDetailsTable(String table, String schema, DbDTO db)
 			throws ClassNotFoundException, SQLException {
 		String sql = "select T.TABLE_NAME AS NAME, C.COMMENTS, T.OWNER, T.PCT_FREE, T.INI_TRANS, T.LOGGING, T.NUM_ROWS, T.BLOCKS, T.AVG_ROW_LEN, "
 				+ "T.SAMPLE_SIZE, T.LAST_ANALYZED, T.DURATION, T.BUFFER_POOL, T.TABLESPACE_NAME, T.COMPRESSION, T.IOT_TYPE, T.MAX_EXTENTS "
@@ -483,7 +485,7 @@ public class DbmsSQL {
 		ResultSet result = null;
 
 		Class.forName(driver);
-		conn = DriverManager.getConnection(url, dto.getDbId(), dto.getDbPw());
+		conn = DriverManager.getConnection(url, db.getDbId(), db.getDbPw());
 		pre = conn.prepareStatement(sql);
 		pre.setString(1, schema);
 		pre.setString(2, table);
@@ -509,7 +511,7 @@ public class DbmsSQL {
 	}
 
 	// 테이블 디테일 Columns 조회
-	public List<Map<String, Object>> tableDetailsColumns(String table, String schema, DbDTO dto)
+	public List<Map<String, Object>> tableDetailsColumns(String table, String schema, DbDTO db)
 			throws ClassNotFoundException, SQLException {
 		String pkSQL = "select acc.column_name from all_constraints ac, all_cons_columns acc "
 				+ "where ac.owner = ? and ac.table_name = ? and ac.con_type = 'PRIMARY KEY' and ac.constraint_name = acc.constraint_name";
@@ -529,7 +531,7 @@ public class DbmsSQL {
 		ResultSet result = null;
 
 		Class.forName(driver);
-		conn = DriverManager.getConnection(url, dto.getDbId(), dto.getDbPw());
+		conn = DriverManager.getConnection(url, db.getDbId(), db.getDbPw());
 
 		// PK 목록 구하기
 		pre = conn.prepareStatement(pkSQL);
@@ -575,7 +577,7 @@ public class DbmsSQL {
 	}
 
 	// 테이블 디테일 Index Top 조회
-	public List<Map<String, Object>> tableDetailsIndexesTop(String table, String schema, DbDTO dto)
+	public List<Map<String, Object>> tableDetailsIndexesTop(String table, String schema, DbDTO db)
 			throws ClassNotFoundException, SQLException {
 		String sql = "select * from all_cons_columns ACC, all_indexes AI "
 				+ "where ACC.owner = ? and ACC.TABLE_NAME = ? and ACC.constraint_name = AI.index_name";
@@ -589,7 +591,7 @@ public class DbmsSQL {
 		ResultSet result = null;
 
 		Class.forName(driver);
-		conn = DriverManager.getConnection(url, dto.getDbId(), dto.getDbPw());
+		conn = DriverManager.getConnection(url, db.getDbId(), db.getDbPw());
 		pre = conn.prepareStatement(sql);
 		pre.setString(1, schema);
 		pre.setString(2, table);
@@ -616,7 +618,7 @@ public class DbmsSQL {
 	}
 
 	// 테이블 디테일 Index Bottom 조회
-	public Map<String, Object> tableDetailsIndexesBottom(String indexName, DbDTO dto)
+	public Map<String, Object> tableDetailsIndexesBottom(String indexName, DbDTO db)
 			throws ClassNotFoundException, SQLException {
 		String sql = "select UNIQUENESS, INDEX_NAME, INDEX_TYPE, TABLE_OWNER, TABLE_NAME, TABLE_TYPE, TABLESPACE_NAME, INI_TRANS, PCT_FREE, INITIAL_EXTENT, NEXT_EXTENT, DISTINCT_KEYS "
 				+ " from all_indexes where INDEX_NAME = ?";
@@ -628,7 +630,7 @@ public class DbmsSQL {
 		ResultSet result = null;
 
 		Class.forName(driver);
-		conn = DriverManager.getConnection(url, dto.getDbId(), dto.getDbPw());
+		conn = DriverManager.getConnection(url, db.getDbId(), db.getDbPw());
 		pre = conn.prepareStatement(sql);
 		pre.setString(1, indexName);
 		result = pre.executeQuery();
@@ -652,7 +654,7 @@ public class DbmsSQL {
 	}
 
 	// 테이블 디테일 Index Top 조회
-	public List<Map<String, Object>> tableDetailsConstraints(String table, String schema, DbDTO dto)
+	public List<Map<String, Object>> tableDetailsConstraints(String table, String schema, DbDTO db)
 			throws ClassNotFoundException, SQLException {
 		String sql = "select ACC.CONSTRAINT_NAME, AC.CON_TYPE, ACC.COLUMN_NAME, ACC.POSITION, AC.DELETE_RULE, AC.R_CONSTRAINT_NAME, AC.SEARCH_CONDITION, AC.R_OWNER "
 				+ "from ALL_CONS_COLUMNS ACC, ALL_CONSTRAINTS AC where ACC.OWNER = ? and ACC.TABLE_NAME = ? and ACC.CONSTRAINT_NAME = AC.CONSTRAINT_NAME "
@@ -667,7 +669,7 @@ public class DbmsSQL {
 		ResultSet result = null;
 
 		Class.forName(driver);
-		conn = DriverManager.getConnection(url, dto.getDbId(), dto.getDbPw());
+		conn = DriverManager.getConnection(url, db.getDbId(), db.getDbPw());
 		pre = conn.prepareStatement(sql);
 		pre.setString(1, schema);
 		pre.setString(2, table);
@@ -694,7 +696,7 @@ public class DbmsSQL {
 	}
 
 	// 인덱스 디테일 Columns 조회
-	public List<Map<String, Object>> indexDetailsColumns(String indexName, DbDTO dto)
+	public List<Map<String, Object>> indexDetailsColumns(String indexName, DbDTO db)
 			throws ClassNotFoundException, SQLException {
 		String sql = "select * from all_ind_columns WHERE index_name = ?";
 
@@ -706,7 +708,7 @@ public class DbmsSQL {
 		ResultSet result = null;
 
 		Class.forName(driver);
-		conn = DriverManager.getConnection(url, dto.getDbId(), dto.getDbPw());
+		conn = DriverManager.getConnection(url, db.getDbId(), db.getDbPw());
 		pre = conn.prepareStatement(sql);
 		pre.setString(1, indexName);
 		result = pre.executeQuery();
@@ -732,7 +734,7 @@ public class DbmsSQL {
 	}
 
 	// 시퀀스 디테일 Info 조회
-	public Map<String, Object> sequenceDetailsInfo(String sequenceName, DbDTO dto)
+	public Map<String, Object> sequenceDetailsInfo(String sequenceName, DbDTO db)
 			throws SQLException, ClassNotFoundException {
 		String sql = "select INCREMENT_BY, MIN_VALUE, MAX_VALUE, CYCLE_FLAG, LAST_NUMBER, CACHE_SIZE, ORDER_FLAG from all_sequences WHERE sequence_name = ?";
 
@@ -743,7 +745,7 @@ public class DbmsSQL {
 		ResultSet result = null;
 
 		Class.forName(driver);
-		conn = DriverManager.getConnection(url, dto.getDbId(), dto.getDbPw());
+		conn = DriverManager.getConnection(url, db.getDbId(), db.getDbPw());
 		pre = conn.prepareStatement(sql);
 		pre.setString(1, sequenceName);
 		result = pre.executeQuery();
@@ -768,7 +770,7 @@ public class DbmsSQL {
 	}
 
 	// 뷰 디테일 Columns 조회
-	public List<Map<String, Object>> viewDetailsColumns(String schema, String viewName, DbDTO dto)
+	public List<Map<String, Object>> viewDetailsColumns(String schema, String viewName, DbDTO db)
 			throws ClassNotFoundException, SQLException {
 		String sql = "select at.column_name, at.column_id, at.data_type, at.nullable, au.updatable, au.insertable, au.deletable, ac.comments "
 				+ "from ALL_TAB_COLUMNS at, ALL_UPDATABLE_COLUMNS au , ALL_COL_COMMENTS ac where at.owner = ? and at.table_name = ? and at.column_name = au.column_name and at.table_name = au.table_name and at.column_name = ac.column_name and at.table_name = ac.table_name order by at.column_id";
@@ -781,7 +783,7 @@ public class DbmsSQL {
 		ResultSet result = null;
 
 		Class.forName(driver);
-		conn = DriverManager.getConnection(url, dto.getDbId(), dto.getDbPw());
+		conn = DriverManager.getConnection(url, db.getDbId(), db.getDbPw());
 		pre = conn.prepareStatement(sql);
 		pre.setString(1, schema);
 		pre.setString(2, viewName);
@@ -808,7 +810,7 @@ public class DbmsSQL {
 	}
 
 	// 뷰 디테일 Script 조회
-	public List<Map<String, Object>> viewDetailsScript(String schema, String viewName, DbDTO dto)
+	public List<Map<String, Object>> viewDetailsScript(String schema, String viewName, DbDTO db)
 			throws ClassNotFoundException, SQLException {
 		String sql = "select TEXT from ALL_VIEWS where owner = ? and view_name = ?";
 
@@ -820,7 +822,7 @@ public class DbmsSQL {
 		ResultSet result = null;
 
 		Class.forName(driver);
-		conn = DriverManager.getConnection(url, dto.getDbId(), dto.getDbPw());
+		conn = DriverManager.getConnection(url, db.getDbId(), db.getDbPw());
 		pre = conn.prepareStatement(sql);
 		pre.setString(1, schema);
 		pre.setString(2, viewName);
@@ -846,8 +848,9 @@ public class DbmsSQL {
 		return list;
 	}
 
-	// function, package, type, package body, undefined, trigger, type body 디테일 Code 조회
-	public List<Map<String, Object>> detailsCode(String schema, String name, DbDTO dto, String type)
+	// function, package, type, package body, undefined, trigger, type body 디테일 Code
+	// 조회
+	public List<Map<String, Object>> detailsCode(String schema, String name, String type, DbDTO db)
 			throws ClassNotFoundException, SQLException {
 		String sql = "select * from all_source where owner = ? and type = ? and name = ? order by line";
 
@@ -859,7 +862,7 @@ public class DbmsSQL {
 		ResultSet result = null;
 
 		Class.forName(driver);
-		conn = DriverManager.getConnection(url, dto.getDbId(), dto.getDbPw());
+		conn = DriverManager.getConnection(url, db.getDbId(), db.getDbPw());
 		pre = conn.prepareStatement(sql);
 		pre.setString(1, schema);
 		pre.setString(2, type);
@@ -888,7 +891,7 @@ public class DbmsSQL {
 
 	// SQL 한줄 실행
 	@SuppressWarnings("finally")
-	public Map<String, Object> runCurrentSQL(String sql, String type, int index, DbDTO dto) throws SQLException {
+	public Map<String, Object> runCurrentSQL(String sql, String type, int index, DbDTO db) throws SQLException {
 
 		Map<String, Object> map = new HashMap<String, Object>();
 		List<Map<String, Object>> data = new ArrayList<Map<String, Object>>();
@@ -910,7 +913,7 @@ public class DbmsSQL {
 		long startTime = System.nanoTime();
 		try {
 			Class.forName(driver);
-			conn = DriverManager.getConnection(url, dto.getDbId(), dto.getDbPw());
+			conn = DriverManager.getConnection(url, db.getDbId(), db.getDbPw());
 			pre = conn.prepareStatement(sql);
 
 			// SELECT 일 경우
@@ -935,7 +938,7 @@ public class DbmsSQL {
 
 				map.put("cols", cols);
 
-			// 그 외 명령어일 경우
+				// 그 외 명령어일 경우
 			} else {
 				int count = pre.executeUpdate();
 				long stopTime = System.nanoTime();
@@ -944,7 +947,7 @@ public class DbmsSQL {
 
 				row.put("Row", index);
 				row.put("ExecutionTime", time);
-				
+
 				// 결과에 따라 row 등록 DDL DML DCL
 				if (type.equals("CREATE") || type.equals("DROP") || type.equals("ALTER") || type.equals("TRUNCATE")) {
 					row.put("DbmsOutput", type.toLowerCase() + " " + sql.split(" ")[1].toLowerCase() + ".");
@@ -956,7 +959,7 @@ public class DbmsSQL {
 				data.add(row);
 			}
 
-		// 에러 발생시 에러메세지 추가
+			// 에러 발생시 에러메세지 추가
 		} catch (Exception e) {
 			long stopTime = System.nanoTime();
 			double time = (double) (stopTime - startTime) / 1000000;
@@ -967,7 +970,7 @@ public class DbmsSQL {
 
 			data.add(row);
 
-		// 에러 메세지를 보내기위해 finally에서 return
+			// 에러 메세지를 보내기위해 finally에서 return
 		} finally {
 			if (result != null)
 				result.close();

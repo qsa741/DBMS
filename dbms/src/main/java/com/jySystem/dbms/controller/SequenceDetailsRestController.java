@@ -7,7 +7,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.jySystem.dbms.dto.DbDTO;
 import com.jySystem.dbms.service.DbmsServiceImpl;
 
 @RestController
@@ -16,11 +15,12 @@ public class SequenceDetailsRestController {
 
 	@Autowired
 	private DbmsServiceImpl dbmsService;
-	
+
 	// SEQUENCE 디테일 INFO 조회
 	@RequestMapping("/sequenceDetailsInfo")
-	public Map<String, Object> sequenceDetailsInfo(String sequenceName, DbDTO dto) throws ClassNotFoundException, SQLException {
-		return dbmsService.sequenceDetailsInfo(sequenceName, dto);
+	public Map<String, Object> sequenceDetailsInfo(String sequenceName, String userId)
+			throws ClassNotFoundException, SQLException {
+		return dbmsService.sequenceDetailsInfo(sequenceName, userId);
 	}
-	
+
 }

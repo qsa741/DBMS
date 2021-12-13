@@ -10,11 +10,11 @@ import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 public class DbmsInterceptor extends HandlerInterceptorAdapter {
 
 	private String url;
-	
+
 	public DbmsInterceptor(String url) {
 		this.url = url;
 	}
-	
+
 	// 일부 페이지 비로그인으로 접근시 로그인 페이지로 이동
 	@Override
 	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
@@ -28,7 +28,7 @@ public class DbmsInterceptor extends HandlerInterceptorAdapter {
 
 		if (path.contains("/dbmsTool/*")) {
 			if (session.getAttribute("JYSESSION") == null) {
-				if(path.contains("/dbmsTool/connectionTest")) {
+				if (path.contains("/dbmsTool/connectionTest")) {
 					return true;
 				}
 				response.sendRedirect(url + "/users/signIn");

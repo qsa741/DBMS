@@ -9,12 +9,11 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import com.jySystem.common.intercept.DbmsInterceptor;
 
 @Configuration
-public class MvcConfig implements WebMvcConfigurer{
-	
+public class MvcConfig implements WebMvcConfigurer {
+
 	@Value("${sso.url}")
 	private String url;
-	
-	
+
 	// DbmsInterceptor 인터셉터로 등록
 	@Override
 	public void addInterceptors(InterceptorRegistry registry) {
@@ -27,5 +26,4 @@ public class MvcConfig implements WebMvcConfigurer{
 		registry.addMapping("/**").allowedOrigins(url).allowedMethods("*");
 	}
 
-	
 }

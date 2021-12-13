@@ -20,8 +20,8 @@ import org.springframework.boot.web.server.WebServerFactoryCustomizer;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-public class TomcatClusterConfig implements WebServerFactoryCustomizer<TomcatServletWebServerFactory>{
-	
+public class TomcatClusterConfig implements WebServerFactoryCustomizer<TomcatServletWebServerFactory> {
+
 	@Override
 	public void customize(TomcatServletWebServerFactory factory) {
 		factory.addContextCustomizers(new TomcatClusterContextCustomizer());
@@ -30,51 +30,53 @@ public class TomcatClusterConfig implements WebServerFactoryCustomizer<TomcatSer
 }
 
 class TomcatClusterContextCustomizer implements TomcatContextCustomizer {
-	
+
 	@Override
 	public void customize(Context context) {
 		context.setDistributable(true);
-		
+
 		DeltaManager manager = new DeltaManager();
 		manager.setExpireSessionsOnShutdown(false);
 		manager.setNotifyListenersOnReplication(true);
 		context.setManager(manager);
-		
-		configureCluster((Engine)context.getParent().getParent());
+
+		configureCluster((Engine) context.getParent().getParent());
 	}
-	
+
 	private void configureCluster(Engine engine) {
 		SimpleTcpCluster cluster = new SimpleTcpCluster();
 		cluster.setChannelSendOptions(6);
-		
+
 		GroupChannel channel = new GroupChannel();
-		
+
 		McastService mcastService = new McastService();
 		mcastService.setAddress("228.0.0.4");
 		mcastService.setPort(45560);
 		mcastService.setFrequency(500);
-		mcastService.setDropTime(3000);
+		mcastService.setDropTime(10000);
 		channel.setMembershipService(mcastService);
-		
+
 		NioReceiver receiver = new NioReceiver();
 		receiver.setAddress("auto");
 		receiver.setPort(4001);
 		receiver.setAutoBind(100);
 		receiver.setMaxThreads(6);
+		receiver.setSelectorTimeout(3000);
+		;
 		channel.setChannelReceiver(receiver);
-		
+
 		ReplicationTransmitter sender = new ReplicationTransmitter();
 		sender.setTransport(new PooledParallelSender());
 		channel.setChannelSender(sender);
-		
+
 		channel.addInterceptor(new TcpFailureDetector());
 		channel.addInterceptor(new MessageDispatchInterceptor());
-		
+
 		cluster.setChannel(channel);
 		cluster.addValve(new ReplicationValve());
 		cluster.addValve(new JvmRouteBinderValve());
 		cluster.addClusterListener(new ClusterSessionListener());
-		
+
 		engine.setCluster(cluster);
 	}
 }

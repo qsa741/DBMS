@@ -34,7 +34,8 @@ public class SchedulerSQL {
 
 	// Action 데이터 저장
 	@SuppressWarnings("resource")
-	public void saveActionData(String action, JSONObject json) throws ClassNotFoundException, SQLException, JSONException {
+	public void saveActionData(String action, JSONObject json)
+			throws ClassNotFoundException, SQLException, JSONException {
 		String select = "select * from ACTIONDATA where year = ? and month = ? and day = ? and action = ?";
 		String insert = "insert into ACTIONDATA values(?,?,?,?,?, sysdate)";
 		String update = "update ACTIONDATA set count = ? where year = ? and month = ? and day = ? and action = ?";
@@ -111,7 +112,7 @@ public class SchedulerSQL {
 			pre.setString(1, (String) map.get("SCHEDULENUM"));
 			pre.executeUpdate();
 		}
-		
+
 		result.close();
 		pre.close();
 		conn.close();
