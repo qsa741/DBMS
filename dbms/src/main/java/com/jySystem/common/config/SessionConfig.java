@@ -29,6 +29,7 @@ public class SessionConfig implements HttpSessionListener {
 		}
 	}
 
+	// 사용자 아이디로 DB ID/PW 찾기
 	public DbDTO getSessionID(String id) {
 		DbDTO dto = new DbDTO();
 		for (String key : sessions.keySet()) {
