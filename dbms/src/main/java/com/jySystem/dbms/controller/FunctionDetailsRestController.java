@@ -1,6 +1,5 @@
 package com.jySystem.dbms.controller;
 
-import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 
@@ -20,7 +19,7 @@ public class FunctionDetailsRestController {
 	// FUCTION 디테일 CODE 조회
 	@RequestMapping("/functionDetailsCode")
 	public List<Map<String, Object>> functionDetailsCode(String schema, String functionName, String userId)
-			throws ClassNotFoundException, SQLException {
+			throws Exception {
 		return dbmsService.detailsCode(schema, functionName, "FUNCTION", userId);
 	}
 

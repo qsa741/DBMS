@@ -1,6 +1,5 @@
 package com.jySystem.dbms.controller;
 
-import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 
@@ -20,7 +19,7 @@ public class TriggerDetailsRestController {
 	// TRIGGER 디테일 SOURCE 조회
 	@RequestMapping("/triggerDetailsSource")
 	public List<Map<String, Object>> triggerDetailsSource(String schema, String triggerName, String userId)
-			throws ClassNotFoundException, SQLException {
+			throws Exception {
 		return dbmsService.detailsCode(schema, triggerName, "TRIGGER", userId);
 	}
 }

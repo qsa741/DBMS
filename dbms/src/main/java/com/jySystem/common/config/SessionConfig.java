@@ -12,7 +12,7 @@ import com.jySystem.dbms.dto.DbDTO;
 
 @WebListener
 public class SessionConfig implements HttpSessionListener {
-
+	
 	private static final Map<String, HttpSession> sessions = new ConcurrentHashMap<>();
 
 	// 세션 로그인 시 sessions에 풋
@@ -30,13 +30,13 @@ public class SessionConfig implements HttpSessionListener {
 	}
 
 	// 사용자 아이디로 DB ID/PW 찾기
-	public DbDTO getSessionID(String id) {
+	public DbDTO getSessionID(String sessionID, String sessionDBID, String sessionDBPW, String id) {
 		DbDTO dto = new DbDTO();
 		for (String key : sessions.keySet()) {
 			HttpSession s = sessions.get(key);
-			if (s != null && s.getAttribute("JYSESSION") != null && s.getAttribute("JYSESSION").equals(id)) {
-				dto.setDbId((String) s.getAttribute("JYDBID"));
-				dto.setDbPw((String) s.getAttribute("JYDBPW"));
+			if (s != null && s.getAttribute(sessionID) != null && s.getAttribute(sessionID).equals(id)) {
+				dto.setDbId((String) s.getAttribute(sessionDBID));
+				dto.setDbPw((String) s.getAttribute(sessionDBPW));
 				break;
 			}
 		}

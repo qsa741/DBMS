@@ -1,6 +1,5 @@
 package com.jySystem.dbms.controller;
 
-import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 
@@ -23,33 +22,33 @@ public class DbmsRestController {
 
 	// 모든 스키마 불러오기
 	@RequestMapping("/allSchemas")
-	public List<TreeDTO> allSchemas(String userId) throws ClassNotFoundException, SQLException {
+	public List<TreeDTO> allSchemas(String userId) throws Exception {
 		return dbmsService.getAllSchemas(userId);
 	}
 
 	// 스키마 정보 불러오기
 	@RequestMapping("/schemaInfo")
-	public List<TreeDTO> schemaInfo(String schema, String userId) throws ClassNotFoundException, SQLException {
+	public List<TreeDTO> schemaInfo(String schema, String userId) throws Exception {
 		return dbmsService.schemaInfo(schema, userId);
 	}
 
 	// 오브젝트 불러오기
 	@RequestMapping("/objectInfo")
-	public List<TreeDTO> objectInfo(ObjectDTO object, String userId) throws ClassNotFoundException, SQLException {
+	public List<TreeDTO> objectInfo(ObjectDTO object, String userId) throws Exception {
 		return dbmsService.objectInfo(object, userId);
 	}
 
 	// 테이블 정보 가져오기
 	@RequestMapping("/loadObject")
 	public Map<String, Object> loadObject(LoadObjectDTO dto, String userId)
-			throws ClassNotFoundException, SQLException {
+			throws Exception {
 		return dbmsService.loadObject(dto, userId);
 	}
 
 	// 테이블 정보 가져오기
 	@RequestMapping("/getTableChildren")
 	public Map<String, Object> getTableChildren(LoadObjectDTO dto, String userId)
-			throws ClassNotFoundException, SQLException {
+			throws Exception {
 		return dbmsService.getTableChildren(dto, userId);
 	}
 
@@ -85,13 +84,13 @@ public class DbmsRestController {
 
 	// 차트 연도 가져오기
 	@RequestMapping("/getChartYears")
-	public List<String> getChartYears() throws ClassNotFoundException, SQLException {
+	public List<String> getChartYears() throws Exception {
 		return dbmsService.getChartYears();
 	}
 
 	// 차트 월 가져오기
 	@RequestMapping("/getChartMonth")
-	public List<String> getChartMonth(String year) throws ClassNotFoundException, SQLException {
+	public List<String> getChartMonth(String year) throws Exception {
 		return dbmsService.getChartMonth(year);
 	}
 

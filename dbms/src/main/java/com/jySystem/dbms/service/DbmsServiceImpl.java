@@ -1,6 +1,5 @@
 package com.jySystem.dbms.service;
 
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -9,6 +8,8 @@ import java.util.Map;
 import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.configurationprocessor.json.JSONException;
 import org.springframework.boot.configurationprocessor.json.JSONObject;
 import org.springframework.stereotype.Service;
 
@@ -19,9 +20,17 @@ import com.jySystem.dbms.dto.LoadObjectDTO;
 import com.jySystem.dbms.dto.ObjectDTO;
 import com.jySystem.dbms.dto.TreeDTO;
 import com.jySystem.dbms.sql.DbmsSQL;
+import com.jySystem.exception.JYException;
 
 @Service
 public class DbmsServiceImpl implements DbmsService {
+
+	@Value("${dbms.properties.session-id}")
+	private String sessionID;
+	@Value("${dbms.properties.session-db-id}")
+	private String sessionDBID;
+	@Value("${dbms.properties.session-db-pw}")
+	private String sessionDBPW;
 
 	@Autowired
 	private DbmsSQL dbmsSQL;
@@ -30,14 +39,14 @@ public class DbmsServiceImpl implements DbmsService {
 
 	// DB 커넥션 테스트
 	@Override
-	public boolean connectionTest(DbDTO dto) throws Exception {
+	public boolean connectionTest(DbDTO dto) throws JYException {
 		return dbmsSQL.connectionTest(dto);
 	}
 
 	// 모든 스키마 정보 불러오기
 	@Override
-	public List<TreeDTO> getAllSchemas(String userId) throws ClassNotFoundException, SQLException {
-		DbDTO db = session.getSessionID(userId);
+	public List<TreeDTO> getAllSchemas(String userId) throws JYException {
+		DbDTO db = session.getSessionID(sessionID, sessionDBID, sessionDBPW, userId);
 
 		// DB 아이디가 없을때 null 리턴
 		if (db.getDbId() == null || db.getDbId().equals("")) {
@@ -48,9 +57,9 @@ public class DbmsServiceImpl implements DbmsService {
 
 	// 스키마 내부 항목 불러오기
 	@Override
-	public List<TreeDTO> schemaInfo(String schema, String userId) throws ClassNotFoundException, SQLException {
+	public List<TreeDTO> schemaInfo(String schema, String userId) throws JYException {
 		List<TreeDTO> treeList = new ArrayList<TreeDTO>();
-		DbDTO db = session.getSessionID(userId);
+		DbDTO db = session.getSessionID(sessionID, sessionDBID, sessionDBPW, userId);
 
 		TreeDTO table = dbmsSQL.schemaInfo(schema, "TABLE", db);
 		TreeDTO view = dbmsSQL.schemaInfo(schema, "VIEW", db);
@@ -98,8 +107,8 @@ public class DbmsServiceImpl implements DbmsService {
 
 	// 오브젝트 불러오기
 	@Override
-	public List<TreeDTO> objectInfo(ObjectDTO object, String userId) throws ClassNotFoundException, SQLException {
-		DbDTO db = session.getSessionID(userId);
+	public List<TreeDTO> objectInfo(ObjectDTO object, String userId) throws JYException {
+		DbDTO db = session.getSessionID(sessionID, sessionDBID, sessionDBPW, userId);
 
 		// 뒤에 붙은 S 빼고 보내기
 		object.setObject(object.getObject().substring(0, object.getObject().length() - 1));
@@ -109,10 +118,9 @@ public class DbmsServiceImpl implements DbmsService {
 
 	// 테이블 정보 불러오기
 	@Override
-	public Map<String, Object> loadObject(LoadObjectDTO dto, String userId)
-			throws ClassNotFoundException, SQLException {
+	public Map<String, Object> loadObject(LoadObjectDTO dto, String userId) throws JYException {
 		Map<String, Object> map = new HashMap<>();
-		DbDTO db = session.getSessionID(userId);
+		DbDTO db = session.getSessionID(sessionID, sessionDBID, sessionDBPW, userId);
 
 		if (db.getDbId() != null) {
 			if (dto.getObjectType().equals("TABLE")) {
@@ -139,9 +147,8 @@ public class DbmsServiceImpl implements DbmsService {
 
 	// 테이블 자식 정보 불러오기
 	@Override
-	public Map<String, Object> getTableChildren(LoadObjectDTO dto, String userId)
-			throws ClassNotFoundException, SQLException {
-		DbDTO db = session.getSessionID(userId);
+	public Map<String, Object> getTableChildren(LoadObjectDTO dto, String userId) throws JYException {
+		DbDTO db = session.getSessionID(sessionID, sessionDBID, sessionDBPW, userId);
 		Map<String, Object> map = new HashMap<String, Object>();
 		List<TreeDTO> children = new ArrayList<TreeDTO>();
 		List<Map<String, Object>> column = dbmsSQL.selectTableChild("column", dto, db);
@@ -224,9 +231,8 @@ public class DbmsServiceImpl implements DbmsService {
 
 	// 스키마 디테일 Info 데이터
 	@Override
-	public Map<String, Object> schemaDetailsInfo(String schema, String userId)
-			throws ClassNotFoundException, SQLException {
-		DbDTO db = session.getSessionID(userId);
+	public Map<String, Object> schemaDetailsInfo(String schema, String userId) throws JYException {
+		DbDTO db = session.getSessionID(sessionID, sessionDBID, sessionDBPW, userId);
 		Map<String, Object> info = new HashMap<String, Object>();
 		Map<String, Object> result = new HashMap<String, Object>();
 		List<Map<String, Object>> rows = new ArrayList<Map<String, Object>>();
@@ -247,36 +253,32 @@ public class DbmsServiceImpl implements DbmsService {
 
 	// 스키마 디테일 Role Grants 테이블 검색
 	@Override
-	public List<Map<String, Object>> schemaDetailsRoleGrants(String schema, String userId)
-			throws ClassNotFoundException, SQLException {
-		DbDTO db = session.getSessionID(userId);
+	public List<Map<String, Object>> schemaDetailsRoleGrants(String schema, String userId) throws JYException {
+		DbDTO db = session.getSessionID(sessionID, sessionDBID, sessionDBPW, userId);
 
 		return dbmsSQL.schemaDetailsRoleGrants(schema, db);
 	}
 
 	// 스키마 디테일 System Privileges 테이블 검색
 	@Override
-	public List<Map<String, Object>> schemaDetailsSystemPrivileges(String schema, String userId)
-			throws ClassNotFoundException, SQLException {
-		DbDTO db = session.getSessionID(userId);
+	public List<Map<String, Object>> schemaDetailsSystemPrivileges(String schema, String userId) throws JYException {
+		DbDTO db = session.getSessionID(sessionID, sessionDBID, sessionDBPW, userId);
 
 		return dbmsSQL.schemaDetailsSystemPrivileges(schema, db);
 	}
 
 	// 스키마 디테일 Extends 테이블 검색
 	@Override
-	public List<Map<String, Object>> schemaDetailsExtents(String schema, String userId)
-			throws ClassNotFoundException, SQLException {
-		DbDTO db = session.getSessionID(userId);
+	public List<Map<String, Object>> schemaDetailsExtents(String schema, String userId) throws JYException {
+		DbDTO db = session.getSessionID(sessionID, sessionDBID, sessionDBPW, userId);
 
 		return dbmsSQL.schemaDetailsExtents(schema, db);
 	}
 
 	// 테이블 디테일 Table 테이블 검색
 	@Override
-	public Map<String, Object> tableDetailsTable(String table, String schema, String userId)
-			throws ClassNotFoundException, SQLException {
-		DbDTO db = session.getSessionID(userId);
+	public Map<String, Object> tableDetailsTable(String table, String schema, String userId) throws JYException {
+		DbDTO db = session.getSessionID(sessionID, sessionDBID, sessionDBPW, userId);
 		Map<String, Object> info = new HashMap<String, Object>();
 		Map<String, Object> result = new HashMap<String, Object>();
 		List<Map<String, Object>> rows = new ArrayList<Map<String, Object>>();
@@ -299,8 +301,8 @@ public class DbmsServiceImpl implements DbmsService {
 	// 테이블 디테일 Columns 테이블 검색
 	@Override
 	public List<Map<String, Object>> tableDetailsColumns(String table, String schema, String userId)
-			throws ClassNotFoundException, SQLException {
-		DbDTO db = session.getSessionID(userId);
+			throws JYException {
+		DbDTO db = session.getSessionID(sessionID, sessionDBID, sessionDBPW, userId);
 
 		return dbmsSQL.tableDetailsColumns(table, schema, db);
 	}
@@ -308,17 +310,16 @@ public class DbmsServiceImpl implements DbmsService {
 	// 테이블 디테일 Indexes Top 테이블 검색
 	@Override
 	public List<Map<String, Object>> tableDetailsIndexesTop(String table, String schema, String userId)
-			throws ClassNotFoundException, SQLException {
-		DbDTO db = session.getSessionID(userId);
+			throws JYException {
+		DbDTO db = session.getSessionID(sessionID, sessionDBID, sessionDBPW, userId);
 
 		return dbmsSQL.tableDetailsIndexesTop(table, schema, db);
 	}
 
 	// 테이블 디테일 Indexes Bottom 테이블 검색
 	@Override
-	public Map<String, Object> tableDetailsIndexesBottom(String indexName, String userId)
-			throws ClassNotFoundException, SQLException {
-		DbDTO db = session.getSessionID(userId);
+	public Map<String, Object> tableDetailsIndexesBottom(String indexName, String userId) throws JYException {
+		DbDTO db = session.getSessionID(sessionID, sessionDBID, sessionDBPW, userId);
 		Map<String, Object> info = new HashMap<String, Object>();
 		Map<String, Object> result = new HashMap<String, Object>();
 		List<Map<String, Object>> rows = new ArrayList<Map<String, Object>>();
@@ -341,26 +342,24 @@ public class DbmsServiceImpl implements DbmsService {
 	// 테이블 디테일 Constraints 테이블 검색
 	@Override
 	public List<Map<String, Object>> tableDetailsConstraints(String table, String schema, String userId)
-			throws ClassNotFoundException, SQLException {
-		DbDTO db = session.getSessionID(userId);
+			throws JYException {
+		DbDTO db = session.getSessionID(sessionID, sessionDBID, sessionDBPW, userId);
 
 		return dbmsSQL.tableDetailsConstraints(table, schema, db);
 	}
 
 	// 인덱스 디테일 Columns 테이블 검색
 	@Override
-	public List<Map<String, Object>> indexDetailsColumns(String indexName, String userId)
-			throws ClassNotFoundException, SQLException {
-		DbDTO db = session.getSessionID(userId);
+	public List<Map<String, Object>> indexDetailsColumns(String indexName, String userId) throws JYException {
+		DbDTO db = session.getSessionID(sessionID, sessionDBID, sessionDBPW, userId);
 
 		return dbmsSQL.indexDetailsColumns(indexName, db);
 	}
 
 	// 시퀀스 디테일 Info 테이블 검색
 	@Override
-	public Map<String, Object> sequenceDetailsInfo(String sequenceName, String userId)
-			throws ClassNotFoundException, SQLException {
-		DbDTO db = session.getSessionID(userId);
+	public Map<String, Object> sequenceDetailsInfo(String sequenceName, String userId) throws JYException {
+		DbDTO db = session.getSessionID(sessionID, sessionDBID, sessionDBPW, userId);
 		Map<String, Object> info = new HashMap<String, Object>();
 		Map<String, Object> result = new HashMap<String, Object>();
 		List<Map<String, Object>> rows = new ArrayList<Map<String, Object>>();
@@ -383,8 +382,8 @@ public class DbmsServiceImpl implements DbmsService {
 	// 뷰 디테일 Columns 테이블 검색
 	@Override
 	public List<Map<String, Object>> viewDetailsColumns(String schema, String viewName, String userId)
-			throws ClassNotFoundException, SQLException {
-		DbDTO db = session.getSessionID(userId);
+			throws JYException {
+		DbDTO db = session.getSessionID(sessionID, sessionDBID, sessionDBPW, userId);
 
 		return dbmsSQL.viewDetailsColumns(schema, viewName, db);
 	}
@@ -392,8 +391,8 @@ public class DbmsServiceImpl implements DbmsService {
 	// 뷰 디테일 Columns 테이블 검색
 	@Override
 	public List<Map<String, Object>> viewDetailsScript(String schema, String viewName, String userId)
-			throws ClassNotFoundException, SQLException {
-		DbDTO db = session.getSessionID(userId);
+			throws JYException {
+		DbDTO db = session.getSessionID(sessionID, sessionDBID, sessionDBPW, userId);
 
 		return dbmsSQL.viewDetailsScript(schema, viewName, db);
 	}
@@ -401,16 +400,16 @@ public class DbmsServiceImpl implements DbmsService {
 	// 펀션 디테일 Code 테이블 검색
 	@Override
 	public List<Map<String, Object>> detailsCode(String schema, String name, String type, String userId)
-			throws ClassNotFoundException, SQLException {
-		DbDTO db = session.getSessionID(userId);
+			throws JYException {
+		DbDTO db = session.getSessionID(sessionID, sessionDBID, sessionDBPW, userId);
 
 		return dbmsSQL.detailsCode(schema, name, type, db);
 	}
 
 	// 현재 SQL 한줄 실행
 	@Override
-	public Map<String, Object> runCurrentSQL(String sql, int cursor, String userId) throws SQLException {
-		DbDTO db = session.getSessionID(userId);
+	public Map<String, Object> runCurrentSQL(String sql, int cursor, String userId) throws JYException {
+		DbDTO db = session.getSessionID(sessionID, sessionDBID, sessionDBPW, userId);
 		if (db.getDbId() == null) {
 			return null;
 		}
@@ -434,8 +433,8 @@ public class DbmsServiceImpl implements DbmsService {
 
 	// 전체 SQL문 실행
 	@Override
-	public List<Map<String, Object>> runAllSQL(String sqls, String userId) throws SQLException {
-		DbDTO db = session.getSessionID(userId);
+	public List<Map<String, Object>> runAllSQL(String sqls, String userId) throws JYException {
+		DbDTO db = session.getSessionID(sessionID, sessionDBID, sessionDBPW, userId);
 		if (db.getDbId() == null) {
 			return null;
 		}
@@ -458,19 +457,19 @@ public class DbmsServiceImpl implements DbmsService {
 
 	// 차트에 들어가는 연도 구하기
 	@Override
-	public List<String> getChartYears() throws ClassNotFoundException, SQLException {
+	public List<String> getChartYears() throws JYException {
 		return dbmsSQL.getChartYears();
 	}
 
 	// 차트에 해당 연도 데이터가 있는 월 구하기
 	@Override
-	public List<String> getChartMonth(String year) throws ClassNotFoundException, SQLException {
+	public List<String> getChartMonth(String year) throws JYException {
 		return dbmsSQL.getChartMonth(year);
 	}
 
 	// mChart 정보 세팅 : 선택된 연도 데이터 정리
 	@Override
-	public Map<String, Object> mChartInfo(String year) throws Exception {
+	public Map<String, Object> mChartInfo(String year) throws JYException {
 		Map<String, Object> result = new HashMap<String, Object>();
 
 		// action별로 데이터 생성
@@ -501,13 +500,17 @@ public class DbmsServiceImpl implements DbmsService {
 
 	// mChart에 들어갈 DataSet 세팅
 	@Override
-	public Map<String, Object> mChartDataSet(List<JSONObject> list, ChartDataSetDTO dto) throws Exception {
+	public Map<String, Object> mChartDataSet(List<JSONObject> list, ChartDataSetDTO dto) throws JYException {
 		// 1월 ~ 12월
 		int[] monthCount = new int[12];
 
-		for (JSONObject json : list) {
-			int month = json.getInt("MONTH") - 1;
-			monthCount[month] += json.getInt("COUNT");
+		try {
+			for (JSONObject json : list) {
+				int month = json.getInt("MONTH") - 1;
+				monthCount[month] += json.getInt("COUNT");
+			}
+		} catch (JSONException je) {
+			throw new JYException("JSON Exception", je);
 		}
 
 		List<Integer> data = new ArrayList<Integer>();
@@ -528,7 +531,7 @@ public class DbmsServiceImpl implements DbmsService {
 
 	// dChart 차트 정보 세팅
 	@Override
-	public Map<String, Object> dChartInfo(String year, String month) throws Exception {
+	public Map<String, Object> dChartInfo(String year, String month) throws JYException {
 		Map<String, Object> result = new HashMap<String, Object>();
 
 		// action별로 데이터 세팅
@@ -585,12 +588,16 @@ public class DbmsServiceImpl implements DbmsService {
 
 	// dChart에 들어갈 데이터 세팅
 	@Override
-	public Map<String, Object> dChartDataSet(List<JSONObject> list, int days, ChartDataSetDTO dto) throws Exception {
+	public Map<String, Object> dChartDataSet(List<JSONObject> list, int days, ChartDataSetDTO dto) throws JYException {
 		int[] dayCount = new int[days];
 
-		for (JSONObject json : list) {
-			int day = json.getInt("DAY") - 1;
-			dayCount[day] += json.getInt("COUNT");
+		try {
+			for (JSONObject json : list) {
+				int day = json.getInt("DAY") - 1;
+				dayCount[day] += json.getInt("COUNT");
+			}
+		} catch (JSONException je) {
+			throw new JYException("JSON Exception", je);
 		}
 
 		List<Integer> data = new ArrayList<Integer>();

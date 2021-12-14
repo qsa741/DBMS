@@ -1,6 +1,5 @@
 package com.jySystem.dbms.controller;
 
-import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 
@@ -20,28 +19,28 @@ public class SchemaDetailRestController {
 	// 스키마 디테일 Info 정보 불러오기
 	@RequestMapping("/schemaDetailsInfo")
 	public Map<String, Object> schemaDetailInfo(String schema, String userId)
-			throws ClassNotFoundException, SQLException {
+			throws Exception {
 		return dbmsService.schemaDetailsInfo(schema, userId);
 	}
 
 	// 스키마 디테일 Role Grants 정보 불러오기
 	@RequestMapping("/schemaDetailsRoleGrants")
 	public List<Map<String, Object>> schemaDetailsRoleGrants(String schema, String userId)
-			throws ClassNotFoundException, SQLException {
+			throws Exception {
 		return dbmsService.schemaDetailsRoleGrants(schema, userId);
 	}
 
 	// 스키마 디테일 System Privileges 정보 불러오기
 	@RequestMapping("/schemaDetailsSystemPrivileges")
 	public List<Map<String, Object>> schemaDetailsSystemPrivileges(String schema, String userId)
-			throws ClassNotFoundException, SQLException {
+			throws Exception {
 		return dbmsService.schemaDetailsSystemPrivileges(schema, userId);
 	}
 
 	// 스키마 디테일 Extends 정보 불러오기
 	@RequestMapping("/schemaDetailsExtents")
 	public List<Map<String, Object>> schemaDetailsExtends(String schema, String userId)
-			throws ClassNotFoundException, SQLException {
+			throws Exception {
 		return dbmsService.schemaDetailsExtents(schema, userId);
 	}
 

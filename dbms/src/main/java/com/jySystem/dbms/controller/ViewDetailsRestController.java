@@ -1,6 +1,5 @@
 package com.jySystem.dbms.controller;
 
-import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 
@@ -20,14 +19,14 @@ public class ViewDetailsRestController {
 	// VIEW 디테일 COLUMNS 조회
 	@RequestMapping("/viewDetailsColumns")
 	public List<Map<String, Object>> viewDetailsColumns(String schema, String viewName, String userId)
-			throws ClassNotFoundException, SQLException {
+			throws Exception {
 		return dbmsService.viewDetailsColumns(schema, viewName, userId);
 	}
 
 	// VIEW 디테일 SCRIPT 조회
 	@RequestMapping("/viewDetailsScript")
 	public List<Map<String, Object>> viewDetailsScript(String schema, String viewName, String userId)
-			throws ClassNotFoundException, SQLException {
+			throws Exception {
 		return dbmsService.viewDetailsScript(schema, viewName, userId);
 	}
 }

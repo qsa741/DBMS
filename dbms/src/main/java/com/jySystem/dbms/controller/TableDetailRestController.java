@@ -1,6 +1,5 @@
 package com.jySystem.dbms.controller;
 
-import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 
@@ -20,35 +19,35 @@ public class TableDetailRestController {
 	// TABLE 디테일 TABLE 조회
 	@RequestMapping("/tableDetailsTable")
 	public Map<String, Object> tableDetailsTable(String table, String schema, String userId)
-			throws ClassNotFoundException, SQLException {
+			throws Exception {
 		return dbmsService.tableDetailsTable(table, schema, userId);
 	}
 
 	// TABLE 디테일 COLUMNS 조회
 	@RequestMapping("/tableDetailsColumns")
 	public List<Map<String, Object>> tableDetailsColumns(String table, String schema, String userId)
-			throws ClassNotFoundException, SQLException {
+			throws Exception {
 		return dbmsService.tableDetailsColumns(table, schema, userId);
 	}
 
 	// TABLE 디테일 INDEXES TOP 조회
 	@RequestMapping("/tableDetailsIndexesTop")
 	public List<Map<String, Object>> tableDetailsIndexesTop(String table, String schema, String userId)
-			throws ClassNotFoundException, SQLException {
+			throws Exception {
 		return dbmsService.tableDetailsIndexesTop(table, schema, userId);
 	}
 
 	// TABLE 디테일 INDEXES BOTTOM 조회
 	@RequestMapping("/tableDetailsIndexesBottom")
 	public Map<String, Object> tableDetailsIndexesBottom(String indexName, String userId)
-			throws ClassNotFoundException, SQLException {
+			throws Exception {
 		return dbmsService.tableDetailsIndexesBottom(indexName, userId);
 	}
 
 	// TABLE 디테일 CONSTRAINTS 조회
 	@RequestMapping("/tableDetailsConstraints")
 	public List<Map<String, Object>> tableDetailsConstraints(String table, String schema, String userId)
-			throws ClassNotFoundException, SQLException {
+			throws Exception {
 		return dbmsService.tableDetailsConstraints(table, schema, userId);
 	}
 

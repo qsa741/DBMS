@@ -1,6 +1,5 @@
 package com.jySystem.dbms.controller;
 
-import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 
@@ -20,14 +19,14 @@ public class IndexDetailRestController {
 	// INDEX 디테일 INDEX 조회
 	@RequestMapping("/indexDetailsIndex")
 	public Map<String, Object> indexDetailsIndex(String indexName, String userId)
-			throws ClassNotFoundException, SQLException {
+			throws Exception {
 		return dbmsService.tableDetailsIndexesBottom(indexName, userId);
 	}
 
 	// INDEX 디테일 COLUMNS 조회
 	@RequestMapping("/indexDetailsColumns")
 	public List<Map<String, Object>> indexDetailsColumns(String indexName, String userId)
-			throws ClassNotFoundException, SQLException {
+			throws Exception {
 		return dbmsService.indexDetailsColumns(indexName, userId);
 	}
 

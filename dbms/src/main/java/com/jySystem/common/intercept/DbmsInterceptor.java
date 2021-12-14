@@ -4,11 +4,15 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
 @SuppressWarnings("deprecation")
 public class DbmsInterceptor extends HandlerInterceptorAdapter {
 
+	@Value("${dbms.properties.session-id}")
+	private String sessionID;
+	
 	private String url;
 
 	public DbmsInterceptor(String url) {
@@ -27,7 +31,7 @@ public class DbmsInterceptor extends HandlerInterceptorAdapter {
 		}
 
 		if (path.contains("/dbmsTool/*")) {
-			if (session.getAttribute("JYSESSION") == null) {
+			if (session.getAttribute(sessionID) == null) {
 				if (path.contains("/dbmsTool/connectionTest")) {
 					return true;
 				}

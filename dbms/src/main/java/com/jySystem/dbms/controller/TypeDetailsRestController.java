@@ -1,6 +1,5 @@
 package com.jySystem.dbms.controller;
 
-import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 
@@ -20,7 +19,7 @@ public class TypeDetailsRestController {
 	// TYPE 디테일 CODE 조회
 	@RequestMapping("/typeDetailsCode")
 	public List<Map<String, Object>> typeDetailsCode(String schema, String typeName, String userId)
-			throws ClassNotFoundException, SQLException {
+			throws Exception {
 		return dbmsService.detailsCode(schema, typeName, "TYPE", userId);
 	}
 
