@@ -50,5 +50,12 @@ public class TableDetailRestController {
 			throws Exception {
 		return dbmsService.tableDetailsConstraints(table, schema, userId);
 	}
+	
+	// TABLE 디테일 SCRIPT 조회
+	@RequestMapping("/tableDetailsScript")
+	public String tableDetailsScript(String table, String schema, String userId) throws Exception {
+		return dbmsService.tableDetailsScript(table, schema, userId);
+	}
+	
 
 }

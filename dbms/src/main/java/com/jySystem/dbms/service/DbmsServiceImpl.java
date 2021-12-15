@@ -348,6 +348,14 @@ public class DbmsServiceImpl implements DbmsService {
 		return dbmsSQL.tableDetailsConstraints(table, schema, db);
 	}
 
+	// 테이블 디테일 Script 검색
+	@Override
+	public String tableDetailsScript(String table, String schema, String userId) throws JYException {
+		DbDTO db = session.getSessionID(sessionID, sessionDBID, sessionDBPW, userId);
+		
+		return dbmsSQL.tableDetailsScript(table, schema, db);
+	}
+	
 	// 인덱스 디테일 Columns 테이블 검색
 	@Override
 	public List<Map<String, Object>> indexDetailsColumns(String indexName, String userId) throws JYException {

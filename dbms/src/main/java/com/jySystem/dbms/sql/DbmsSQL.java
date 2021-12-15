@@ -789,6 +789,43 @@ public class DbmsSQL {
 
 		return list;
 	}
+	
+	// 테이블 디테일 Script 조회
+	public String tableDetailsScript(String table, String schema, DbDTO db)
+			throws JYException {
+		String sql = "select dbms_lob.substr(dbms_metadata.get_DDL('TABLE', table_name, owner) "
+				+ ",dbms_lob.getlength(dbms_metadata.get_DDL('TABLE', table_name, owner))) from all_tables "
+				+ "where owner = ? and table_name = ?";
+		
+		String script = "";
+		
+		Connection conn = null;
+		PreparedStatement pre = null;
+		ResultSet result = null;
+		
+		try {
+			Class.forName(driver);
+			conn = DriverManager.getConnection(url, db.getDbId(), db.getDbPw());
+			pre = conn.prepareStatement(sql);
+			pre.setString(1, schema);
+			pre.setString(2, table);
+			result = pre.executeQuery();
+			
+			while (result.next()) {
+				script += result.getString(1);
+			}
+			
+			result.close();
+			pre.close();
+			conn.close();
+		} catch (ClassNotFoundException cnfe) {
+			throw new JYException("Class Not Found Exception", cnfe);
+		} catch (SQLException se) {
+			throw new JYException("SQL Exception", se);
+		}
+		
+		return script;
+	}
 
 	// 인덱스 디테일 Columns 조회
 	public List<Map<String, Object>> indexDetailsColumns(String indexName, DbDTO db)
@@ -1015,6 +1052,7 @@ public class DbmsSQL {
 	}
 
 	// SQL 한줄 실행
+	@SuppressWarnings("finally")
 	public Map<String, Object> runCurrentSQL(String sql, String type, int index, DbDTO db) throws JYException {
 
 		Map<String, Object> map = new HashMap<String, Object>();
@@ -1098,15 +1136,16 @@ public class DbmsSQL {
 
 			data.add(row);
 			throw new JYException("SQL Exception", e);
-			// 에러 메세지를 보내기위해 finally에서 return
+			
+		// 에러 메세지를 보내기위해 finally에서 return
 		} catch (ClassNotFoundException cnfe) {
 			throw new JYException("Class Not Found Exception", cnfe);
-		} 
-		
-		map.put("size", size);
-		map.put("data", data);
-		
-		return map;
+		} finally {
+			map.put("size", size);
+			map.put("data", data);
+			
+			return map;
+		}
 	}
 
 	// 카프카로 받은 데이터 스케줄러 테이블에 저장

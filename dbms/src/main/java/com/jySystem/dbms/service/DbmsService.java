@@ -30,52 +30,45 @@ public interface DbmsService {
 	public Map<String, Object> loadObject(LoadObjectDTO dto, String userId) throws JYException;
 
 	// 테이블 자식 정보 불러오기
-	public Map<String, Object> getTableChildren(LoadObjectDTO dto, String userId)
-			throws JYException;
+	public Map<String, Object> getTableChildren(LoadObjectDTO dto, String userId) throws JYException;
 
 	// 스키마 디테일 정보 검색
-	public Map<String, Object> schemaDetailsInfo(String schema, String userId)
-			throws JYException;
+	public Map<String, Object> schemaDetailsInfo(String schema, String userId) throws JYException;
 
 	// 스키마 디테일 정보 검색
-	public List<Map<String, Object>> schemaDetailsRoleGrants(String schema, String userId)
-			throws JYException;
+	public List<Map<String, Object>> schemaDetailsRoleGrants(String schema, String userId) throws JYException;
 
 	// 스키마 디테일 정보 검색
-	public List<Map<String, Object>> schemaDetailsSystemPrivileges(String schema, String userId)
-			throws JYException;
+	public List<Map<String, Object>> schemaDetailsSystemPrivileges(String schema, String userId) throws JYException;
 
 	// 스키마 디테일 정보 검색
-	public List<Map<String, Object>> schemaDetailsExtents(String schema, String userId)
-			throws JYException;
+	public List<Map<String, Object>> schemaDetailsExtents(String schema, String userId) throws JYException;
 
 	// 테이블 디테일 정보 검색
-	public Map<String, Object> tableDetailsTable(String table, String schema, String userId)
-			throws JYException;
+	public Map<String, Object> tableDetailsTable(String table, String schema, String userId) throws JYException;
 
 	// 테이블 디테일 정보 검색
-	public List<Map<String, Object>> tableDetailsColumns(String table, String schema, String userId)
-			throws JYException;
+	public List<Map<String, Object>> tableDetailsColumns(String table, String schema, String userId) throws JYException;
 
 	// 테이블 디테일 정보 검색
 	public List<Map<String, Object>> tableDetailsIndexesTop(String table, String schema, String userId)
 			throws JYException;
 
 	// 테이블 디테일 정보 검색
-	public Map<String, Object> tableDetailsIndexesBottom(String indexName, String userId)
-			throws JYException;
+	public Map<String, Object> tableDetailsIndexesBottom(String indexName, String userId) throws JYException;
 
 	// 테이블 디테일 정보 검색
 	public List<Map<String, Object>> tableDetailsConstraints(String table, String schema, String userId)
 			throws JYException;
 
+	// 테이블 디테일 정보 검색
+	public String tableDetailsScript(String table, String schema, String userId) throws JYException;
+
 	// 인덱스 디테일 정보 검색
-	public List<Map<String, Object>> indexDetailsColumns(String indexName, String userId)
-			throws JYException;
+	public List<Map<String, Object>> indexDetailsColumns(String indexName, String userId) throws JYException;
 
 	// 스키마 디테일 정보 검색
-	public Map<String, Object> sequenceDetailsInfo(String sequenceName, String userId)
-			throws JYException;
+	public Map<String, Object> sequenceDetailsInfo(String sequenceName, String userId) throws JYException;
 
 	// 뷰 디테일 정보 검색
 	public List<Map<String, Object>> viewDetailsColumns(String schema, String viewName, String userId)
@@ -90,8 +83,7 @@ public interface DbmsService {
 			throws JYException;
 
 	// SQL 한줄 실행
-	public Map<String, Object> runCurrentSQL(String sql, int cursor, String userId)
-			throws JYException;
+	public Map<String, Object> runCurrentSQL(String sql, int cursor, String userId) throws JYException;
 
 	// SQL 전체 실행
 	public List<Map<String, Object>> runAllSQL(String sql, String userId) throws JYException;
