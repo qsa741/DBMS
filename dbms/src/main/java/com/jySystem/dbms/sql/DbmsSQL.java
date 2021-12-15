@@ -74,6 +74,7 @@ public class DbmsSQL {
 		try {
 			Class.forName(driver);
 			conn = DriverManager.getConnection(url, db.getDbId(), db.getDbPw());
+//			conn = DriverManager.getConnection(url, db.getDbId(), "aa");
 			pre = conn.prepareStatement(sql);
 			result = pre.executeQuery();
 			TreeDTO tree;
