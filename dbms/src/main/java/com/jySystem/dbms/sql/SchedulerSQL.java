@@ -1,4 +1,4 @@
-package com.jySystem.common.scheduler;
+package com.jySystem.dbms.sql;
 
 import java.sql.Connection;
 import java.sql.DriverManager;

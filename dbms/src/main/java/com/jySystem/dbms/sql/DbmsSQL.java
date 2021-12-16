@@ -203,6 +203,9 @@ public class DbmsSQL {
 		String sql = "SELECT * FROM " + dto.getSchema() + "." + dto.getObjectName();
 		List<Map<String, Object>> list = new ArrayList<>();
 
+		System.out.println(dto.getSchema());
+		System.out.println(dto.getObjectName());
+		
 		Connection conn = null;
 		PreparedStatement pre = null;
 		ResultSet result = null;

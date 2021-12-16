@@ -61,6 +61,27 @@
 		</rollingPolicy>
 	</appender>
 
+	<!-- Scheduler -->
+	<appender name="SCHEDULE"
+		class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<!-- 파일명과 경로 설정 -->
+		<file>${LOGS_PATH}/schedule_file.log</file>
+		<!-- 출력 패턴 설정 -->
+		<encoder
+			class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+			<pattern>[%d{yyyy-MM-dd HH:mm:ss}:%-3relative][%thread] %-5level %logger{35} - %msg%n</pattern>
+			<charset>UTF-8</charset>
+		</encoder>
+		<!-- Rolling 정책 -->
+		<rollingPolicy
+			class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+			<!-- .gz,.zip 등을 넣으면 자동 일자별 로그파일 압축 -->
+			<fileNamePattern>${LOGS_PATH}/%d{yyyy-MM-dd}_schedule.log
+			</fileNamePattern>
+			<maxHistory>30</maxHistory>
+		</rollingPolicy>
+	</appender>
+
 	<!-- 지역 설정 -->
 	<logger name="org.springframework.web" level="DEBUG"
 		additivity="false">
@@ -73,9 +94,14 @@
 		<appender-ref ref="FILE" />	
 	</root>
 	
-	<logger name="com.jySystem" level="DEBUG"
+	<logger name="com.jySystem" level="WARN"
 		additivity="false">
 		<appender-ref ref="ERROR" />	
 	</logger>
-
+	
+	<logger name="com.jySystem.dbms.scheduler" level="INFO"
+		additivity="false">
+		<appender-ref ref="SCHEDULE" />	
+	</logger>
+	
 </configuration>

@@ -25,7 +25,7 @@ public class KafkaConsumer {
 	private KafkaServiceImpl kafkaService;
 
 	// 유저 정보 토픽(생성 / 수정)
-	@KafkaListener(topics = "userTopic", groupId = "dbms")
+	@KafkaListener(topics = "userTopic", groupId = "dbms-userTopic")
 	public void userTopic(String data) throws Exception {
 		JSONObject json = new JSONObject(data);
 		if (json.get("id").equals(saveAgentId)) {
@@ -34,7 +34,7 @@ public class KafkaConsumer {
 	}
 
 	// 유저 활동 토픽 (C R U D)
-	@KafkaListener(topics = "actionTopic", groupId = "dbms")
+	@KafkaListener(topics = "actionTopic", groupId = "dbms-actionTopic")
 	public void userAction(String data) throws Exception {
 		JSONObject json = new JSONObject(data);
 

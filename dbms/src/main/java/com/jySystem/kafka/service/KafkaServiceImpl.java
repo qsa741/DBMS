@@ -4,7 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.configurationprocessor.json.JSONObject;
 import org.springframework.stereotype.Service;
 
-import com.jySystem.common.scheduler.SchedulerSQL;
+import com.jySystem.dbms.sql.SchedulerSQL;
 
 @Service
 public class KafkaServiceImpl implements KafkaService {

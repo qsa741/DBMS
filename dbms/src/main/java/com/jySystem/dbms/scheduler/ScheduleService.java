@@ -1,4 +1,4 @@
-package com.jySystem.common.scheduler;
+package com.jySystem.dbms.scheduler;
 
 public interface ScheduleService {
 

@@ -1,18 +1,23 @@
-package com.jySystem.common.scheduler;
+package com.jySystem.dbms.scheduler;
 
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.configurationprocessor.json.JSONObject;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
+import com.jySystem.dbms.sql.SchedulerSQL;
 import com.jySystem.network.service.NetworkServiceImpl;
 
 @Service
 public class ScheduleServiceImpl implements ScheduleService {
+
+	private Logger logger = LoggerFactory.getLogger(this.getClass());
 
 	@Autowired
 	private NetworkServiceImpl networkService;
@@ -24,7 +29,7 @@ public class ScheduleServiceImpl implements ScheduleService {
 	@Scheduled(cron = "0 0 10 * * *")
 	@Override
 	public void settingUserAction() throws Exception {
-		System.out.println(new Date().toString() + " / Setting User Action Scheduler Execute");
+		logger.info(new Date().toString() + " / Setting User Action Scheduler Execute");
 		networkService.settingUserAction();
 	}
 
@@ -32,7 +37,7 @@ public class ScheduleServiceImpl implements ScheduleService {
 	@Scheduled(cron = "0 5 10 * * *")
 	@Override
 	public void saveActionData() throws Exception {
-		System.out.println(new Date().toString() + " / Save Action Data Scheduler Execute");
+		logger.info(new Date().toString() + " / Save Action Data Scheduler Execute");
 		List<Map<String, Object>> list = schedulerSQL.actionScheduler();
 		Map<String, Object> map;
 
