@@ -16,8 +16,7 @@ import org.springframework.stereotype.Service;
 import com.jySystem.common.config.SessionConfig;
 import com.jySystem.dbms.dto.ChartDataSetDTO;
 import com.jySystem.dbms.dto.DbDTO;
-import com.jySystem.dbms.dto.LoadObjectDTO;
-import com.jySystem.dbms.dto.ObjectDTO;
+import com.jySystem.dbms.dto.DbObjectDTO;
 import com.jySystem.dbms.dto.TreeDTO;
 import com.jySystem.dbms.sql.DbmsSQL;
 import com.jySystem.exception.JYException;
@@ -57,30 +56,30 @@ public class DbmsServiceImpl implements DbmsService {
 
 	// 스키마 내부 항목 불러오기
 	@Override
-	public List<TreeDTO> schemaInfo(String schema, String userId) throws JYException {
+	public List<TreeDTO> schemaInfo(DbObjectDTO dto, String userId) throws JYException {
 		List<TreeDTO> treeList = new ArrayList<TreeDTO>();
 		DbDTO db = session.getSessionID(sessionID, sessionDBID, sessionDBPW, userId);
 
-		TreeDTO table = dbmsSQL.schemaInfo(schema, "TABLE", db);
-		TreeDTO view = dbmsSQL.schemaInfo(schema, "VIEW", db);
-		TreeDTO synonym = dbmsSQL.schemaInfo(schema, "SYNONYM", db);
-		TreeDTO function = dbmsSQL.schemaInfo(schema, "FUNCTION", db);
+		TreeDTO table = dbmsSQL.schemaInfo(dto.getSchemaName(), "TABLE", db);
+		TreeDTO view = dbmsSQL.schemaInfo(dto.getSchemaName(), "VIEW", db);
+		TreeDTO synonym = dbmsSQL.schemaInfo(dto.getSchemaName(), "SYNONYM", db);
+		TreeDTO function = dbmsSQL.schemaInfo(dto.getSchemaName(), "FUNCTION", db);
 		function.setIconCls("tree-function");
-		TreeDTO procedure = dbmsSQL.schemaInfo(schema, "PROCEDURE", db);
+		TreeDTO procedure = dbmsSQL.schemaInfo(dto.getSchemaName(), "PROCEDURE", db);
 		procedure.setIconCls("tree-procedure");
-		TreeDTO pvmPackage = dbmsSQL.schemaInfo(schema, "PACKAGE", db);
+		TreeDTO pvmPackage = dbmsSQL.schemaInfo(dto.getSchemaName(), "PACKAGE", db);
 		pvmPackage.setIconCls("tree-package");
-		TreeDTO type = dbmsSQL.schemaInfo(schema, "TYPE", db);
+		TreeDTO type = dbmsSQL.schemaInfo(dto.getSchemaName(), "TYPE", db);
 		type.setIconCls("tree-type");
-		TreeDTO trigger = dbmsSQL.schemaInfo(schema, "TRIGGER", db);
-		TreeDTO index = dbmsSQL.schemaInfo(schema, "INDEX", db);
-		TreeDTO sequence = dbmsSQL.schemaInfo(schema, "SEQUENCE", db);
-		TreeDTO dbLink = dbmsSQL.schemaInfo(schema, "DBLINK", db);
-		TreeDTO mView = dbmsSQL.schemaInfo(schema, "MVIEW", db);
-		TreeDTO mViewLog = dbmsSQL.schemaInfo(schema, "MVIEWLOG", db);
-		TreeDTO job = dbmsSQL.schemaInfo(schema, "JOB", db);
-		TreeDTO library = dbmsSQL.schemaInfo(schema, "LIBRARY", db);
-		TreeDTO pvm = dbmsSQL.schemaInfo(schema, "PVM", db);
+		TreeDTO trigger = dbmsSQL.schemaInfo(dto.getSchemaName(), "TRIGGER", db);
+		TreeDTO index = dbmsSQL.schemaInfo(dto.getSchemaName(), "INDEX", db);
+		TreeDTO sequence = dbmsSQL.schemaInfo(dto.getSchemaName(), "SEQUENCE", db);
+		TreeDTO dbLink = dbmsSQL.schemaInfo(dto.getSchemaName(), "DBLINK", db);
+		TreeDTO mView = dbmsSQL.schemaInfo(dto.getSchemaName(), "MVIEW", db);
+		TreeDTO mViewLog = dbmsSQL.schemaInfo(dto.getSchemaName(), "MVIEWLOG", db);
+		TreeDTO job = dbmsSQL.schemaInfo(dto.getSchemaName(), "JOB", db);
+		TreeDTO library = dbmsSQL.schemaInfo(dto.getSchemaName(), "LIBRARY", db);
+		TreeDTO pvm = dbmsSQL.schemaInfo(dto.getSchemaName(), "PVM", db);
 
 		List<TreeDTO> pvmChildren = new ArrayList<TreeDTO>();
 		pvmChildren.add(function);
@@ -107,18 +106,18 @@ public class DbmsServiceImpl implements DbmsService {
 
 	// 오브젝트 불러오기
 	@Override
-	public List<TreeDTO> objectInfo(ObjectDTO object, String userId) throws JYException {
+	public List<TreeDTO> objectInfo(DbObjectDTO dto, String userId) throws JYException {
 		DbDTO db = session.getSessionID(sessionID, sessionDBID, sessionDBPW, userId);
 
 		// 뒤에 붙은 S 빼고 보내기
-		object.setObject(object.getObject().substring(0, object.getObject().length() - 1));
+		dto.setObjectType(dto.getObjectType().substring(0, dto.getObjectType().length() - 1));
 
-		return dbmsSQL.objectInfo(object, db);
+		return dbmsSQL.objectInfo(dto, db);
 	}
 
 	// 테이블 정보 불러오기
 	@Override
-	public Map<String, Object> loadObject(LoadObjectDTO dto, String userId) throws JYException {
+	public Map<String, Object> loadObject(DbObjectDTO dto, String userId) throws JYException {
 		Map<String, Object> map = new HashMap<>();
 		DbDTO db = session.getSessionID(sessionID, sessionDBID, sessionDBPW, userId);
 
@@ -147,7 +146,7 @@ public class DbmsServiceImpl implements DbmsService {
 
 	// 테이블 자식 정보 불러오기
 	@Override
-	public Map<String, Object> getTableChildren(LoadObjectDTO dto, String userId) throws JYException {
+	public Map<String, Object> getTableChildren(DbObjectDTO dto, String userId) throws JYException {
 		DbDTO db = session.getSessionID(sessionID, sessionDBID, sessionDBPW, userId);
 		Map<String, Object> map = new HashMap<String, Object>();
 		List<TreeDTO> children = new ArrayList<TreeDTO>();
@@ -231,13 +230,13 @@ public class DbmsServiceImpl implements DbmsService {
 
 	// 스키마 디테일 Info 데이터
 	@Override
-	public Map<String, Object> schemaDetailsInfo(String schema, String userId) throws JYException {
+	public Map<String, Object> schemaDetailsInfo(DbObjectDTO dto, String userId) throws JYException {
 		DbDTO db = session.getSessionID(sessionID, sessionDBID, sessionDBPW, userId);
 		Map<String, Object> info = new HashMap<String, Object>();
 		Map<String, Object> result = new HashMap<String, Object>();
 		List<Map<String, Object>> rows = new ArrayList<Map<String, Object>>();
 
-		info = dbmsSQL.schemaDetailsInfo(schema, db);
+		info = dbmsSQL.schemaDetailsInfo(dto, db);
 
 		Set<String> parameters = info.keySet();
 		for (String s : parameters) {
@@ -253,36 +252,36 @@ public class DbmsServiceImpl implements DbmsService {
 
 	// 스키마 디테일 Role Grants 테이블 검색
 	@Override
-	public List<Map<String, Object>> schemaDetailsRoleGrants(String schema, String userId) throws JYException {
+	public List<Map<String, Object>> schemaDetailsRoleGrants(DbObjectDTO dto, String userId) throws JYException {
 		DbDTO db = session.getSessionID(sessionID, sessionDBID, sessionDBPW, userId);
 
-		return dbmsSQL.schemaDetailsRoleGrants(schema, db);
+		return dbmsSQL.schemaDetailsRoleGrants(dto, db);
 	}
 
 	// 스키마 디테일 System Privileges 테이블 검색
 	@Override
-	public List<Map<String, Object>> schemaDetailsSystemPrivileges(String schema, String userId) throws JYException {
+	public List<Map<String, Object>> schemaDetailsSystemPrivileges(DbObjectDTO dto, String userId) throws JYException {
 		DbDTO db = session.getSessionID(sessionID, sessionDBID, sessionDBPW, userId);
 
-		return dbmsSQL.schemaDetailsSystemPrivileges(schema, db);
+		return dbmsSQL.schemaDetailsSystemPrivileges(dto, db);
 	}
 
 	// 스키마 디테일 Extends 테이블 검색
 	@Override
-	public List<Map<String, Object>> schemaDetailsExtents(String schema, String userId) throws JYException {
+	public List<Map<String, Object>> schemaDetailsExtents(DbObjectDTO dto, String userId) throws JYException {
 		DbDTO db = session.getSessionID(sessionID, sessionDBID, sessionDBPW, userId);
 
-		return dbmsSQL.schemaDetailsExtents(schema, db);
+		return dbmsSQL.schemaDetailsExtents(dto, db);
 	}
 
 	// 테이블 디테일 Table 테이블 검색
 	@Override
-	public Map<String, Object> tableDetailsTable(String table, String schema, String userId) throws JYException {
+	public Map<String, Object> tableDetailsTable(DbObjectDTO dto, String userId) throws JYException {
 		DbDTO db = session.getSessionID(sessionID, sessionDBID, sessionDBPW, userId);
 		Map<String, Object> info = new HashMap<String, Object>();
 		Map<String, Object> result = new HashMap<String, Object>();
 		List<Map<String, Object>> rows = new ArrayList<Map<String, Object>>();
-		info = dbmsSQL.tableDetailsTable(table, schema, db);
+		info = dbmsSQL.tableDetailsTable(dto, db);
 
 		Set<String> parameters = info.keySet();
 		for (String s : parameters) {
@@ -300,30 +299,30 @@ public class DbmsServiceImpl implements DbmsService {
 
 	// 테이블 디테일 Columns 테이블 검색
 	@Override
-	public List<Map<String, Object>> tableDetailsColumns(String table, String schema, String userId)
+	public List<Map<String, Object>> tableDetailsColumns(DbObjectDTO dto, String userId)
 			throws JYException {
 		DbDTO db = session.getSessionID(sessionID, sessionDBID, sessionDBPW, userId);
 
-		return dbmsSQL.tableDetailsColumns(table, schema, db);
+		return dbmsSQL.tableDetailsColumns(dto, db);
 	}
 
 	// 테이블 디테일 Indexes Top 테이블 검색
 	@Override
-	public List<Map<String, Object>> tableDetailsIndexesTop(String table, String schema, String userId)
+	public List<Map<String, Object>> tableDetailsIndexesTop(DbObjectDTO dto, String userId)
 			throws JYException {
 		DbDTO db = session.getSessionID(sessionID, sessionDBID, sessionDBPW, userId);
 
-		return dbmsSQL.tableDetailsIndexesTop(table, schema, db);
+		return dbmsSQL.tableDetailsIndexesTop(dto, db);
 	}
 
 	// 테이블 디테일 Indexes Bottom 테이블 검색
 	@Override
-	public Map<String, Object> tableDetailsIndexesBottom(String indexName, String userId) throws JYException {
+	public Map<String, Object> tableDetailsIndexesBottom(DbObjectDTO dto, String userId) throws JYException {
 		DbDTO db = session.getSessionID(sessionID, sessionDBID, sessionDBPW, userId);
 		Map<String, Object> info = new HashMap<String, Object>();
 		Map<String, Object> result = new HashMap<String, Object>();
 		List<Map<String, Object>> rows = new ArrayList<Map<String, Object>>();
-		info = dbmsSQL.tableDetailsIndexesBottom(indexName, db);
+		info = dbmsSQL.tableDetailsIndexesBottom(dto, db);
 
 		Set<String> parameters = info.keySet();
 		for (String s : parameters) {
@@ -341,37 +340,37 @@ public class DbmsServiceImpl implements DbmsService {
 
 	// 테이블 디테일 Constraints 테이블 검색
 	@Override
-	public List<Map<String, Object>> tableDetailsConstraints(String table, String schema, String userId)
+	public List<Map<String, Object>> tableDetailsConstraints(DbObjectDTO dto, String userId)
 			throws JYException {
 		DbDTO db = session.getSessionID(sessionID, sessionDBID, sessionDBPW, userId);
 
-		return dbmsSQL.tableDetailsConstraints(table, schema, db);
+		return dbmsSQL.tableDetailsConstraints(dto, db);
 	}
 
 	// 테이블 디테일 Script 검색
 	@Override
-	public String tableDetailsScript(String table, String schema, String userId) throws JYException {
+	public String tableDetailsScript(DbObjectDTO dto, String userId) throws JYException {
 		DbDTO db = session.getSessionID(sessionID, sessionDBID, sessionDBPW, userId);
 		
-		return dbmsSQL.tableDetailsScript(table, schema, db);
+		return dbmsSQL.tableDetailsScript(dto, db);
 	}
 	
 	// 인덱스 디테일 Columns 테이블 검색
 	@Override
-	public List<Map<String, Object>> indexDetailsColumns(String indexName, String userId) throws JYException {
+	public List<Map<String, Object>> indexDetailsColumns(DbObjectDTO dto, String userId) throws JYException {
 		DbDTO db = session.getSessionID(sessionID, sessionDBID, sessionDBPW, userId);
 
-		return dbmsSQL.indexDetailsColumns(indexName, db);
+		return dbmsSQL.indexDetailsColumns(dto, db);
 	}
 
 	// 시퀀스 디테일 Info 테이블 검색
 	@Override
-	public Map<String, Object> sequenceDetailsInfo(String sequenceName, String userId) throws JYException {
+	public Map<String, Object> sequenceDetailsInfo(DbObjectDTO dto, String userId) throws JYException {
 		DbDTO db = session.getSessionID(sessionID, sessionDBID, sessionDBPW, userId);
 		Map<String, Object> info = new HashMap<String, Object>();
 		Map<String, Object> result = new HashMap<String, Object>();
 		List<Map<String, Object>> rows = new ArrayList<Map<String, Object>>();
-		info = dbmsSQL.sequenceDetailsInfo(sequenceName, db);
+		info = dbmsSQL.sequenceDetailsInfo(dto, db);
 
 		Set<String> parameters = info.keySet();
 		for (String s : parameters) {
@@ -389,29 +388,29 @@ public class DbmsServiceImpl implements DbmsService {
 
 	// 뷰 디테일 Columns 테이블 검색
 	@Override
-	public List<Map<String, Object>> viewDetailsColumns(String schema, String viewName, String userId)
+	public List<Map<String, Object>> viewDetailsColumns(DbObjectDTO dto, String userId)
 			throws JYException {
 		DbDTO db = session.getSessionID(sessionID, sessionDBID, sessionDBPW, userId);
 
-		return dbmsSQL.viewDetailsColumns(schema, viewName, db);
+		return dbmsSQL.viewDetailsColumns(dto, db);
 	}
 
 	// 뷰 디테일 Columns 테이블 검색
 	@Override
-	public List<Map<String, Object>> viewDetailsScript(String schema, String viewName, String userId)
+	public List<Map<String, Object>> viewDetailsScript(DbObjectDTO dto, String userId)
 			throws JYException {
 		DbDTO db = session.getSessionID(sessionID, sessionDBID, sessionDBPW, userId);
 
-		return dbmsSQL.viewDetailsScript(schema, viewName, db);
+		return dbmsSQL.viewDetailsScript(dto, db);
 	}
 
 	// 펀션 디테일 Code 테이블 검색
 	@Override
-	public List<Map<String, Object>> detailsCode(String schema, String name, String type, String userId)
+	public List<Map<String, Object>> detailsCode(DbObjectDTO dto, String userId)
 			throws JYException {
 		DbDTO db = session.getSessionID(sessionID, sessionDBID, sessionDBPW, userId);
 
-		return dbmsSQL.detailsCode(schema, name, type, db);
+		return dbmsSQL.detailsCode(dto, db);
 	}
 
 	// 현재 SQL 한줄 실행

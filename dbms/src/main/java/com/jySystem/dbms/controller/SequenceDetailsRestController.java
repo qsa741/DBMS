@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.jySystem.dbms.dto.DbObjectDTO;
 import com.jySystem.dbms.service.DbmsServiceImpl;
 
 @RestController
@@ -17,9 +18,9 @@ public class SequenceDetailsRestController {
 
 	// SEQUENCE 디테일 INFO 조회
 	@RequestMapping("/sequenceDetailsInfo")
-	public Map<String, Object> sequenceDetailsInfo(String sequenceName, String userId)
+	public Map<String, Object> sequenceDetailsInfo(DbObjectDTO dto, String userId)
 			throws Exception {
-		return dbmsService.sequenceDetailsInfo(sequenceName, userId);
+		return dbmsService.sequenceDetailsInfo(dto, userId);
 	}
 
 }

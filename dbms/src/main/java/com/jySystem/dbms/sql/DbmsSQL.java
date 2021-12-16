@@ -18,8 +18,7 @@ import org.springframework.boot.configurationprocessor.json.JSONObject;
 import org.springframework.stereotype.Service;
 
 import com.jySystem.dbms.dto.DbDTO;
-import com.jySystem.dbms.dto.LoadObjectDTO;
-import com.jySystem.dbms.dto.ObjectDTO;
+import com.jySystem.dbms.dto.DbObjectDTO;
 import com.jySystem.dbms.dto.TreeDTO;
 import com.jySystem.exception.JYException;
 
@@ -154,9 +153,9 @@ public class DbmsSQL {
 	}
 
 	// 오브젝트 항목 조회
-	public List<TreeDTO> objectInfo(ObjectDTO dto, DbDTO db) throws JYException {
+	public List<TreeDTO> objectInfo(DbObjectDTO dto, DbDTO db) throws JYException {
 		String sql = "SELECT OBJECT_TYPE, OBJECT_NAME FROM all_objects WHERE OWNER = ? AND OBJECT_TYPE = ?";
-		String iconCls = "tree-" + dto.getObject().toLowerCase();
+		String iconCls = "tree-" + dto.getObjectType().toLowerCase();
 
 		List<TreeDTO> list = new ArrayList<TreeDTO>();
 		TreeDTO tree = null;
@@ -169,8 +168,8 @@ public class DbmsSQL {
 			Class.forName(driver);
 			conn = DriverManager.getConnection(url, db.getDbId(), db.getDbPw());
 			pre = conn.prepareStatement(sql);
-			pre.setString(1, dto.getId());
-			pre.setString(2, dto.getObject());
+			pre.setString(1, dto.getSchemaName());
+			pre.setString(2, dto.getObjectType());
 			result = pre.executeQuery();
 			
 			while (result.next()) {
@@ -198,14 +197,11 @@ public class DbmsSQL {
 	}
 
 	// Table 불러오기
-	public List<Map<String, Object>> loadObjectTable(LoadObjectDTO dto, DbDTO db)
+	public List<Map<String, Object>> loadObjectTable(DbObjectDTO dto, DbDTO db)
 			throws JYException{
-		String sql = "SELECT * FROM " + dto.getSchema() + "." + dto.getObjectName();
+		String sql = "SELECT * FROM " + dto.getSchemaName() +"." + dto.getTableName();
 		List<Map<String, Object>> list = new ArrayList<>();
 
-		System.out.println(dto.getSchema());
-		System.out.println(dto.getObjectName());
-		
 		Connection conn = null;
 		PreparedStatement pre = null;
 		ResultSet result = null;
@@ -243,7 +239,7 @@ public class DbmsSQL {
 	}
 
 	// Table 하위 목록 조회 (column, constraint, index)
-	public List<Map<String, Object>> selectTableChild(String type, LoadObjectDTO dto, DbDTO db)
+	public List<Map<String, Object>> selectTableChild(String type, DbObjectDTO dto, DbDTO db)
 			throws JYException {
 		String sql = "";
 		if (type.equals("column")) {
@@ -265,8 +261,8 @@ public class DbmsSQL {
 			Class.forName(driver);
 			conn = DriverManager.getConnection(url, db.getDbId(), db.getDbPw());
 			pre = conn.prepareStatement(sql);
-			pre.setString(1, dto.getSchema());
-			pre.setString(2, dto.getObjectName());
+			pre.setString(1, dto.getSchemaName());
+			pre.setString(2, dto.getTableName());
 			result = pre.executeQuery();
 			
 			ResultSetMetaData metaData = result.getMetaData();
@@ -332,13 +328,13 @@ public class DbmsSQL {
 	}
 
 	// 스키마 디테일 Info 조회
-	public Map<String, Object> schemaDetailsInfo(String schema, DbDTO db) throws JYException {
+	public Map<String, Object> schemaDetailsInfo(DbObjectDTO dto, DbDTO db) throws JYException {
 		String sql = "SELECT * FROM all_users WHERE USERNAME = ?";
 		if (getGrant(db).equals("DBA")) {
 			sql = "SELECT USERNAME, USER_ID, ACCOUNT_STATUS, LOCK_DATE, EXPIRY_DATE, DEFAULT_TABLESPACE, CREATED "
 					+ "FROM dba_users WHERE USERNAME = ?";
 			// 권한이 DBA가 아닐때 자기 자신 조회시 추가 정보있음
-		} else if (schema.equals(db.getDbId().toUpperCase())) {
+		} else if (dto.getSchemaName().equals(db.getDbId().toUpperCase())) {
 			sql = "SELECT * FROM USER_USERS WHERE USERNAME = ?";
 		}
 
@@ -352,7 +348,7 @@ public class DbmsSQL {
 			Class.forName(driver);
 			conn = DriverManager.getConnection(url, db.getDbId(), db.getDbPw());
 			pre = conn.prepareStatement(sql);
-			pre.setString(1, schema);
+			pre.setString(1, dto.getSchemaName());
 			result = pre.executeQuery();
 			
 			ResultSetMetaData metaData = result.getMetaData();
@@ -385,7 +381,7 @@ public class DbmsSQL {
 	}
 
 	// 스키마 디테일 Role Grants 조회
-	public List<Map<String, Object>> schemaDetailsRoleGrants(String schema, DbDTO db)
+	public List<Map<String, Object>> schemaDetailsRoleGrants(DbObjectDTO dto, DbDTO db)
 			throws JYException {
 		String sql = "SELECT * FROM user_role_privs WHERE GRANTEE = ?";
 		if (getGrant(db).equals("DBA")) {
@@ -402,7 +398,7 @@ public class DbmsSQL {
 			Class.forName(driver);
 			conn = DriverManager.getConnection(url, db.getDbId(), db.getDbPw());
 			pre = conn.prepareStatement(sql);
-			pre.setString(1, schema);
+			pre.setString(1, dto.getSchemaName());
 			result = pre.executeQuery();
 			
 			ResultSetMetaData metaData = result.getMetaData();
@@ -433,7 +429,7 @@ public class DbmsSQL {
 	}
 
 	// 스키마 디테일 System Privileges 조회
-	public List<Map<String, Object>> schemaDetailsSystemPrivileges(String schema, DbDTO db)
+	public List<Map<String, Object>> schemaDetailsSystemPrivileges(DbObjectDTO dto, DbDTO db)
 			throws JYException {
 		String sql = "SELECT PRIVILEGE, ADMIN_OPTION, USERNAME AS GRANTEE, 'USER' AS TYPE FROM user_sys_privs WHERE USERNAME = ?";
 		if (getGrant(db).equals("DBA")) {
@@ -450,7 +446,7 @@ public class DbmsSQL {
 			Class.forName(driver);
 			conn = DriverManager.getConnection(url, db.getDbId(), db.getDbPw());
 			pre = conn.prepareStatement(sql);
-			pre.setString(1, schema);
+			pre.setString(1, dto.getSchemaName());
 			result = pre.executeQuery();
 			
 			ResultSetMetaData metaData = result.getMetaData();
@@ -486,7 +482,7 @@ public class DbmsSQL {
 	}
 
 	// 스키마 디테일 Extends 조회
-	public List<Map<String, Object>> schemaDetailsExtents(String schema, DbDTO db)
+	public List<Map<String, Object>> schemaDetailsExtents(DbObjectDTO dto, DbDTO db)
 			throws JYException {
 		String sql = "SELECT SEGMENT_TYPE AS TABLESPACE, '' AS SEGMENT_NAME, SEGMENT_NAME AS OBJECT_NAME, '' AS FILE_ID, '' AS BLOCK_ID, BLOCKS FROM user_extents ORDER BY SEGMENT_NAME";
 		String grant = getGrant(db);
@@ -504,7 +500,7 @@ public class DbmsSQL {
 			conn = DriverManager.getConnection(url, db.getDbId(), db.getDbPw());
 			pre = conn.prepareStatement(sql);
 			if (grant.equals("DBA")) {
-				pre.setString(1, schema);
+				pre.setString(1, dto.getSchemaName());
 			}
 			
 			result = pre.executeQuery();
@@ -523,7 +519,7 @@ public class DbmsSQL {
 				list.add(map);
 			}
 			// 권한이 DBA가 아니고 ID와 스키마가 다를경우 빈칸으로 리턴
-			if (!grant.equals("DBA") && !schema.equals(db.getDbId().toUpperCase())) {
+			if (!grant.equals("DBA") && !dto.getSchemaName().equals(db.getDbId().toUpperCase())) {
 				list = new ArrayList<Map<String, Object>>();
 			}
 			
@@ -540,7 +536,7 @@ public class DbmsSQL {
 	}
 
 	// 테이블 디테일 Table 조회
-	public Map<String, Object> tableDetailsTable(String table, String schema, DbDTO db)
+	public Map<String, Object> tableDetailsTable(DbObjectDTO dto, DbDTO db)
 			throws JYException {
 		String sql = "select T.TABLE_NAME AS NAME, C.COMMENTS, T.OWNER, T.PCT_FREE, T.INI_TRANS, T.LOGGING, T.NUM_ROWS, T.BLOCKS, T.AVG_ROW_LEN, "
 				+ "T.SAMPLE_SIZE, T.LAST_ANALYZED, T.DURATION, T.BUFFER_POOL, T.TABLESPACE_NAME, T.COMPRESSION, T.IOT_TYPE, T.MAX_EXTENTS "
@@ -556,8 +552,8 @@ public class DbmsSQL {
 			Class.forName(driver);
 			conn = DriverManager.getConnection(url, db.getDbId(), db.getDbPw());
 			pre = conn.prepareStatement(sql);
-			pre.setString(1, schema);
-			pre.setString(2, table);
+			pre.setString(1, dto.getSchemaName());
+			pre.setString(2, dto.getTableName());
 			result = pre.executeQuery();
 			
 			ResultSetMetaData metaData = result.getMetaData();
@@ -585,7 +581,7 @@ public class DbmsSQL {
 	}
 
 	// 테이블 디테일 Columns 조회
-	public List<Map<String, Object>> tableDetailsColumns(String table, String schema, DbDTO db)
+	public List<Map<String, Object>> tableDetailsColumns(DbObjectDTO dto, DbDTO db)
 			throws JYException {
 		String pkSQL = "select acc.column_name from all_constraints ac, all_cons_columns acc "
 				+ "where ac.owner = ? and ac.table_name = ? and ac.con_type = 'PRIMARY KEY' and ac.constraint_name = acc.constraint_name";
@@ -610,8 +606,8 @@ public class DbmsSQL {
 			
 			// PK 목록 구하기
 			pre = conn.prepareStatement(pkSQL);
-			pre.setString(1, schema);
-			pre.setString(2, table);
+			pre.setString(1, dto.getSchemaName());
+			pre.setString(2, dto.getTableName());
 			result = pre.executeQuery();
 			
 			while (result.next()) {
@@ -619,8 +615,8 @@ public class DbmsSQL {
 			}
 			
 			pre = conn.prepareStatement(sql);
-			pre.setString(1, schema);
-			pre.setString(2, table);
+			pre.setString(1, dto.getSchemaName());
+			pre.setString(2, dto.getTableName());
 			result = pre.executeQuery();
 			
 			ResultSetMetaData metaData = result.getMetaData();
@@ -657,7 +653,7 @@ public class DbmsSQL {
 	}
 
 	// 테이블 디테일 Index Top 조회
-	public List<Map<String, Object>> tableDetailsIndexesTop(String table, String schema, DbDTO db)
+	public List<Map<String, Object>> tableDetailsIndexesTop(DbObjectDTO dto, DbDTO db)
 			throws JYException {
 		String sql = "select * from all_cons_columns ACC, all_indexes AI "
 				+ "where ACC.owner = ? and ACC.TABLE_NAME = ? and ACC.constraint_name = AI.index_name";
@@ -674,8 +670,8 @@ public class DbmsSQL {
 			Class.forName(driver);
 			conn = DriverManager.getConnection(url, db.getDbId(), db.getDbPw());
 			pre = conn.prepareStatement(sql);
-			pre.setString(1, schema);
-			pre.setString(2, table);
+			pre.setString(1, dto.getSchemaName());
+			pre.setString(2, dto.getTableName());
 			result = pre.executeQuery();
 			
 			ResultSetMetaData metaData = result.getMetaData();
@@ -704,7 +700,7 @@ public class DbmsSQL {
 	}
 
 	// 테이블 디테일 Index Bottom 조회
-	public Map<String, Object> tableDetailsIndexesBottom(String indexName, DbDTO db)
+	public Map<String, Object> tableDetailsIndexesBottom(DbObjectDTO dto, DbDTO db)
 			throws JYException {
 		String sql = "select UNIQUENESS, INDEX_NAME, INDEX_TYPE, TABLE_OWNER, TABLE_NAME, TABLE_TYPE, TABLESPACE_NAME, INI_TRANS, PCT_FREE, INITIAL_EXTENT, NEXT_EXTENT, DISTINCT_KEYS "
 				+ " from all_indexes where INDEX_NAME = ?";
@@ -719,7 +715,7 @@ public class DbmsSQL {
 			Class.forName(driver);
 			conn = DriverManager.getConnection(url, db.getDbId(), db.getDbPw());
 			pre = conn.prepareStatement(sql);
-			pre.setString(1, indexName);
+			pre.setString(1, dto.getIndexName());
 			result = pre.executeQuery();
 			
 			ResultSetMetaData metaData = result.getMetaData();
@@ -746,7 +742,7 @@ public class DbmsSQL {
 	}
 
 	// 테이블 디테일 Index Top 조회
-	public List<Map<String, Object>> tableDetailsConstraints(String table, String schema, DbDTO db)
+	public List<Map<String, Object>> tableDetailsConstraints(DbObjectDTO dto, DbDTO db)
 			throws JYException {
 		String sql = "select ACC.CONSTRAINT_NAME, AC.CON_TYPE, ACC.COLUMN_NAME, ACC.POSITION, AC.DELETE_RULE, AC.R_CONSTRAINT_NAME, AC.SEARCH_CONDITION, AC.R_OWNER "
 				+ "from ALL_CONS_COLUMNS ACC, ALL_CONSTRAINTS AC where ACC.OWNER = ? and ACC.TABLE_NAME = ? and ACC.CONSTRAINT_NAME = AC.CONSTRAINT_NAME "
@@ -764,8 +760,8 @@ public class DbmsSQL {
 			Class.forName(driver);
 			conn = DriverManager.getConnection(url, db.getDbId(), db.getDbPw());
 			pre = conn.prepareStatement(sql);
-			pre.setString(1, schema);
-			pre.setString(2, table);
+			pre.setString(1, dto.getSchemaName());
+			pre.setString(2, dto.getTableName());
 			result = pre.executeQuery();
 			
 			ResultSetMetaData metaData = result.getMetaData();
@@ -794,7 +790,7 @@ public class DbmsSQL {
 	}
 	
 	// 테이블 디테일 Script 조회
-	public String tableDetailsScript(String table, String schema, DbDTO db)
+	public String tableDetailsScript(DbObjectDTO dto, DbDTO db)
 			throws JYException {
 		String sql = "select dbms_lob.substr(dbms_metadata.get_DDL('TABLE', table_name, owner) "
 				+ ",dbms_lob.getlength(dbms_metadata.get_DDL('TABLE', table_name, owner))) from all_tables "
@@ -810,8 +806,8 @@ public class DbmsSQL {
 			Class.forName(driver);
 			conn = DriverManager.getConnection(url, db.getDbId(), db.getDbPw());
 			pre = conn.prepareStatement(sql);
-			pre.setString(1, schema);
-			pre.setString(2, table);
+			pre.setString(1, dto.getSchemaName());
+			pre.setString(2, dto.getTableName());
 			result = pre.executeQuery();
 			
 			while (result.next()) {
@@ -831,7 +827,7 @@ public class DbmsSQL {
 	}
 
 	// 인덱스 디테일 Columns 조회
-	public List<Map<String, Object>> indexDetailsColumns(String indexName, DbDTO db)
+	public List<Map<String, Object>> indexDetailsColumns(DbObjectDTO dto, DbDTO db)
 			throws JYException {
 		String sql = "select * from all_ind_columns WHERE index_name = ?";
 
@@ -846,7 +842,7 @@ public class DbmsSQL {
 		Class.forName(driver);
 		conn = DriverManager.getConnection(url, db.getDbId(), db.getDbPw());
 		pre = conn.prepareStatement(sql);
-		pre.setString(1, indexName);
+		pre.setString(1, dto.getIndexName());
 		result = pre.executeQuery();
 		
 		ResultSetMetaData metaData = result.getMetaData();
@@ -875,7 +871,7 @@ public class DbmsSQL {
 	}
 
 	// 시퀀스 디테일 Info 조회
-	public Map<String, Object> sequenceDetailsInfo(String sequenceName, DbDTO db)
+	public Map<String, Object> sequenceDetailsInfo(DbObjectDTO dto, DbDTO db)
 			throws JYException {
 		String sql = "select INCREMENT_BY, MIN_VALUE, MAX_VALUE, CYCLE_FLAG, LAST_NUMBER, CACHE_SIZE, ORDER_FLAG from all_sequences WHERE sequence_name = ?";
 
@@ -889,7 +885,7 @@ public class DbmsSQL {
 			Class.forName(driver);
 			conn = DriverManager.getConnection(url, db.getDbId(), db.getDbPw());
 			pre = conn.prepareStatement(sql);
-			pre.setString(1, sequenceName);
+			pre.setString(1, dto.getSequenceName());
 			result = pre.executeQuery();
 			
 			ResultSetMetaData metaData = result.getMetaData();
@@ -917,7 +913,7 @@ public class DbmsSQL {
 	}
 
 	// 뷰 디테일 Columns 조회
-	public List<Map<String, Object>> viewDetailsColumns(String schema, String viewName, DbDTO db)
+	public List<Map<String, Object>> viewDetailsColumns(DbObjectDTO dto, DbDTO db)
 			throws JYException {
 		String sql = "select at.column_name, at.column_id, at.data_type, at.nullable, au.updatable, au.insertable, au.deletable, ac.comments "
 				+ "from ALL_TAB_COLUMNS at, ALL_UPDATABLE_COLUMNS au , ALL_COL_COMMENTS ac where at.owner = ? and at.table_name = ? and at.column_name = au.column_name and at.table_name = au.table_name and at.column_name = ac.column_name and at.table_name = ac.table_name order by at.column_id";
@@ -933,8 +929,8 @@ public class DbmsSQL {
 			Class.forName(driver);
 			conn = DriverManager.getConnection(url, db.getDbId(), db.getDbPw());
 			pre = conn.prepareStatement(sql);
-			pre.setString(1, schema);
-			pre.setString(2, viewName);
+			pre.setString(1, dto.getSchemaName());
+			pre.setString(2, dto.getViewName());
 			result = pre.executeQuery();
 			
 			ResultSetMetaData metaData = result.getMetaData();
@@ -963,7 +959,7 @@ public class DbmsSQL {
 	}
 
 	// 뷰 디테일 Script 조회
-	public List<Map<String, Object>> viewDetailsScript(String schema, String viewName, DbDTO db)
+	public List<Map<String, Object>> viewDetailsScript(DbObjectDTO dto, DbDTO db)
 			throws JYException {
 		String sql = "select TEXT from ALL_VIEWS where owner = ? and view_name = ?";
 
@@ -978,8 +974,8 @@ public class DbmsSQL {
 			Class.forName(driver);
 			conn = DriverManager.getConnection(url, db.getDbId(), db.getDbPw());
 			pre = conn.prepareStatement(sql);
-			pre.setString(1, schema);
-			pre.setString(2, viewName);
+			pre.setString(1, dto.getSchemaName());
+			pre.setString(2, dto.getViewName());
 			result = pre.executeQuery();
 			
 			ResultSetMetaData metaData = result.getMetaData();
@@ -1009,7 +1005,7 @@ public class DbmsSQL {
 
 	// function, package, type, package body, undefined, trigger, type body 디테일 Code
 	// 조회
-	public List<Map<String, Object>> detailsCode(String schema, String name, String type, DbDTO db)
+	public List<Map<String, Object>> detailsCode(DbObjectDTO dto, DbDTO db)
 			throws JYException {
 		String sql = "select * from all_source where owner = ? and type = ? and name = ? order by line";
 
@@ -1024,9 +1020,17 @@ public class DbmsSQL {
 			Class.forName(driver);
 			conn = DriverManager.getConnection(url, db.getDbId(), db.getDbPw());
 			pre = conn.prepareStatement(sql);
-			pre.setString(1, schema);
-			pre.setString(2, type);
-			pre.setString(3, name);
+			pre.setString(1, dto.getSchemaName());
+			pre.setString(2, dto.getObjectType());
+			if(dto.getObjectType().equals("FUNCTION")) {
+				pre.setString(3, dto.getFunctionName());
+			} else if(dto.getObjectType().equals("PACKAGE")) {
+				pre.setString(3, dto.getPackageName());
+			} else if(dto.getObjectType().equals("TYPE")) {
+				pre.setString(3, dto.getTypeName());
+			} else if(dto.getObjectType().equals("TRIGGER")) {
+				pre.setString(3, dto.getTriggerName());
+			} 
 			result = pre.executeQuery();
 			
 			ResultSetMetaData metaData = result.getMetaData();

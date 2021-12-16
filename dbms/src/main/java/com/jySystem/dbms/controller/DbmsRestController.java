@@ -8,8 +8,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.jySystem.dbms.dto.DbDTO;
-import com.jySystem.dbms.dto.LoadObjectDTO;
-import com.jySystem.dbms.dto.ObjectDTO;
+import com.jySystem.dbms.dto.DbObjectDTO;
 import com.jySystem.dbms.dto.TreeDTO;
 import com.jySystem.dbms.service.DbmsServiceImpl;
 
@@ -28,26 +27,26 @@ public class DbmsRestController {
 
 	// 스키마 정보 불러오기
 	@RequestMapping("/schemaInfo")
-	public List<TreeDTO> schemaInfo(String schema, String userId) throws Exception {
-		return dbmsService.schemaInfo(schema, userId);
+	public List<TreeDTO> schemaInfo(DbObjectDTO dto, String userId) throws Exception {
+		return dbmsService.schemaInfo(dto, userId);
 	}
 
 	// 오브젝트 불러오기
 	@RequestMapping("/objectInfo")
-	public List<TreeDTO> objectInfo(ObjectDTO object, String userId) throws Exception {
-		return dbmsService.objectInfo(object, userId);
+	public List<TreeDTO> objectInfo(DbObjectDTO dto, String userId) throws Exception {
+		return dbmsService.objectInfo(dto, userId);
 	}
 
 	// 테이블 정보 가져오기
 	@RequestMapping("/loadObject")
-	public Map<String, Object> loadObject(LoadObjectDTO dto, String userId)
+	public Map<String, Object> loadObject(DbObjectDTO dto, String userId)
 			throws Exception {
 		return dbmsService.loadObject(dto, userId);
 	}
 
 	// 테이블 정보 가져오기
 	@RequestMapping("/getTableChildren")
-	public Map<String, Object> getTableChildren(LoadObjectDTO dto, String userId)
+	public Map<String, Object> getTableChildren(DbObjectDTO dto, String userId)
 			throws Exception {
 		return dbmsService.getTableChildren(dto, userId);
 	}

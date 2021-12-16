@@ -7,8 +7,7 @@ import org.springframework.boot.configurationprocessor.json.JSONObject;
 
 import com.jySystem.dbms.dto.ChartDataSetDTO;
 import com.jySystem.dbms.dto.DbDTO;
-import com.jySystem.dbms.dto.LoadObjectDTO;
-import com.jySystem.dbms.dto.ObjectDTO;
+import com.jySystem.dbms.dto.DbObjectDTO;
 import com.jySystem.dbms.dto.TreeDTO;
 import com.jySystem.exception.JYException;
 
@@ -21,65 +20,65 @@ public interface DbmsService {
 	public List<TreeDTO> getAllSchemas(String userId) throws JYException;
 
 	// 스키마 정보 가져오기
-	public List<TreeDTO> schemaInfo(String schema, String userId) throws JYException;
+	public List<TreeDTO> schemaInfo(DbObjectDTO dto, String userId) throws JYException;
 
 	// 오브젝트 정보 가져오기
-	public List<TreeDTO> objectInfo(ObjectDTO object, String userId) throws JYException;
+	public List<TreeDTO> objectInfo(DbObjectDTO object, String userId) throws JYException;
 
 	// 테이블 불러오기
-	public Map<String, Object> loadObject(LoadObjectDTO dto, String userId) throws JYException;
+	public Map<String, Object> loadObject(DbObjectDTO dto, String userId) throws JYException;
 
 	// 테이블 자식 정보 불러오기
-	public Map<String, Object> getTableChildren(LoadObjectDTO dto, String userId) throws JYException;
+	public Map<String, Object> getTableChildren(DbObjectDTO dto, String userId) throws JYException;
 
 	// 스키마 디테일 정보 검색
-	public Map<String, Object> schemaDetailsInfo(String schema, String userId) throws JYException;
+	public Map<String, Object> schemaDetailsInfo(DbObjectDTO dto, String userId) throws JYException;
 
 	// 스키마 디테일 정보 검색
-	public List<Map<String, Object>> schemaDetailsRoleGrants(String schema, String userId) throws JYException;
+	public List<Map<String, Object>> schemaDetailsRoleGrants(DbObjectDTO dto, String userId) throws JYException;
 
 	// 스키마 디테일 정보 검색
-	public List<Map<String, Object>> schemaDetailsSystemPrivileges(String schema, String userId) throws JYException;
+	public List<Map<String, Object>> schemaDetailsSystemPrivileges(DbObjectDTO dto, String userId) throws JYException;
 
 	// 스키마 디테일 정보 검색
-	public List<Map<String, Object>> schemaDetailsExtents(String schema, String userId) throws JYException;
+	public List<Map<String, Object>> schemaDetailsExtents(DbObjectDTO dto, String userId) throws JYException;
 
 	// 테이블 디테일 정보 검색
-	public Map<String, Object> tableDetailsTable(String table, String schema, String userId) throws JYException;
+	public Map<String, Object> tableDetailsTable(DbObjectDTO dto, String userId) throws JYException;
 
 	// 테이블 디테일 정보 검색
-	public List<Map<String, Object>> tableDetailsColumns(String table, String schema, String userId) throws JYException;
+	public List<Map<String, Object>> tableDetailsColumns(DbObjectDTO dto, String userId) throws JYException;
 
 	// 테이블 디테일 정보 검색
-	public List<Map<String, Object>> tableDetailsIndexesTop(String table, String schema, String userId)
+	public List<Map<String, Object>> tableDetailsIndexesTop(DbObjectDTO dto, String userId)
 			throws JYException;
 
 	// 테이블 디테일 정보 검색
-	public Map<String, Object> tableDetailsIndexesBottom(String indexName, String userId) throws JYException;
+	public Map<String, Object> tableDetailsIndexesBottom(DbObjectDTO dto, String userId) throws JYException;
 
 	// 테이블 디테일 정보 검색
-	public List<Map<String, Object>> tableDetailsConstraints(String table, String schema, String userId)
+	public List<Map<String, Object>> tableDetailsConstraints(DbObjectDTO dto, String userId)
 			throws JYException;
 
 	// 테이블 디테일 정보 검색
-	public String tableDetailsScript(String table, String schema, String userId) throws JYException;
+	public String tableDetailsScript(DbObjectDTO dto, String userId) throws JYException;
 
 	// 인덱스 디테일 정보 검색
-	public List<Map<String, Object>> indexDetailsColumns(String indexName, String userId) throws JYException;
+	public List<Map<String, Object>> indexDetailsColumns(DbObjectDTO dto, String userId) throws JYException;
 
 	// 스키마 디테일 정보 검색
-	public Map<String, Object> sequenceDetailsInfo(String sequenceName, String userId) throws JYException;
+	public Map<String, Object> sequenceDetailsInfo(DbObjectDTO dto, String userId) throws JYException;
 
 	// 뷰 디테일 정보 검색
-	public List<Map<String, Object>> viewDetailsColumns(String schema, String viewName, String userId)
+	public List<Map<String, Object>> viewDetailsColumns(DbObjectDTO dto, String userId)
 			throws JYException;
 
 	// 뷰 디테일 정보 검색
-	public List<Map<String, Object>> viewDetailsScript(String schema, String viewName, String userId)
+	public List<Map<String, Object>> viewDetailsScript(DbObjectDTO dto, String userId)
 			throws JYException;
 
 	// 펑션 디테일 정보 검색
-	public List<Map<String, Object>> detailsCode(String schema, String name, String type, String userId)
+	public List<Map<String, Object>> detailsCode(DbObjectDTO dto, String userId)
 			throws JYException;
 
 	// SQL 한줄 실행
