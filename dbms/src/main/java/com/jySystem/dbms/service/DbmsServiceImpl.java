@@ -110,7 +110,7 @@ public class DbmsServiceImpl implements DbmsService {
 		DbDTO db = session.getSessionID(sessionID, sessionDBID, sessionDBPW, userId);
 
 		// 뒤에 붙은 S 빼고 보내기
-		dto.setObjectType(dto.getObjectType().substring(0, dto.getObjectType().length() - 1));
+		dto.setObjectType(dto.getObjectType().replace("Folder", ""));
 
 		return dbmsSQL.objectInfo(dto, db);
 	}

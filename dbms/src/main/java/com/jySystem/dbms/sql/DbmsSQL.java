@@ -129,7 +129,7 @@ public class DbmsSQL {
 			result = pre.executeQuery();
 			
 			while (result.next()) {
-				tree.setId(objectType + "S");
+				tree.setId(objectType + "Folder");
 				// 첫글자 대문자로 바꾸기
 				String substr1 = objectType.substring(0, 1);
 				String substr2 = objectType.substring(1);
