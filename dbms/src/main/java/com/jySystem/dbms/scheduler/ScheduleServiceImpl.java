@@ -26,7 +26,7 @@ public class ScheduleServiceImpl implements ScheduleService {
 	private SchedulerSQL schedulerSQL;
 
 	// 오전 10시마다 ActionData 테이블 정리 명령어 SSO로 전송
-	@Scheduled(cron = "0 0 10 * * *")
+	@Scheduled(cron = "${schedule.settingUserAction}")
 	@Override
 	public void settingUserAction() throws Exception {
 		logger.info(new Date().toString() + " / Setting User Action Scheduler Execute");
@@ -34,7 +34,7 @@ public class ScheduleServiceImpl implements ScheduleService {
 	}
 
 	// 오전 10시 5분에 ActionScheduler에 저장된 데이터 처리
-	@Scheduled(cron = "0 5 10 * * *")
+	@Scheduled(cron = "${schedule.saveActionData}")
 	@Override
 	public void saveActionData() throws Exception {
 		logger.info(new Date().toString() + " / Save Action Data Scheduler Execute");
