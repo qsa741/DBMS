@@ -1,5 +1,7 @@
 package com.jySystem.kafka;
 
+import java.util.Objects;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.configurationprocessor.json.JSONObject;
@@ -28,7 +30,7 @@ public class KafkaConsumer {
 	@KafkaListener(topics = "userTopic", groupId = "dbms-userTopic")
 	public void userTopic(String data) throws Exception {
 		JSONObject json = new JSONObject(data);
-		if (json.get("id").equals(saveAgentId)) {
+		if (Objects.equals(json.get("id"), saveAgentId)) {
 			networkService.saveUser(json);
 		}
 	}
@@ -39,7 +41,7 @@ public class KafkaConsumer {
 		JSONObject json = new JSONObject(data);
 
 		String id = json.getString("id");
-		if (id.equals(actionAgentId + "-02")) {
+		if (Objects.equals(id, actionAgentId + "-02")) {
 			kafkaService.saveActionData(json);
 		}
 	}

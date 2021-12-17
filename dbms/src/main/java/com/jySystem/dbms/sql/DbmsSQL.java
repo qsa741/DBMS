@@ -11,6 +11,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.configurationprocessor.json.JSONException;
@@ -113,7 +114,7 @@ public class DbmsSQL {
 			PreparedStatement pre = null;
 			ResultSet result = null;
 
-			if (objectType.equals("PVM")) {
+			if (Objects.equals(objectType,"PVM")) {
 				tree.setId("PVM");
 				tree.setText("Pvm (4)");
 				tree.setState("closed");
@@ -240,10 +241,10 @@ public class DbmsSQL {
 	// Table 하위 목록 조회 (column, constraint, index)
 	public List<Map<String, Object>> selectTableChild(String type, DbObjectDTO dto, DbDTO db) throws JYException {
 		String sql = "";
-		if (type.equals("column")) {
+		if (Objects.equals(type, "column")) {
 			sql = "SELECT OWNER, TABLE_NAME, COLUMN_NAME, DATA_TYPE, DATA_LENGTH "
 					+ "FROM all_tab_columns WHERE OWNER = ? AND TABLE_NAME = ?";
-		} else if (type.equals("index")) {
+		} else if (Objects.equals(type, "index")) {
 			sql = "SELECT INDEX_NAME FROM (SELECT * FROM all_ind_columns WHERE INDEX_OWNER = ? AND TABLE_NAME = ?) GROUP BY INDEX_NAME";
 		} else {
 			sql = "SELECT CONSTRAINT_NAME FROM (SELECT * FROM all_cons_columns WHERE OWNER = ? AND TABLE_NAME = ?) GROUP BY CONSTRAINT_NAME";
@@ -307,7 +308,7 @@ public class DbmsSQL {
 			while (result.next()) {
 				grant = result.getString(1);
 				// DBA 권한이 있을때 빠져나오기
-				if (grant.equals("DBA")) {
+				if (Objects.equals(grant, "DBA")) {
 					break;
 				}
 				grant = "CONNECT";
@@ -328,11 +329,11 @@ public class DbmsSQL {
 	// 스키마 디테일 Info 조회
 	public Map<String, Object> schemaDetailsInfo(DbObjectDTO dto, DbDTO db) throws JYException {
 		String sql = "SELECT * FROM all_users WHERE USERNAME = ?";
-		if (getGrant(db).equals("DBA")) {
+		if (Objects.equals(getGrant(db), "DBA")) {
 			sql = "SELECT USERNAME, USER_ID, ACCOUNT_STATUS, LOCK_DATE, EXPIRY_DATE, DEFAULT_TABLESPACE, CREATED "
 					+ "FROM dba_users WHERE USERNAME = ?";
 			// 권한이 DBA가 아닐때 자기 자신 조회시 추가 정보있음
-		} else if (dto.getSchemaName().equals(db.getDbId().toUpperCase())) {
+		} else if (Objects.equals(dto.getSchemaName(), db.getDbId().toUpperCase())) {
 			sql = "SELECT * FROM USER_USERS WHERE USERNAME = ?";
 		}
 
@@ -358,7 +359,7 @@ public class DbmsSQL {
 				for (int i = 0; i < size; i++) {
 					col = metaData.getColumnName(i + 1);
 					// 날짜형식 YYYY-MM-DD 로 고정
-					if (col.equals("CREATED")) {
+					if (Objects.equals(col, "CREATED")) {
 						map.put(col, result.getString(col).substring(0, 10));
 					} else {
 						map.put(col, result.getString(col));
@@ -428,7 +429,7 @@ public class DbmsSQL {
 	// 스키마 디테일 System Privileges 조회
 	public List<Map<String, Object>> schemaDetailsSystemPrivileges(DbObjectDTO dto, DbDTO db) throws JYException {
 		String sql = "SELECT PRIVILEGE, ADMIN_OPTION, USERNAME AS GRANTEE, 'USER' AS TYPE FROM user_sys_privs WHERE USERNAME = ?";
-		if (getGrant(db).equals("DBA")) {
+		if (Objects.equals(getGrant(db), "DBA")) {
 			sql = "SELECT PRIVILEGE, ADMIN_OPTION, GRANTEE, 'USER' AS TYPE FROM dba_sys_privs WHERE GRANTEE = ?";
 		}
 
@@ -456,7 +457,7 @@ public class DbmsSQL {
 				for (int i = 0; i < size; i++) {
 					col = metaData.getColumnName(i + 1);
 					// 티베로에서 조회시 빈칸으로 나옴
-					if (col.equals("GRANTEE")) {
+					if (Objects.equals(col, "GRANTEE")) {
 						map.put(col, "");
 					} else {
 						map.put(col, result.getString(col));
@@ -481,7 +482,7 @@ public class DbmsSQL {
 	public List<Map<String, Object>> schemaDetailsExtents(DbObjectDTO dto, DbDTO db) throws JYException {
 		String sql = "SELECT SEGMENT_TYPE AS TABLESPACE, '' AS SEGMENT_NAME, SEGMENT_NAME AS OBJECT_NAME, '' AS FILE_ID, '' AS BLOCK_ID, BLOCKS FROM user_extents ORDER BY SEGMENT_NAME";
 		String grant = getGrant(db);
-		if (grant.equals("DBA")) {
+		if (Objects.equals(grant, "DBA")) {
 			sql = "SELECT SEGMENT_TYPE AS TABLESPACE, '' AS SEGMENT_NAME, SEGMENT_NAME AS OBJECT_NAME, FILE_ID, BLOCK_ID, BLOCKS FROM dba_extents WHERE OWNER = ? ORDER BY SEGMENT_NAME";
 		}
 		List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();
@@ -494,7 +495,7 @@ public class DbmsSQL {
 			Class.forName(driver);
 			conn = DriverManager.getConnection(url, db.getDbId(), db.getDbPw());
 			pre = conn.prepareStatement(sql);
-			if (grant.equals("DBA")) {
+			if (Objects.equals(grant, "DBA")) {
 				pre.setString(1, dto.getSchemaName());
 			}
 
@@ -514,7 +515,7 @@ public class DbmsSQL {
 				list.add(map);
 			}
 			// 권한이 DBA가 아니고 ID와 스키마가 다를경우 빈칸으로 리턴
-			if (!grant.equals("DBA") && !dto.getSchemaName().equals(db.getDbId().toUpperCase())) {
+			if (!Objects.equals(grant, "DBA") && !Objects.equals(dto.getSchemaName(), db.getDbId().toUpperCase())) {
 				list = new ArrayList<Map<String, Object>>();
 			}
 
@@ -1006,13 +1007,13 @@ public class DbmsSQL {
 			pre = conn.prepareStatement(sql);
 			pre.setString(1, dto.getSchemaName());
 			pre.setString(2, dto.getObjectType());
-			if (dto.getObjectType().equals("FUNCTION")) {
+			if (Objects.equals(dto.getObjectType(),"FUNCTION")) {
 				pre.setString(3, dto.getFunctionName());
-			} else if (dto.getObjectType().equals("PACKAGE")) {
+			} else if (Objects.equals(dto.getObjectType(),"PACKAGE")) {
 				pre.setString(3, dto.getPackageName());
-			} else if (dto.getObjectType().equals("TYPE")) {
+			} else if (Objects.equals(dto.getObjectType(),"TYPE")) {
 				pre.setString(3, dto.getTypeName());
-			} else if (dto.getObjectType().equals("TRIGGER")) {
+			} else if (Objects.equals(dto.getObjectType(),"TRIGGER")) {
 				pre.setString(3, dto.getTriggerName());
 			}
 			result = pre.executeQuery();
@@ -1070,7 +1071,7 @@ public class DbmsSQL {
 			pre = conn.prepareStatement(sql);
 
 			// SELECT 일 경우
-			if (type.equals("SELECT")) {
+			if (Objects.equals(type, "SELECT")) {
 				result = pre.executeQuery();
 				ResultSetMetaData metaData = result.getMetaData();
 				size = metaData.getColumnCount();
@@ -1102,11 +1103,11 @@ public class DbmsSQL {
 				row.put("ExecutionTime", time);
 
 				// 결과에 따라 row 등록 DDL DML DCL
-				if (type.equals("CREATE") || type.equals("DROP") || type.equals("ALTER") || type.equals("TRUNCATE")) {
+				if (Objects.equals(type, "CREATE") || Objects.equals(type, "DROP") || Objects.equals(type,"ALTER") || Objects.equals(type,"TRUNCATE")) {
 					row.put("DbmsOutput", type.toLowerCase() + " " + sql.split(" ")[1].toLowerCase() + ".");
-				} else if (type.equals("INSERT") || type.equals("UPDATE") || type.equals("DELETE")) {
+				} else if (Objects.equals(type, "INSERT") || Objects.equals(type, "UPDATE") || Objects.equals(type,"DELETE")) {
 					row.put("DbmsOutput", count + " rows " + type.toLowerCase() + ".");
-				} else if (type.equals("GRANT") || type.equals("REVOKE")) {
+				} else if (Objects.equals(type,"GRANT") || Objects.equals(type,"REVOKE")) {
 					row.put("DbmsOutput", "commends complated successfully.");
 				}
 				data.add(row);

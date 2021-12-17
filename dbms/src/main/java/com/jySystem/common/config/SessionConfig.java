@@ -1,6 +1,7 @@
 package com.jySystem.common.config;
 
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 
 import javax.servlet.annotation.WebListener;
@@ -34,7 +35,7 @@ public class SessionConfig implements HttpSessionListener {
 		DbDTO dto = new DbDTO();
 		for (String key : sessions.keySet()) {
 			HttpSession s = sessions.get(key);
-			if (s != null && s.getAttribute(sessionID) != null && s.getAttribute(sessionID).equals(id)) {
+			if (s != null && s.getAttribute(sessionID) != null && Objects.equals(s.getAttribute(sessionID),id)) {
 				dto.setDbId((String) s.getAttribute(sessionDBID));
 				dto.setDbPw((String) s.getAttribute(sessionDBPW));
 				break;

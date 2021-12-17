@@ -1,6 +1,7 @@
 package com.jySystem.network.service;
 
 import java.util.Date;
+import java.util.Objects;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -39,7 +40,7 @@ public class NetworkServiceImpl implements NetworkService {
 	@Override
 	public boolean networkCheck(String agentNetwork) {
 		boolean result = false;
-		if (dbmsPropertiesNetwork.equals(agentNetwork)) {
+		if (Objects.equals(dbmsPropertiesNetwork, agentNetwork)) {
 			result = true;
 		}
 
@@ -50,9 +51,9 @@ public class NetworkServiceImpl implements NetworkService {
 	// type이 kafka일 경우 saveUser에 명령어 저장
 	@Override
 	public void saveUser(JSONObject data) throws Exception {
-		if (data.get("type").equals("DB")) {
+		if (Objects.equals(data.get("type"), "DB")) {
 			dbmsSQL.userSchedulerSave((String) data.get("data"));
-		} else if (data.get("type").equals("KAFKA")) {
+		} else if (Objects.equals(data.get("type"), "KAFKA")) {
 			JSONObject json = new JSONObject();
 			json.put("id", saveAgentId + "-02");
 			json.put("data", (String) data.get("data"));

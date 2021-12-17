@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,7 +49,7 @@ public class DbmsServiceImpl implements DbmsService {
 		DbDTO db = session.getSessionID(sessionID, sessionDBID, sessionDBPW, userId);
 
 		// DB 아이디가 없을때 null 리턴
-		if (db.getDbId() == null || db.getDbId().equals("")) {
+		if (db.getDbId() == null || Objects.equals(db.getDbId(), "")) {
 			return null;
 		}
 		return dbmsSQL.allSchemas(db);
@@ -109,7 +110,7 @@ public class DbmsServiceImpl implements DbmsService {
 	public List<TreeDTO> objectInfo(DbObjectDTO dto, String userId) throws JYException {
 		DbDTO db = session.getSessionID(sessionID, sessionDBID, sessionDBPW, userId);
 
-		// 뒤에 붙은 S 빼고 보내기
+		// 뒤에 붙은 Folder 빼고 보내기
 		dto.setObjectType(dto.getObjectType().replace("Folder", ""));
 
 		return dbmsSQL.objectInfo(dto, db);
@@ -122,7 +123,7 @@ public class DbmsServiceImpl implements DbmsService {
 		DbDTO db = session.getSessionID(sessionID, sessionDBID, sessionDBPW, userId);
 
 		if (db.getDbId() != null) {
-			if (dto.getObjectType().equals("TABLE")) {
+			if (Objects.equals(dto.getObjectType(), "TABLE")) {
 				List<Map<String, Object>> rows = dbmsSQL.loadObjectTable(dto, db);
 				List<Map<String, Object>> column = dbmsSQL.selectTableChild("column", dto, db);
 
@@ -192,7 +193,7 @@ public class DbmsServiceImpl implements DbmsService {
 			tree.setId("COLUMN");
 			tree.setIconCls("tree-column");
 			String text = (String) c.get("COLUMN_NAME") + " : " + (String) c.get("DATA_TYPE");
-			if (c.get("DATA_TYPE").equals("VARCHAR")) {
+			if (Objects.equals(c.get("DATA_TYPE"), "VARCHAR")) {
 				text += " (" + c.get("DATA_LENGTH") + ")";
 			}
 			tree.setText(text);
@@ -328,9 +329,10 @@ public class DbmsServiceImpl implements DbmsService {
 		Set<String> parameters = info.keySet();
 		for (String s : parameters) {
 			Map<String, Object> map = new HashMap<String, Object>();
-			map.put("VALUE", info.get(s));
 			s = s.replace("_", " ");
 			String parameter = s.substring(0, 1) + s.substring(1).toLowerCase();
+
+			map.put("VALUE", info.get(s));
 			map.put("PARAMETER", parameter);
 			rows.add(map);
 		}
@@ -375,9 +377,10 @@ public class DbmsServiceImpl implements DbmsService {
 		Set<String> parameters = info.keySet();
 		for (String s : parameters) {
 			Map<String, Object> map = new HashMap<String, Object>();
-			map.put("VALUE", info.get(s));
 			s = s.replace("_", " ");
 			String parameter = s.substring(0, 1) + s.substring(1).toLowerCase();
+
+			map.put("VALUE", info.get(s));
 			map.put("PARAMETER", parameter);
 			rows.add(map);
 		}
@@ -418,7 +421,8 @@ public class DbmsServiceImpl implements DbmsService {
 			return null;
 		}
 		sql = sql.replace("\r", "").replace("\n", "").replace("\t", "");
-		String[] array = sql.split(";");
+		String[] array = sql.split(";", -1);
+		
 		int count = 0;
 		// 커서의 위치 계산 후 SQL문 실행
 		for (int i = 1; i < sql.length(); i++) {
@@ -443,14 +447,16 @@ public class DbmsServiceImpl implements DbmsService {
 			return null;
 		}
 		sqls = sqls.replace("\r", "").replace("\n", "").replace("\t", "");
-		String[] array = sqls.split(";");
+		String[] array = sqls.split(";", -1);
+		
 		List<Map<String, Object>> list = new ArrayList<>();
 		int count = 0;
 		for (int i = 0; i < array.length; i++) {
 			String sql = array[i];
 			String type = sql.split(" ")[0].toUpperCase();
+			
 			// SELECT문이 아닐시 DBMS OUTPUT에 적용할 Row count 사용
-			if (!type.equals("SELECT")) {
+			if (!Objects.equals(type, "SELECT")) {
 				count++;
 			}
 			list.add(dbmsSQL.runCurrentSQL(sql, type, count, db));
