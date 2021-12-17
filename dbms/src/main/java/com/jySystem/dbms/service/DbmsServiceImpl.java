@@ -122,25 +122,28 @@ public class DbmsServiceImpl implements DbmsService {
 		DbDTO db = session.getSessionID(sessionID, sessionDBID, sessionDBPW, userId);
 
 		if (db.getDbId() != null) {
-			if (dto.getObjectType().equals("TABLE")) {
+			if(dto.getObjectType().equals("TABLE")) {
 				List<Map<String, Object>> rows = dbmsSQL.loadObjectTable(dto, db);
 				List<Map<String, Object>> column = dbmsSQL.selectTableChild("column", dto, db);
-
+				
 				List<String> columnName = new ArrayList<>();
 				for (Map<String, Object> c : column) {
 					columnName.add((String) c.get("COLUMN_NAME"));
 				}
-
+				
 				Map<String, Object> data = new HashMap<>();
-
+				
 				data.put("rows", rows);
 				data.put("total", rows.size());
 				map.put("columns", columnName);
 				map.put("data", data);
+				map.put("key", dto.getSchemaName() + dto.getTableName());
+				map.put("title", dto.getTableName());
+			} else {
+				return null;
 			}
-		} else {
-			return null;
 		}
+		
 		return map;
 	}
 
