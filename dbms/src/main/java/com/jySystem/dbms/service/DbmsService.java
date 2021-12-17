@@ -50,15 +50,13 @@ public interface DbmsService {
 	public List<Map<String, Object>> tableDetailsColumns(DbObjectDTO dto, String userId) throws JYException;
 
 	// 테이블 디테일 정보 검색
-	public List<Map<String, Object>> tableDetailsIndexesTop(DbObjectDTO dto, String userId)
-			throws JYException;
+	public List<Map<String, Object>> tableDetailsIndexesTop(DbObjectDTO dto, String userId) throws JYException;
 
 	// 테이블 디테일 정보 검색
 	public Map<String, Object> tableDetailsIndexesBottom(DbObjectDTO dto, String userId) throws JYException;
 
 	// 테이블 디테일 정보 검색
-	public List<Map<String, Object>> tableDetailsConstraints(DbObjectDTO dto, String userId)
-			throws JYException;
+	public List<Map<String, Object>> tableDetailsConstraints(DbObjectDTO dto, String userId) throws JYException;
 
 	// 테이블 디테일 정보 검색
 	public String tableDetailsScript(DbObjectDTO dto, String userId) throws JYException;
@@ -70,16 +68,13 @@ public interface DbmsService {
 	public Map<String, Object> sequenceDetailsInfo(DbObjectDTO dto, String userId) throws JYException;
 
 	// 뷰 디테일 정보 검색
-	public List<Map<String, Object>> viewDetailsColumns(DbObjectDTO dto, String userId)
-			throws JYException;
+	public List<Map<String, Object>> viewDetailsColumns(DbObjectDTO dto, String userId) throws JYException;
 
 	// 뷰 디테일 정보 검색
-	public List<Map<String, Object>> viewDetailsScript(DbObjectDTO dto, String userId)
-			throws JYException;
+	public List<Map<String, Object>> viewDetailsScript(DbObjectDTO dto, String userId) throws JYException;
 
 	// 펑션 디테일 정보 검색
-	public List<Map<String, Object>> detailsCode(DbObjectDTO dto, String userId)
-			throws JYException;
+	public List<Map<String, Object>> detailsCode(DbObjectDTO dto, String userId) throws JYException;
 
 	// SQL 한줄 실행
 	public Map<String, Object> runCurrentSQL(String sql, int cursor, String userId) throws JYException;

@@ -18,8 +18,7 @@ public class SequenceDetailsRestController {
 
 	// SEQUENCE 디테일 INFO 조회
 	@RequestMapping("/sequenceDetailsInfo")
-	public Map<String, Object> sequenceDetailsInfo(DbObjectDTO dto, String userId)
-			throws Exception {
+	public Map<String, Object> sequenceDetailsInfo(DbObjectDTO dto, String userId) throws Exception {
 		return dbmsService.sequenceDetailsInfo(dto, userId);
 	}
 

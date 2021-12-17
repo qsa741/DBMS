@@ -91,17 +91,16 @@
 	<!-- 전역 설정 -->
 	<root level="${LOGS_LEVEL}">
 		<appender-ref ref="STDOUT" />
-		<appender-ref ref="FILE" />	
+		<appender-ref ref="FILE" />
 	</root>
-	
-	<logger name="com.jySystem" level="WARN"
-		additivity="false">
-		<appender-ref ref="ERROR" />	
+
+	<logger name="com.jySystem" level="WARN" additivity="false">
+		<appender-ref ref="ERROR" />
 	</logger>
-	
+
 	<logger name="com.jySystem.dbms.scheduler" level="INFO"
 		additivity="false">
-		<appender-ref ref="SCHEDULE" />	
+		<appender-ref ref="SCHEDULE" />
 	</logger>
-	
+
 </configuration>

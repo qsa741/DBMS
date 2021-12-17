@@ -12,7 +12,7 @@ public class DbmsInterceptor extends HandlerInterceptorAdapter {
 
 	@Value("${dbms.properties.session-id}")
 	private String sessionID;
-	
+
 	private String url;
 
 	public DbmsInterceptor(String url) {

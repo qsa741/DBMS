@@ -7,10 +7,10 @@ public class JYException extends Exception {
 	public JYException(String msg) {
 		super(msg);
 	}
-	
+
 	public JYException(String msg, Throwable cause) {
 		super(msg, cause);
 		cause.printStackTrace();
 	}
-	
+
 }

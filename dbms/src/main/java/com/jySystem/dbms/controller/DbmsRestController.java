@@ -39,15 +39,13 @@ public class DbmsRestController {
 
 	// 테이블 정보 가져오기
 	@RequestMapping("/loadObject")
-	public Map<String, Object> loadObject(DbObjectDTO dto, String userId)
-			throws Exception {
+	public Map<String, Object> loadObject(DbObjectDTO dto, String userId) throws Exception {
 		return dbmsService.loadObject(dto, userId);
 	}
 
 	// 테이블 정보 가져오기
 	@RequestMapping("/getTableChildren")
-	public Map<String, Object> getTableChildren(DbObjectDTO dto, String userId)
-			throws Exception {
+	public Map<String, Object> getTableChildren(DbObjectDTO dto, String userId) throws Exception {
 		return dbmsService.getTableChildren(dto, userId);
 	}
 

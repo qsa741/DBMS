@@ -19,8 +19,7 @@ public class TypeDetailsRestController {
 
 	// TYPE 디테일 CODE 조회
 	@RequestMapping("/typeDetailsCode")
-	public List<Map<String, Object>> typeDetailsCode(DbObjectDTO dto, String userId)
-			throws Exception {
+	public List<Map<String, Object>> typeDetailsCode(DbObjectDTO dto, String userId) throws Exception {
 		return dbmsService.detailsCode(dto, userId);
 	}
 

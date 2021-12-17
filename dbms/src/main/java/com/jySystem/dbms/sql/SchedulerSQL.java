@@ -36,8 +36,7 @@ public class SchedulerSQL {
 
 	// Action 데이터 저장
 	@SuppressWarnings("resource")
-	public void saveActionData(String action, JSONObject json)
-			throws JYException {
+	public void saveActionData(String action, JSONObject json) throws JYException {
 		String select = "select * from ACTIONDATA where year = ? and month = ? and day = ? and action = ?";
 		String insert = "insert into ACTIONDATA values(?,?,?,?,?, sysdate)";
 		String update = "update ACTIONDATA set count = ? where year = ? and month = ? and day = ? and action = ?";
@@ -48,16 +47,16 @@ public class SchedulerSQL {
 		try {
 			Class.forName(driver);
 			conn = DriverManager.getConnection(url, username, password);
-			
+
 			// 해당 일에 데이터가 있는지 확인
 			pre = conn.prepareStatement(select);
 			pre.setString(1, json.getString("year"));
 			pre.setString(2, json.getString("month"));
 			pre.setString(3, json.getString("day"));
 			pre.setString(4, action);
-			
+
 			rs = pre.executeQuery();
-			
+
 			// 데이터가 있으면 Update, 없으면 Insert
 			if (rs.next()) {
 				pre = conn.prepareStatement(update);
@@ -74,9 +73,9 @@ public class SchedulerSQL {
 				pre.setString(4, action);
 				pre.setInt(5, json.getInt("count"));
 			}
-			
+
 			pre.executeUpdate();
-			
+
 			rs.close();
 			pre.close();
 			conn.close();
@@ -87,7 +86,7 @@ public class SchedulerSQL {
 		} catch (JSONException je) {
 			throw new JYException("JSON Exception", je);
 		}
-		
+
 	}
 
 	// ActionScheduler 테이블에 읽지 않은 데이터 처리 후 읽음으로 표시
@@ -107,12 +106,12 @@ public class SchedulerSQL {
 			conn = DriverManager.getConnection(url, username, password);
 			pre = conn.prepareStatement(sql);
 			result = pre.executeQuery();
-			
+
 			ResultSetMetaData metaData = result.getMetaData();
-			
+
 			Map<String, Object> map;
 			String col;
-			
+
 			while (result.next()) {
 				map = new LinkedHashMap<>();
 				for (int i = 0; i < 4; i++) {
@@ -124,7 +123,7 @@ public class SchedulerSQL {
 				pre.setString(1, (String) map.get("SCHEDULENUM"));
 				pre.executeUpdate();
 			}
-			
+
 			result.close();
 			pre.close();
 			conn.close();

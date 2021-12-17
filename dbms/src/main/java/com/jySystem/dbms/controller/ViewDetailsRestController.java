@@ -19,15 +19,13 @@ public class ViewDetailsRestController {
 
 	// VIEW 디테일 COLUMNS 조회
 	@RequestMapping("/viewDetailsColumns")
-	public List<Map<String, Object>> viewDetailsColumns(DbObjectDTO dto, String userId)
-			throws Exception {
+	public List<Map<String, Object>> viewDetailsColumns(DbObjectDTO dto, String userId) throws Exception {
 		return dbmsService.viewDetailsColumns(dto, userId);
 	}
 
 	// VIEW 디테일 SCRIPT 조회
 	@RequestMapping("/viewDetailsScript")
-	public List<Map<String, Object>> viewDetailsScript(DbObjectDTO dto, String userId)
-			throws Exception {
+	public List<Map<String, Object>> viewDetailsScript(DbObjectDTO dto, String userId) throws Exception {
 		return dbmsService.viewDetailsScript(dto, userId);
 	}
 }

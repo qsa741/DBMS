@@ -19,29 +19,25 @@ public class SchemaDetailRestController {
 
 	// 스키마 디테일 Info 정보 불러오기
 	@RequestMapping("/schemaDetailsInfo")
-	public Map<String, Object> schemaDetailInfo(DbObjectDTO dto, String userId)
-			throws Exception {
+	public Map<String, Object> schemaDetailInfo(DbObjectDTO dto, String userId) throws Exception {
 		return dbmsService.schemaDetailsInfo(dto, userId);
 	}
 
 	// 스키마 디테일 Role Grants 정보 불러오기
 	@RequestMapping("/schemaDetailsRoleGrants")
-	public List<Map<String, Object>> schemaDetailsRoleGrants(DbObjectDTO dto, String userId)
-			throws Exception {
+	public List<Map<String, Object>> schemaDetailsRoleGrants(DbObjectDTO dto, String userId) throws Exception {
 		return dbmsService.schemaDetailsRoleGrants(dto, userId);
 	}
 
 	// 스키마 디테일 System Privileges 정보 불러오기
 	@RequestMapping("/schemaDetailsSystemPrivileges")
-	public List<Map<String, Object>> schemaDetailsSystemPrivileges(DbObjectDTO dto, String userId)
-			throws Exception {
+	public List<Map<String, Object>> schemaDetailsSystemPrivileges(DbObjectDTO dto, String userId) throws Exception {
 		return dbmsService.schemaDetailsSystemPrivileges(dto, userId);
 	}
 
 	// 스키마 디테일 Extends 정보 불러오기
 	@RequestMapping("/schemaDetailsExtents")
-	public List<Map<String, Object>> schemaDetailsExtends(DbObjectDTO dto, String userId)
-			throws Exception {
+	public List<Map<String, Object>> schemaDetailsExtends(DbObjectDTO dto, String userId) throws Exception {
 		return dbmsService.schemaDetailsExtents(dto, userId);
 	}
 
