@@ -52,30 +52,30 @@ public class DbmsServiceImpl implements DbmsService {
 
 	// 스키마 내부 항목 불러오기
 	@Override
-	public List<TreeDTO> schemaInfo(DbObjectDTO dto, String userId) throws JYException {
+	public List<TreeDTO> getSchemaInfo(DbObjectDTO dto, String userId) throws JYException {
 		List<TreeDTO> treeList = new ArrayList<TreeDTO>();
 		DbDTO db = session.getSessionID(sessionID, sessionDBID, sessionDBPW, userId);
 
-		TreeDTO table = dbmsSQL.schemaInfo(dto.getSchemaName(), "TABLE", db);
-		TreeDTO view = dbmsSQL.schemaInfo(dto.getSchemaName(), "VIEW", db);
-		TreeDTO synonym = dbmsSQL.schemaInfo(dto.getSchemaName(), "SYNONYM", db);
-		TreeDTO function = dbmsSQL.schemaInfo(dto.getSchemaName(), "FUNCTION", db);
+		TreeDTO table = dbmsSQL.getSchemaInfo(dto.getSchemaName(), "TABLE", db);
+		TreeDTO view = dbmsSQL.getSchemaInfo(dto.getSchemaName(), "VIEW", db);
+		TreeDTO synonym = dbmsSQL.getSchemaInfo(dto.getSchemaName(), "SYNONYM", db);
+		TreeDTO function = dbmsSQL.getSchemaInfo(dto.getSchemaName(), "FUNCTION", db);
 		function.setIconCls("tree-function");
-		TreeDTO procedure = dbmsSQL.schemaInfo(dto.getSchemaName(), "PROCEDURE", db);
+		TreeDTO procedure = dbmsSQL.getSchemaInfo(dto.getSchemaName(), "PROCEDURE", db);
 		procedure.setIconCls("tree-procedure");
-		TreeDTO pvmPackage = dbmsSQL.schemaInfo(dto.getSchemaName(), "PACKAGE", db);
+		TreeDTO pvmPackage = dbmsSQL.getSchemaInfo(dto.getSchemaName(), "PACKAGE", db);
 		pvmPackage.setIconCls("tree-package");
-		TreeDTO type = dbmsSQL.schemaInfo(dto.getSchemaName(), "TYPE", db);
+		TreeDTO type = dbmsSQL.getSchemaInfo(dto.getSchemaName(), "TYPE", db);
 		type.setIconCls("tree-type");
-		TreeDTO trigger = dbmsSQL.schemaInfo(dto.getSchemaName(), "TRIGGER", db);
-		TreeDTO index = dbmsSQL.schemaInfo(dto.getSchemaName(), "INDEX", db);
-		TreeDTO sequence = dbmsSQL.schemaInfo(dto.getSchemaName(), "SEQUENCE", db);
-		TreeDTO dbLink = dbmsSQL.schemaInfo(dto.getSchemaName(), "DBLINK", db);
-		TreeDTO mView = dbmsSQL.schemaInfo(dto.getSchemaName(), "MVIEW", db);
-		TreeDTO mViewLog = dbmsSQL.schemaInfo(dto.getSchemaName(), "MVIEWLOG", db);
-		TreeDTO job = dbmsSQL.schemaInfo(dto.getSchemaName(), "JOB", db);
-		TreeDTO library = dbmsSQL.schemaInfo(dto.getSchemaName(), "LIBRARY", db);
-		TreeDTO pvm = dbmsSQL.schemaInfo(dto.getSchemaName(), "PVM", db);
+		TreeDTO trigger = dbmsSQL.getSchemaInfo(dto.getSchemaName(), "TRIGGER", db);
+		TreeDTO index = dbmsSQL.getSchemaInfo(dto.getSchemaName(), "INDEX", db);
+		TreeDTO sequence = dbmsSQL.getSchemaInfo(dto.getSchemaName(), "SEQUENCE", db);
+		TreeDTO dbLink = dbmsSQL.getSchemaInfo(dto.getSchemaName(), "DBLINK", db);
+		TreeDTO mView = dbmsSQL.getSchemaInfo(dto.getSchemaName(), "MVIEW", db);
+		TreeDTO mViewLog = dbmsSQL.getSchemaInfo(dto.getSchemaName(), "MVIEWLOG", db);
+		TreeDTO job = dbmsSQL.getSchemaInfo(dto.getSchemaName(), "JOB", db);
+		TreeDTO library = dbmsSQL.getSchemaInfo(dto.getSchemaName(), "LIBRARY", db);
+		TreeDTO pvm = dbmsSQL.getSchemaInfo(dto.getSchemaName(), "PVM", db);
 
 		List<TreeDTO> pvmChildren = new ArrayList<TreeDTO>();
 		pvmChildren.add(function);
@@ -102,13 +102,13 @@ public class DbmsServiceImpl implements DbmsService {
 
 	// 오브젝트 불러오기
 	@Override
-	public List<TreeDTO> objectInfo(DbObjectDTO dto, String userId) throws JYException {
+	public List<TreeDTO> getObjectInfo(DbObjectDTO dto, String userId) throws JYException {
 		DbDTO db = session.getSessionID(sessionID, sessionDBID, sessionDBPW, userId);
 
 		// 뒤에 붙은 Folder 빼고 보내기
 		dto.setObjectType(dto.getObjectType().replace("Folder", ""));
 
-		return dbmsSQL.objectInfo(dto, db);
+		return dbmsSQL.getObjectInfo(dto, db);
 	}
 
 	// 테이블 정보 불러오기

@@ -20,6 +20,6 @@ public class ProcedureDetailsRestController {
 	// PROCEDURE 디테일 CODE 조회
 	@RequestMapping("/procedureDetailsCode")
 	public List<Map<String, Object>> procedureDetailsCode(DbObjectDTO dto, String userId) throws Exception {
-		return dbmsDetailService.detailsCode(dto, userId);
+		return dbmsDetailService.getDetailsCode(dto, userId);
 	}
 }

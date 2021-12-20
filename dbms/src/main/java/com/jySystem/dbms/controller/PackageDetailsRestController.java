@@ -20,7 +20,7 @@ public class PackageDetailsRestController {
 	// PACKAGE 디테일 CODE 조회
 	@RequestMapping("/packageDetailsCode")
 	public List<Map<String, Object>> packageDetailsCode(DbObjectDTO dto, String userId) throws Exception {
-		return dbmsDetailService.detailsCode(dto, userId);
+		return dbmsDetailService.getDetailsCode(dto, userId);
 	}
 
 }

@@ -31,14 +31,14 @@ public class DbmsRestController {
 
 	// 스키마 정보 불러오기
 	@RequestMapping("/schemaInfo")
-	public List<TreeDTO> schemaInfo(DbObjectDTO dto, String userId) throws Exception {
-		return dbmsService.schemaInfo(dto, userId);
+	public List<TreeDTO> getSchemaInfo(DbObjectDTO dto, String userId) throws Exception {
+		return dbmsService.getSchemaInfo(dto, userId);
 	}
 
 	// 오브젝트 불러오기
 	@RequestMapping("/objectInfo")
-	public List<TreeDTO> objectInfo(DbObjectDTO dto, String userId) throws Exception {
-		return dbmsService.objectInfo(dto, userId);
+	public List<TreeDTO> getObjectInfo(DbObjectDTO dto, String userId) throws Exception {
+		return dbmsService.getObjectInfo(dto, userId);
 	}
 
 	// 테이블 정보 가져오기

@@ -20,25 +20,25 @@ public class SchemaDetailRestController {
 	// 스키마 디테일 Info 정보 불러오기
 	@RequestMapping("/schemaDetailsInfo")
 	public Map<String, Object> schemaDetailInfo(DbObjectDTO dto, String userId) throws Exception {
-		return dbmsDetailService.schemaDetailsInfo(dto, userId);
+		return dbmsDetailService.getSchemaDetailsInfo(dto, userId);
 	}
 
 	// 스키마 디테일 Role Grants 정보 불러오기
 	@RequestMapping("/schemaDetailsRoleGrants")
 	public List<Map<String, Object>> schemaDetailsRoleGrants(DbObjectDTO dto, String userId) throws Exception {
-		return dbmsDetailService.schemaDetailsRoleGrants(dto, userId);
+		return dbmsDetailService.getSchemaDetailsRoleGrants(dto, userId);
 	}
 
 	// 스키마 디테일 System Privileges 정보 불러오기
 	@RequestMapping("/schemaDetailsSystemPrivileges")
 	public List<Map<String, Object>> schemaDetailsSystemPrivileges(DbObjectDTO dto, String userId) throws Exception {
-		return dbmsDetailService.schemaDetailsSystemPrivileges(dto, userId);
+		return dbmsDetailService.getSchemaDetailsSystemPrivileges(dto, userId);
 	}
 
 	// 스키마 디테일 Extends 정보 불러오기
 	@RequestMapping("/schemaDetailsExtents")
 	public List<Map<String, Object>> schemaDetailsExtends(DbObjectDTO dto, String userId) throws Exception {
-		return dbmsDetailService.schemaDetailsExtents(dto, userId);
+		return dbmsDetailService.getSchemaDetailsExtents(dto, userId);
 	}
 
 }

@@ -20,37 +20,37 @@ public class TableDetailRestController {
 	// TABLE 디테일 TABLE 조회
 	@RequestMapping("/tableDetailsTable")
 	public Map<String, Object> tableDetailsTable(DbObjectDTO dto, String userId) throws Exception {
-		return dbmsDetailService.tableDetailsTable(dto, userId);
+		return dbmsDetailService.getTableDetailsTable(dto, userId);
 	}
 
 	// TABLE 디테일 COLUMNS 조회
 	@RequestMapping("/tableDetailsColumns")
 	public List<Map<String, Object>> tableDetailsColumns(DbObjectDTO dto, String userId) throws Exception {
-		return dbmsDetailService.tableDetailsColumns(dto, userId);
+		return dbmsDetailService.getTableDetailsColumns(dto, userId);
 	}
 
 	// TABLE 디테일 INDEXES TOP 조회
 	@RequestMapping("/tableDetailsIndexesTop")
 	public List<Map<String, Object>> tableDetailsIndexesTop(DbObjectDTO dto, String userId) throws Exception {
-		return dbmsDetailService.tableDetailsIndexesTop(dto, userId);
+		return dbmsDetailService.getTableDetailsIndexesTop(dto, userId);
 	}
 
 	// TABLE 디테일 INDEXES BOTTOM 조회
 	@RequestMapping("/tableDetailsIndexesBottom")
 	public Map<String, Object> tableDetailsIndexesBottom(DbObjectDTO dto, String userId) throws Exception {
-		return dbmsDetailService.tableDetailsIndexesBottom(dto, userId);
+		return dbmsDetailService.getTableDetailsIndexesBottom(dto, userId);
 	}
 
 	// TABLE 디테일 CONSTRAINTS 조회
 	@RequestMapping("/tableDetailsConstraints")
 	public List<Map<String, Object>> tableDetailsConstraints(DbObjectDTO dto, String userId) throws Exception {
-		return dbmsDetailService.tableDetailsConstraints(dto, userId);
+		return dbmsDetailService.getTableDetailsConstraints(dto, userId);
 	}
 
 	// TABLE 디테일 SCRIPT 조회
 	@RequestMapping("/tableDetailsScript")
 	public String tableDetailsScript(DbObjectDTO dto, String userId) throws Exception {
-		return dbmsDetailService.tableDetailsScript(dto, userId);
+		return dbmsDetailService.getTableDetailsScript(dto, userId);
 	}
 
 }

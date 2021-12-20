@@ -33,13 +33,13 @@ public class DbmsDetailServiceImpl implements DbmsDetailService {
 	
 	// 스키마 디테일 Info 데이터
 	@Override
-	public Map<String, Object> schemaDetailsInfo(DbObjectDTO dto, String userId) throws JYException {
+	public Map<String, Object> getSchemaDetailsInfo(DbObjectDTO dto, String userId) throws JYException {
 		DbDTO db = session.getSessionID(sessionID, sessionDBID, sessionDBPW, userId);
 		Map<String, Object> info = new HashMap<String, Object>();
 		Map<String, Object> result = new HashMap<String, Object>();
 		List<Map<String, Object>> rows = new ArrayList<Map<String, Object>>();
 
-		info = dbmsSQL.schemaDetailsInfo(dto, db);
+		info = dbmsSQL.getSchemaDetailsInfo(dto, db);
 
 		Set<String> parameters = info.keySet();
 		for (String s : parameters) {
@@ -55,36 +55,36 @@ public class DbmsDetailServiceImpl implements DbmsDetailService {
 
 	// 스키마 디테일 Role Grants 테이블 검색
 	@Override
-	public List<Map<String, Object>> schemaDetailsRoleGrants(DbObjectDTO dto, String userId) throws JYException {
+	public List<Map<String, Object>> getSchemaDetailsRoleGrants(DbObjectDTO dto, String userId) throws JYException {
 		DbDTO db = session.getSessionID(sessionID, sessionDBID, sessionDBPW, userId);
 
-		return dbmsSQL.schemaDetailsRoleGrants(dto, db);
+		return dbmsSQL.getSchemaDetailsRoleGrants(dto, db);
 	}
 
 	// 스키마 디테일 System Privileges 테이블 검색
 	@Override
-	public List<Map<String, Object>> schemaDetailsSystemPrivileges(DbObjectDTO dto, String userId) throws JYException {
+	public List<Map<String, Object>> getSchemaDetailsSystemPrivileges(DbObjectDTO dto, String userId) throws JYException {
 		DbDTO db = session.getSessionID(sessionID, sessionDBID, sessionDBPW, userId);
 
-		return dbmsSQL.schemaDetailsSystemPrivileges(dto, db);
+		return dbmsSQL.getSchemaDetailsSystemPrivileges(dto, db);
 	}
 
 	// 스키마 디테일 Extends 테이블 검색
 	@Override
-	public List<Map<String, Object>> schemaDetailsExtents(DbObjectDTO dto, String userId) throws JYException {
+	public List<Map<String, Object>> getSchemaDetailsExtents(DbObjectDTO dto, String userId) throws JYException {
 		DbDTO db = session.getSessionID(sessionID, sessionDBID, sessionDBPW, userId);
 
-		return dbmsSQL.schemaDetailsExtents(dto, db);
+		return dbmsSQL.getSchemaDetailsExtents(dto, db);
 	}
 
 	// 테이블 디테일 Table 테이블 검색
 	@Override
-	public Map<String, Object> tableDetailsTable(DbObjectDTO dto, String userId) throws JYException {
+	public Map<String, Object> getTableDetailsTable(DbObjectDTO dto, String userId) throws JYException {
 		DbDTO db = session.getSessionID(sessionID, sessionDBID, sessionDBPW, userId);
 		Map<String, Object> info = new HashMap<String, Object>();
 		Map<String, Object> result = new HashMap<String, Object>();
 		List<Map<String, Object>> rows = new ArrayList<Map<String, Object>>();
-		info = dbmsSQL.tableDetailsTable(dto, db);
+		info = dbmsSQL.getTableDetailsTable(dto, db);
 
 		Set<String> parameters = info.keySet();
 		for (String s : parameters) {
@@ -102,28 +102,28 @@ public class DbmsDetailServiceImpl implements DbmsDetailService {
 
 	// 테이블 디테일 Columns 테이블 검색
 	@Override
-	public List<Map<String, Object>> tableDetailsColumns(DbObjectDTO dto, String userId) throws JYException {
+	public List<Map<String, Object>> getTableDetailsColumns(DbObjectDTO dto, String userId) throws JYException {
 		DbDTO db = session.getSessionID(sessionID, sessionDBID, sessionDBPW, userId);
 
-		return dbmsSQL.tableDetailsColumns(dto, db);
+		return dbmsSQL.getTableDetailsColumns(dto, db);
 	}
 
 	// 테이블 디테일 Indexes Top 테이블 검색
 	@Override
-	public List<Map<String, Object>> tableDetailsIndexesTop(DbObjectDTO dto, String userId) throws JYException {
+	public List<Map<String, Object>> getTableDetailsIndexesTop(DbObjectDTO dto, String userId) throws JYException {
 		DbDTO db = session.getSessionID(sessionID, sessionDBID, sessionDBPW, userId);
 
-		return dbmsSQL.tableDetailsIndexesTop(dto, db);
+		return dbmsSQL.getTableDetailsIndexesTop(dto, db);
 	}
 
 	// 테이블 디테일 Indexes Bottom 테이블 검색
 	@Override
-	public Map<String, Object> tableDetailsIndexesBottom(DbObjectDTO dto, String userId) throws JYException {
+	public Map<String, Object> getTableDetailsIndexesBottom(DbObjectDTO dto, String userId) throws JYException {
 		DbDTO db = session.getSessionID(sessionID, sessionDBID, sessionDBPW, userId);
 		Map<String, Object> info = new HashMap<String, Object>();
 		Map<String, Object> result = new HashMap<String, Object>();
 		List<Map<String, Object>> rows = new ArrayList<Map<String, Object>>();
-		info = dbmsSQL.tableDetailsIndexesBottom(dto, db);
+		info = dbmsSQL.getTableDetailsIndexesBottom(dto, db);
 
 		Set<String> parameters = info.keySet();
 		for (String s : parameters) {
@@ -142,36 +142,36 @@ public class DbmsDetailServiceImpl implements DbmsDetailService {
 
 	// 테이블 디테일 Constraints 테이블 검색
 	@Override
-	public List<Map<String, Object>> tableDetailsConstraints(DbObjectDTO dto, String userId) throws JYException {
+	public List<Map<String, Object>> getTableDetailsConstraints(DbObjectDTO dto, String userId) throws JYException {
 		DbDTO db = session.getSessionID(sessionID, sessionDBID, sessionDBPW, userId);
 
-		return dbmsSQL.tableDetailsConstraints(dto, db);
+		return dbmsSQL.getTableDetailsConstraints(dto, db);
 	}
 
 	// 테이블 디테일 Script 검색
 	@Override
-	public String tableDetailsScript(DbObjectDTO dto, String userId) throws JYException {
+	public String getTableDetailsScript(DbObjectDTO dto, String userId) throws JYException {
 		DbDTO db = session.getSessionID(sessionID, sessionDBID, sessionDBPW, userId);
 
-		return dbmsSQL.tableDetailsScript(dto, db);
+		return dbmsSQL.getTableDetailsScript(dto, db);
 	}
 
 	// 인덱스 디테일 Columns 테이블 검색
 	@Override
-	public List<Map<String, Object>> indexDetailsColumns(DbObjectDTO dto, String userId) throws JYException {
+	public List<Map<String, Object>> getIndexDetailsColumns(DbObjectDTO dto, String userId) throws JYException {
 		DbDTO db = session.getSessionID(sessionID, sessionDBID, sessionDBPW, userId);
 
-		return dbmsSQL.indexDetailsColumns(dto, db);
+		return dbmsSQL.getIndexDetailsColumns(dto, db);
 	}
 
 	// 시퀀스 디테일 Info 테이블 검색
 	@Override
-	public Map<String, Object> sequenceDetailsInfo(DbObjectDTO dto, String userId) throws JYException {
+	public Map<String, Object> getSequenceDetailsInfo(DbObjectDTO dto, String userId) throws JYException {
 		DbDTO db = session.getSessionID(sessionID, sessionDBID, sessionDBPW, userId);
 		Map<String, Object> info = new HashMap<String, Object>();
 		Map<String, Object> result = new HashMap<String, Object>();
 		List<Map<String, Object>> rows = new ArrayList<Map<String, Object>>();
-		info = dbmsSQL.sequenceDetailsInfo(dto, db);
+		info = dbmsSQL.getSequenceDetailsInfo(dto, db);
 
 		Set<String> parameters = info.keySet();
 		for (String s : parameters) {
@@ -190,26 +190,26 @@ public class DbmsDetailServiceImpl implements DbmsDetailService {
 
 	// 뷰 디테일 Columns 테이블 검색
 	@Override
-	public List<Map<String, Object>> viewDetailsColumns(DbObjectDTO dto, String userId) throws JYException {
+	public List<Map<String, Object>> getViewDetailsColumns(DbObjectDTO dto, String userId) throws JYException {
 		DbDTO db = session.getSessionID(sessionID, sessionDBID, sessionDBPW, userId);
 
-		return dbmsSQL.viewDetailsColumns(dto, db);
+		return dbmsSQL.getViewDetailsColumns(dto, db);
 	}
 
 	// 뷰 디테일 Columns 테이블 검색
 	@Override
-	public List<Map<String, Object>> viewDetailsScript(DbObjectDTO dto, String userId) throws JYException {
+	public List<Map<String, Object>> getViewDetailsScript(DbObjectDTO dto, String userId) throws JYException {
 		DbDTO db = session.getSessionID(sessionID, sessionDBID, sessionDBPW, userId);
 
-		return dbmsSQL.viewDetailsScript(dto, db);
+		return dbmsSQL.getViewDetailsScript(dto, db);
 	}
 
 	// 펀션 디테일 Code 테이블 검색
 	@Override
-	public List<Map<String, Object>> detailsCode(DbObjectDTO dto, String userId) throws JYException {
+	public List<Map<String, Object>> getDetailsCode(DbObjectDTO dto, String userId) throws JYException {
 		DbDTO db = session.getSessionID(sessionID, sessionDBID, sessionDBPW, userId);
 
-		return dbmsSQL.detailsCode(dto, db);
+		return dbmsSQL.getDetailsCode(dto, db);
 	}
 
 }

@@ -20,13 +20,13 @@ public class IndexDetailRestController {
 	// INDEX 디테일 INDEX 조회
 	@RequestMapping("/indexDetailsIndex")
 	public Map<String, Object> indexDetailsIndex(DbObjectDTO dto, String userId) throws Exception {
-		return dbmsDetailService.tableDetailsIndexesBottom(dto, userId);
+		return dbmsDetailService.getTableDetailsIndexesBottom(dto, userId);
 	}
 
 	// INDEX 디테일 COLUMNS 조회
 	@RequestMapping("/indexDetailsColumns")
 	public List<Map<String, Object>> indexDetailsColumns(DbObjectDTO dto, String userId) throws Exception {
-		return dbmsDetailService.indexDetailsColumns(dto, userId);
+		return dbmsDetailService.getIndexDetailsColumns(dto, userId);
 	}
 
 }

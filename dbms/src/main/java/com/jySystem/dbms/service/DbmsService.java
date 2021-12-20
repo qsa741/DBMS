@@ -17,10 +17,10 @@ public interface DbmsService {
 	public List<TreeDTO> getAllSchemas(String userId) throws JYException;
 
 	// 스키마 정보 가져오기
-	public List<TreeDTO> schemaInfo(DbObjectDTO dto, String userId) throws JYException;
+	public List<TreeDTO> getSchemaInfo(DbObjectDTO dto, String userId) throws JYException;
 
 	// 오브젝트 정보 가져오기
-	public List<TreeDTO> objectInfo(DbObjectDTO object, String userId) throws JYException;
+	public List<TreeDTO> getObjectInfo(DbObjectDTO object, String userId) throws JYException;
 
 	// 테이블 불러오기
 	public Map<String, Object> loadObject(DbObjectDTO dto, String userId) throws JYException;

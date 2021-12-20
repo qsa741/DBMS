@@ -20,6 +20,6 @@ public class TriggerDetailsRestController {
 	// TRIGGER 디테일 SOURCE 조회
 	@RequestMapping("/triggerDetailsSource")
 	public List<Map<String, Object>> triggerDetailsSource(DbObjectDTO dto, String userId) throws Exception {
-		return dbmsDetailService.detailsCode(dto, userId);
+		return dbmsDetailService.getDetailsCode(dto, userId);
 	}
 }

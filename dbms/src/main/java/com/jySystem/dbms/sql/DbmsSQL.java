@@ -102,7 +102,7 @@ public class DbmsSQL {
 	}
 
 	// 스키마 항목 카운트 조회
-	public TreeDTO schemaInfo(String owner, String objectType, DbDTO db) throws JYException {
+	public TreeDTO getSchemaInfo(String owner, String objectType, DbDTO db) throws JYException {
 		String sql = "SELECT COUNT(*) FROM all_objects WHERE OWNER = ? AND OBJECT_TYPE = ?";
 
 		TreeDTO tree = new TreeDTO();
@@ -153,7 +153,7 @@ public class DbmsSQL {
 	}
 
 	// 오브젝트 항목 조회
-	public List<TreeDTO> objectInfo(DbObjectDTO dto, DbDTO db) throws JYException {
+	public List<TreeDTO> getObjectInfo(DbObjectDTO dto, DbDTO db) throws JYException {
 		String sql = "SELECT OBJECT_TYPE, OBJECT_NAME FROM all_objects WHERE OWNER = ? AND OBJECT_TYPE = ?";
 		String iconCls = "tree-" + dto.getObjectType().toLowerCase();
 

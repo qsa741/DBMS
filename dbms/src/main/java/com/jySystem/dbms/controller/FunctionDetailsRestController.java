@@ -20,7 +20,7 @@ public class FunctionDetailsRestController {
 	// FUCTION 디테일 CODE 조회
 	@RequestMapping("/functionDetailsCode")
 	public List<Map<String, Object>> functionDetailsCode(DbObjectDTO dto, String userId) throws Exception {
-		return dbmsDetailService.detailsCode(dto, userId);
+		return dbmsDetailService.getDetailsCode(dto, userId);
 	}
 
 }
