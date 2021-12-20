@@ -7,19 +7,19 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.jySystem.dbms.dto.DbObjectDTO;
-import com.jySystem.dbms.service.DbmsServiceImpl;
+import com.jySystem.dbms.service.DbmsDetailServiceImpl;
 
 @RestController
 @RequestMapping("/dbmsTool")
 public class SequenceDetailsRestController {
 
 	@Autowired
-	private DbmsServiceImpl dbmsService;
+	private DbmsDetailServiceImpl dbmsDetailService;
 
 	// SEQUENCE 디테일 INFO 조회
 	@RequestMapping("/sequenceDetailsInfo")
 	public Map<String, Object> sequenceDetailsInfo(DbObjectDTO dto, String userId) throws Exception {
-		return dbmsService.sequenceDetailsInfo(dto, userId);
+		return dbmsDetailService.sequenceDetailsInfo(dto, userId);
 	}
 
 }

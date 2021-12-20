@@ -13,6 +13,13 @@ public class TreeDTO {
 	private Map<String, Object> attributes;
 	private List<TreeDTO> children;
 
+	public TreeDTO() {}
+	
+	public TreeDTO(String id, String text) {
+		this.id = id;
+		this.text = text;
+	}
+	
 	public String getId() {
 		return id;
 	}

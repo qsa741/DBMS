@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.jySystem.dbms.dto.DbDTO;
 import com.jySystem.dbms.dto.DbObjectDTO;
 import com.jySystem.dbms.dto.TreeDTO;
+import com.jySystem.dbms.service.DbmsChartServiceImpl;
 import com.jySystem.dbms.service.DbmsServiceImpl;
 
 @RequestMapping("/dbmsTool")
@@ -18,6 +19,9 @@ public class DbmsRestController {
 
 	@Autowired
 	private DbmsServiceImpl dbmsService;
+	
+	@Autowired
+	private DbmsChartServiceImpl dbmsChartService;
 
 	// 모든 스키마 불러오기
 	@RequestMapping("/allSchemas")
@@ -70,25 +74,25 @@ public class DbmsRestController {
 	// mChart 차트 정보 가져오기
 	@RequestMapping("/setMChart")
 	public Map<String, Object> setMChart(String year) throws Exception {
-		return dbmsService.mChartInfo(year);
+		return dbmsChartService.mChartInfo(year);
 	}
 
 	// dChart 차트 정보 가져오기
 	@RequestMapping("/setDChart")
 	public Map<String, Object> setDChart(String year, String month) throws Exception {
-		return dbmsService.dChartInfo(year, month);
+		return dbmsChartService.dChartInfo(year, month);
 	}
 
 	// 차트 연도 가져오기
 	@RequestMapping("/getChartYears")
 	public List<String> getChartYears() throws Exception {
-		return dbmsService.getChartYears();
+		return dbmsChartService.getChartYears();
 	}
 
 	// 차트 월 가져오기
 	@RequestMapping("/getChartMonth")
 	public List<String> getChartMonth(String year) throws Exception {
-		return dbmsService.getChartMonth(year);
+		return dbmsChartService.getChartMonth(year);
 	}
 
 }

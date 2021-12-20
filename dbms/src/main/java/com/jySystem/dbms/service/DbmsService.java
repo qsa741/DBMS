@@ -3,9 +3,6 @@ package com.jySystem.dbms.service;
 import java.util.List;
 import java.util.Map;
 
-import org.springframework.boot.configurationprocessor.json.JSONObject;
-
-import com.jySystem.dbms.dto.ChartDataSetDTO;
 import com.jySystem.dbms.dto.DbDTO;
 import com.jySystem.dbms.dto.DbObjectDTO;
 import com.jySystem.dbms.dto.TreeDTO;
@@ -31,73 +28,11 @@ public interface DbmsService {
 	// 테이블 자식 정보 불러오기
 	public Map<String, Object> getTableChildren(DbObjectDTO dto, String userId) throws JYException;
 
-	// 스키마 디테일 정보 검색
-	public Map<String, Object> schemaDetailsInfo(DbObjectDTO dto, String userId) throws JYException;
-
-	// 스키마 디테일 정보 검색
-	public List<Map<String, Object>> schemaDetailsRoleGrants(DbObjectDTO dto, String userId) throws JYException;
-
-	// 스키마 디테일 정보 검색
-	public List<Map<String, Object>> schemaDetailsSystemPrivileges(DbObjectDTO dto, String userId) throws JYException;
-
-	// 스키마 디테일 정보 검색
-	public List<Map<String, Object>> schemaDetailsExtents(DbObjectDTO dto, String userId) throws JYException;
-
-	// 테이블 디테일 정보 검색
-	public Map<String, Object> tableDetailsTable(DbObjectDTO dto, String userId) throws JYException;
-
-	// 테이블 디테일 정보 검색
-	public List<Map<String, Object>> tableDetailsColumns(DbObjectDTO dto, String userId) throws JYException;
-
-	// 테이블 디테일 정보 검색
-	public List<Map<String, Object>> tableDetailsIndexesTop(DbObjectDTO dto, String userId) throws JYException;
-
-	// 테이블 디테일 정보 검색
-	public Map<String, Object> tableDetailsIndexesBottom(DbObjectDTO dto, String userId) throws JYException;
-
-	// 테이블 디테일 정보 검색
-	public List<Map<String, Object>> tableDetailsConstraints(DbObjectDTO dto, String userId) throws JYException;
-
-	// 테이블 디테일 정보 검색
-	public String tableDetailsScript(DbObjectDTO dto, String userId) throws JYException;
-
-	// 인덱스 디테일 정보 검색
-	public List<Map<String, Object>> indexDetailsColumns(DbObjectDTO dto, String userId) throws JYException;
-
-	// 스키마 디테일 정보 검색
-	public Map<String, Object> sequenceDetailsInfo(DbObjectDTO dto, String userId) throws JYException;
-
-	// 뷰 디테일 정보 검색
-	public List<Map<String, Object>> viewDetailsColumns(DbObjectDTO dto, String userId) throws JYException;
-
-	// 뷰 디테일 정보 검색
-	public List<Map<String, Object>> viewDetailsScript(DbObjectDTO dto, String userId) throws JYException;
-
-	// 펑션 디테일 정보 검색
-	public List<Map<String, Object>> detailsCode(DbObjectDTO dto, String userId) throws JYException;
-
 	// SQL 한줄 실행
 	public Map<String, Object> runCurrentSQL(String sql, int cursor, String userId) throws JYException;
 
 	// SQL 전체 실행
 	public List<Map<String, Object>> runAllSQL(String sql, String userId) throws JYException;
 
-	// 차트 연도 가져오기
-	public List<String> getChartYears() throws JYException;
-
-	// 차트 월 가져오기
-	public List<String> getChartMonth(String year) throws JYException;
-
-	// mChart 차트 정보 가져오기
-	public Map<String, Object> mChartInfo(String year) throws JYException;
-
-	// mChart 차트 dataset 세팅
-	public Map<String, Object> mChartDataSet(List<JSONObject> data, ChartDataSetDTO dto) throws JYException;
-
-	// dChart 차트 정보 가져오기
-	public Map<String, Object> dChartInfo(String year, String month) throws JYException;
-
-	// dChart 차트 dataset 세팅
-	public Map<String, Object> dChartDataSet(List<JSONObject> data, int day, ChartDataSetDTO dto) throws JYException;
 
 }

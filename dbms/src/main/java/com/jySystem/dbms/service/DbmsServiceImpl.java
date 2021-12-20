@@ -1,21 +1,16 @@
 package com.jySystem.dbms.service;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.configurationprocessor.json.JSONException;
-import org.springframework.boot.configurationprocessor.json.JSONObject;
 import org.springframework.stereotype.Service;
 
 import com.jySystem.common.config.SessionConfig;
-import com.jySystem.dbms.dto.ChartDataSetDTO;
 import com.jySystem.dbms.dto.DbDTO;
 import com.jySystem.dbms.dto.DbObjectDTO;
 import com.jySystem.dbms.dto.TreeDTO;
@@ -159,25 +154,19 @@ public class DbmsServiceImpl implements DbmsService {
 		List<Map<String, Object>> constraint = dbmsSQL.selectTableChild("constraint", dto, db);
 
 		// Column Tree Node 세팅
-		TreeDTO childColumn = new TreeDTO();
-		childColumn.setId("COLUMNS");
-		childColumn.setText("Column (" + column.size() + ")");
+		TreeDTO childColumn = new TreeDTO("COLUMNS", "Column (" + column.size() + ")");
 		childColumn.setState("closed");
 		childColumn.setIconCls("tree-column");
 
 		// Constraint Tree Node 세팅
-		TreeDTO childConstraint = new TreeDTO();
-		childConstraint.setId("CONSTRAINTS");
-		childConstraint.setText("Constraint (" + constraint.size() + ")");
+		TreeDTO childConstraint = new TreeDTO("CONSTRAINTS", "Constraint (" + constraint.size() + ")");
 		if (constraint.size() != 0) {
 			childConstraint.setState("closed");
 		}
 		childConstraint.setIconCls("tree-constraint");
 
 		// Index Tree Node 세팅
-		TreeDTO childIndex = new TreeDTO();
-		childIndex.setId("INDEXS");
-		childIndex.setText("Index (" + index.size() + ")");
+		TreeDTO childIndex = new TreeDTO("INDEXS", "Index (" + index.size() + ")");
 		if (index.size() != 0) {
 			childIndex.setState("closed");
 		}
@@ -189,24 +178,20 @@ public class DbmsServiceImpl implements DbmsService {
 
 		// Column은 한개 이상 필수로 존재하므로 바로 for문 실행
 		for (Map<String, Object> c : column) {
-			TreeDTO tree = new TreeDTO();
-			tree.setId("COLUMN");
-			tree.setIconCls("tree-column");
 			String text = (String) c.get("COLUMN_NAME") + " : " + (String) c.get("DATA_TYPE");
 			if (Objects.equals(c.get("DATA_TYPE"), "VARCHAR")) {
 				text += " (" + c.get("DATA_LENGTH") + ")";
 			}
-			tree.setText(text);
+			TreeDTO tree = new TreeDTO("COLUMN", text);
+			tree.setIconCls("tree-column");
 			colTreeList.add(tree);
 		}
 		childColumn.setChildren(colTreeList);
 
 		if (constraint.size() > 0) {
 			for (Map<String, Object> c : constraint) {
-				TreeDTO tree = new TreeDTO();
-				tree.setId("CONSTRAINT");
+				TreeDTO tree = new TreeDTO("CONSTRAINT", (String) c.get("CONSTRAINT_NAME"));
 				tree.setIconCls("tree-constraint");
-				tree.setText((String) c.get("CONSTRAINT_NAME"));
 				conTreeList.add(tree);
 			}
 			childConstraint.setChildren(conTreeList);
@@ -214,10 +199,8 @@ public class DbmsServiceImpl implements DbmsService {
 
 		if (index.size() > 0) {
 			for (Map<String, Object> i : index) {
-				TreeDTO tree = new TreeDTO();
-				tree.setId("INDEX");
+				TreeDTO tree = new TreeDTO("INDEX", (String) i.get("INDEX_NAME"));
 				tree.setIconCls("tree-index");
-				tree.setText((String) i.get("INDEX_NAME"));
 				idxTreeList.add(tree);
 			}
 			childIndex.setChildren(idxTreeList);
@@ -230,187 +213,6 @@ public class DbmsServiceImpl implements DbmsService {
 		map.put("children", children);
 
 		return map;
-	}
-
-	// 스키마 디테일 Info 데이터
-	@Override
-	public Map<String, Object> schemaDetailsInfo(DbObjectDTO dto, String userId) throws JYException {
-		DbDTO db = session.getSessionID(sessionID, sessionDBID, sessionDBPW, userId);
-		Map<String, Object> info = new HashMap<String, Object>();
-		Map<String, Object> result = new HashMap<String, Object>();
-		List<Map<String, Object>> rows = new ArrayList<Map<String, Object>>();
-
-		info = dbmsSQL.schemaDetailsInfo(dto, db);
-
-		Set<String> parameters = info.keySet();
-		for (String s : parameters) {
-			Map<String, Object> map = new HashMap<String, Object>();
-			map.put("PARAMETER", s);
-			map.put("VALUE", info.get(s));
-			rows.add(map);
-		}
-		result.put("rows", rows);
-
-		return result;
-	}
-
-	// 스키마 디테일 Role Grants 테이블 검색
-	@Override
-	public List<Map<String, Object>> schemaDetailsRoleGrants(DbObjectDTO dto, String userId) throws JYException {
-		DbDTO db = session.getSessionID(sessionID, sessionDBID, sessionDBPW, userId);
-
-		return dbmsSQL.schemaDetailsRoleGrants(dto, db);
-	}
-
-	// 스키마 디테일 System Privileges 테이블 검색
-	@Override
-	public List<Map<String, Object>> schemaDetailsSystemPrivileges(DbObjectDTO dto, String userId) throws JYException {
-		DbDTO db = session.getSessionID(sessionID, sessionDBID, sessionDBPW, userId);
-
-		return dbmsSQL.schemaDetailsSystemPrivileges(dto, db);
-	}
-
-	// 스키마 디테일 Extends 테이블 검색
-	@Override
-	public List<Map<String, Object>> schemaDetailsExtents(DbObjectDTO dto, String userId) throws JYException {
-		DbDTO db = session.getSessionID(sessionID, sessionDBID, sessionDBPW, userId);
-
-		return dbmsSQL.schemaDetailsExtents(dto, db);
-	}
-
-	// 테이블 디테일 Table 테이블 검색
-	@Override
-	public Map<String, Object> tableDetailsTable(DbObjectDTO dto, String userId) throws JYException {
-		DbDTO db = session.getSessionID(sessionID, sessionDBID, sessionDBPW, userId);
-		Map<String, Object> info = new HashMap<String, Object>();
-		Map<String, Object> result = new HashMap<String, Object>();
-		List<Map<String, Object>> rows = new ArrayList<Map<String, Object>>();
-		info = dbmsSQL.tableDetailsTable(dto, db);
-
-		Set<String> parameters = info.keySet();
-		for (String s : parameters) {
-			Map<String, Object> map = new HashMap<String, Object>();
-			map.put("VALUE", info.get(s));
-			s = s.replace("_", " ");
-			String parameter = s.substring(0, 1) + s.substring(1).toLowerCase();
-			map.put("PARAMETER", parameter);
-			rows.add(map);
-		}
-		result.put("rows", rows);
-
-		return result;
-	}
-
-	// 테이블 디테일 Columns 테이블 검색
-	@Override
-	public List<Map<String, Object>> tableDetailsColumns(DbObjectDTO dto, String userId) throws JYException {
-		DbDTO db = session.getSessionID(sessionID, sessionDBID, sessionDBPW, userId);
-
-		return dbmsSQL.tableDetailsColumns(dto, db);
-	}
-
-	// 테이블 디테일 Indexes Top 테이블 검색
-	@Override
-	public List<Map<String, Object>> tableDetailsIndexesTop(DbObjectDTO dto, String userId) throws JYException {
-		DbDTO db = session.getSessionID(sessionID, sessionDBID, sessionDBPW, userId);
-
-		return dbmsSQL.tableDetailsIndexesTop(dto, db);
-	}
-
-	// 테이블 디테일 Indexes Bottom 테이블 검색
-	@Override
-	public Map<String, Object> tableDetailsIndexesBottom(DbObjectDTO dto, String userId) throws JYException {
-		DbDTO db = session.getSessionID(sessionID, sessionDBID, sessionDBPW, userId);
-		Map<String, Object> info = new HashMap<String, Object>();
-		Map<String, Object> result = new HashMap<String, Object>();
-		List<Map<String, Object>> rows = new ArrayList<Map<String, Object>>();
-		info = dbmsSQL.tableDetailsIndexesBottom(dto, db);
-
-		Set<String> parameters = info.keySet();
-		for (String s : parameters) {
-			Map<String, Object> map = new HashMap<String, Object>();
-			s = s.replace("_", " ");
-			String parameter = s.substring(0, 1) + s.substring(1).toLowerCase();
-
-			map.put("VALUE", info.get(s));
-			map.put("PARAMETER", parameter);
-			rows.add(map);
-		}
-		result.put("rows", rows);
-
-		return result;
-	}
-
-	// 테이블 디테일 Constraints 테이블 검색
-	@Override
-	public List<Map<String, Object>> tableDetailsConstraints(DbObjectDTO dto, String userId) throws JYException {
-		DbDTO db = session.getSessionID(sessionID, sessionDBID, sessionDBPW, userId);
-
-		return dbmsSQL.tableDetailsConstraints(dto, db);
-	}
-
-	// 테이블 디테일 Script 검색
-	@Override
-	public String tableDetailsScript(DbObjectDTO dto, String userId) throws JYException {
-		DbDTO db = session.getSessionID(sessionID, sessionDBID, sessionDBPW, userId);
-
-		return dbmsSQL.tableDetailsScript(dto, db);
-	}
-
-	// 인덱스 디테일 Columns 테이블 검색
-	@Override
-	public List<Map<String, Object>> indexDetailsColumns(DbObjectDTO dto, String userId) throws JYException {
-		DbDTO db = session.getSessionID(sessionID, sessionDBID, sessionDBPW, userId);
-
-		return dbmsSQL.indexDetailsColumns(dto, db);
-	}
-
-	// 시퀀스 디테일 Info 테이블 검색
-	@Override
-	public Map<String, Object> sequenceDetailsInfo(DbObjectDTO dto, String userId) throws JYException {
-		DbDTO db = session.getSessionID(sessionID, sessionDBID, sessionDBPW, userId);
-		Map<String, Object> info = new HashMap<String, Object>();
-		Map<String, Object> result = new HashMap<String, Object>();
-		List<Map<String, Object>> rows = new ArrayList<Map<String, Object>>();
-		info = dbmsSQL.sequenceDetailsInfo(dto, db);
-
-		Set<String> parameters = info.keySet();
-		for (String s : parameters) {
-			Map<String, Object> map = new HashMap<String, Object>();
-			s = s.replace("_", " ");
-			String parameter = s.substring(0, 1) + s.substring(1).toLowerCase();
-
-			map.put("VALUE", info.get(s));
-			map.put("PARAMETER", parameter);
-			rows.add(map);
-		}
-		result.put("rows", rows);
-
-		return result;
-	}
-
-	// 뷰 디테일 Columns 테이블 검색
-	@Override
-	public List<Map<String, Object>> viewDetailsColumns(DbObjectDTO dto, String userId) throws JYException {
-		DbDTO db = session.getSessionID(sessionID, sessionDBID, sessionDBPW, userId);
-
-		return dbmsSQL.viewDetailsColumns(dto, db);
-	}
-
-	// 뷰 디테일 Columns 테이블 검색
-	@Override
-	public List<Map<String, Object>> viewDetailsScript(DbObjectDTO dto, String userId) throws JYException {
-		DbDTO db = session.getSessionID(sessionID, sessionDBID, sessionDBPW, userId);
-
-		return dbmsSQL.viewDetailsScript(dto, db);
-	}
-
-	// 펀션 디테일 Code 테이블 검색
-	@Override
-	public List<Map<String, Object>> detailsCode(DbObjectDTO dto, String userId) throws JYException {
-		DbDTO db = session.getSessionID(sessionID, sessionDBID, sessionDBPW, userId);
-
-		return dbmsSQL.detailsCode(dto, db);
 	}
 
 	// 현재 SQL 한줄 실행
@@ -465,165 +267,5 @@ public class DbmsServiceImpl implements DbmsService {
 		return list;
 	}
 
-	// 차트에 들어가는 연도 구하기
-	@Override
-	public List<String> getChartYears() throws JYException {
-		return dbmsSQL.getChartYears();
-	}
-
-	// 차트에 해당 연도 데이터가 있는 월 구하기
-	@Override
-	public List<String> getChartMonth(String year) throws JYException {
-		return dbmsSQL.getChartMonth(year);
-	}
-
-	// mChart 정보 세팅 : 선택된 연도 데이터 정리
-	@Override
-	public Map<String, Object> mChartInfo(String year) throws JYException {
-		Map<String, Object> result = new HashMap<String, Object>();
-
-		// action별로 데이터 생성
-		List<JSONObject> create = dbmsSQL.getActionData(year, "C");
-		List<JSONObject> read = dbmsSQL.getActionData(year, "R");
-		List<JSONObject> update = dbmsSQL.getActionData(year, "U");
-		List<JSONObject> delete = dbmsSQL.getActionData(year, "D");
-
-		String[] monthArray = { "01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12" };
-
-		// 디자인 관련 초기값 생성자로 세팅
-		ChartDataSetDTO createDataSet = new ChartDataSetDTO("가입", "white", "red", 2);
-		ChartDataSetDTO readDataSet = new ChartDataSetDTO("로그인", "white", "orange", 2);
-		ChartDataSetDTO updateDataSet = new ChartDataSetDTO("수정", "white", "blue", 2);
-		ChartDataSetDTO deleteDataSet = new ChartDataSetDTO("탈퇴", "white", "black", 2);
-
-		List<Map<String, Object>> data = new ArrayList<Map<String, Object>>();
-		data.add(mChartDataSet(create, createDataSet));
-		data.add(mChartDataSet(read, readDataSet));
-		data.add(mChartDataSet(update, updateDataSet));
-		data.add(mChartDataSet(delete, deleteDataSet));
-
-		result.put("labels", monthArray);
-		result.put("datasets", data);
-
-		return result;
-	}
-
-	// mChart에 들어갈 DataSet 세팅
-	@Override
-	public Map<String, Object> mChartDataSet(List<JSONObject> list, ChartDataSetDTO dto) throws JYException {
-		// 1월 ~ 12월
-		int[] monthCount = new int[12];
-
-		try {
-			for (JSONObject json : list) {
-				int month = json.getInt("MONTH") - 1;
-				monthCount[month] += json.getInt("COUNT");
-			}
-		} catch (JSONException je) {
-			throw new JYException("JSON Exception", je);
-		}
-
-		List<Integer> data = new ArrayList<Integer>();
-
-		for (int num : monthCount) {
-			data.add(num);
-		}
-
-		Map<String, Object> map = new HashMap<String, Object>();
-		map.put("label", dto.getLabel());
-		map.put("backgroundColor", dto.getBackgroundColor());
-		map.put("borderColor", dto.getBorderColor());
-		map.put("borderWidth", dto.getBorderWidth());
-		map.put("data", data);
-
-		return map;
-	}
-
-	// dChart 차트 정보 세팅
-	@Override
-	public Map<String, Object> dChartInfo(String year, String month) throws JYException {
-		Map<String, Object> result = new HashMap<String, Object>();
-
-		// action별로 데이터 세팅
-		List<JSONObject> create = dbmsSQL.getActionData(year, month, "C");
-		List<JSONObject> read = dbmsSQL.getActionData(year, month, "R");
-		List<JSONObject> update = dbmsSQL.getActionData(year, month, "U");
-		List<JSONObject> delete = dbmsSQL.getActionData(year, month, "D");
-
-		List<String> labels = new ArrayList<String>();
-		// 31일까지 있는 달
-		String[] monthArray = { "01", "03", "05", "07", "08", "10", "12" };
-		int day = 0;
-
-		if (Arrays.stream(monthArray).anyMatch(month::equals)) {
-			day = 31;
-			// 2월 (28일까지)
-		} else if (month.equals("02")) {
-			day = 28;
-			// 윤년
-			if (Integer.parseInt(year) / 4 == 0) {
-				day += 1;
-			}
-			// 나머지 월
-		} else {
-			day = 30;
-		}
-
-		// 1자리수의 숫자 앞에 "0" 추가
-		for (int i = 1; i <= day; i++) {
-			if (i / 10.0 < 1) {
-				labels.add("0" + i);
-			} else {
-				labels.add("" + i);
-			}
-		}
-
-		// 디자인 관련 초기값 생성자로 세팅
-		ChartDataSetDTO createDataSet = new ChartDataSetDTO("가입", "white", "red", 2);
-		ChartDataSetDTO readDataSet = new ChartDataSetDTO("로그인", "white", "orange", 2);
-		ChartDataSetDTO updateDataSet = new ChartDataSetDTO("수정", "white", "blue", 2);
-		ChartDataSetDTO deleteDataSet = new ChartDataSetDTO("탈퇴", "white", "black", 2);
-
-		List<Map<String, Object>> data = new ArrayList<Map<String, Object>>();
-		data.add(dChartDataSet(create, day, createDataSet));
-		data.add(dChartDataSet(read, day, readDataSet));
-		data.add(dChartDataSet(update, day, updateDataSet));
-		data.add(dChartDataSet(delete, day, deleteDataSet));
-
-		result.put("labels", labels);
-		result.put("datasets", data);
-
-		return result;
-	}
-
-	// dChart에 들어갈 데이터 세팅
-	@Override
-	public Map<String, Object> dChartDataSet(List<JSONObject> list, int days, ChartDataSetDTO dto) throws JYException {
-		int[] dayCount = new int[days];
-
-		try {
-			for (JSONObject json : list) {
-				int day = json.getInt("DAY") - 1;
-				dayCount[day] += json.getInt("COUNT");
-			}
-		} catch (JSONException je) {
-			throw new JYException("JSON Exception", je);
-		}
-
-		List<Integer> data = new ArrayList<Integer>();
-
-		for (int num : dayCount) {
-			data.add(num);
-		}
-
-		Map<String, Object> map = new HashMap<String, Object>();
-		map.put("label", dto.getLabel());
-		map.put("backgroundColor", dto.getBackgroundColor());
-		map.put("borderColor", dto.getBorderColor());
-		map.put("borderWidth", dto.getBorderWidth());
-		map.put("data", data);
-
-		return map;
-	}
 
 }

@@ -8,19 +8,19 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.jySystem.dbms.dto.DbObjectDTO;
-import com.jySystem.dbms.service.DbmsServiceImpl;
+import com.jySystem.dbms.service.DbmsDetailServiceImpl;
 
 @RestController
 @RequestMapping("/dbmsTool")
 public class TypeDetailsRestController {
 
 	@Autowired
-	private DbmsServiceImpl dbmsService;
+	private DbmsDetailServiceImpl dbmsDetailService;
 
 	// TYPE 디테일 CODE 조회
 	@RequestMapping("/typeDetailsCode")
 	public List<Map<String, Object>> typeDetailsCode(DbObjectDTO dto, String userId) throws Exception {
-		return dbmsService.detailsCode(dto, userId);
+		return dbmsDetailService.detailsCode(dto, userId);
 	}
 
 }

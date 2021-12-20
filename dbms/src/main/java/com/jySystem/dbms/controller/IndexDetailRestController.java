@@ -8,25 +8,25 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.jySystem.dbms.dto.DbObjectDTO;
-import com.jySystem.dbms.service.DbmsServiceImpl;
+import com.jySystem.dbms.service.DbmsDetailServiceImpl;
 
 @RestController
 @RequestMapping("/dbmsTool")
 public class IndexDetailRestController {
 
 	@Autowired
-	private DbmsServiceImpl dbmsService;
+	private DbmsDetailServiceImpl dbmsDetailService;
 
 	// INDEX 디테일 INDEX 조회
 	@RequestMapping("/indexDetailsIndex")
 	public Map<String, Object> indexDetailsIndex(DbObjectDTO dto, String userId) throws Exception {
-		return dbmsService.tableDetailsIndexesBottom(dto, userId);
+		return dbmsDetailService.tableDetailsIndexesBottom(dto, userId);
 	}
 
 	// INDEX 디테일 COLUMNS 조회
 	@RequestMapping("/indexDetailsColumns")
 	public List<Map<String, Object>> indexDetailsColumns(DbObjectDTO dto, String userId) throws Exception {
-		return dbmsService.indexDetailsColumns(dto, userId);
+		return dbmsDetailService.indexDetailsColumns(dto, userId);
 	}
 
 }

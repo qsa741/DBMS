@@ -8,24 +8,24 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.jySystem.dbms.dto.DbObjectDTO;
-import com.jySystem.dbms.service.DbmsServiceImpl;
+import com.jySystem.dbms.service.DbmsDetailServiceImpl;
 
 @RestController
 @RequestMapping("/dbmsTool")
 public class ViewDetailsRestController {
 
 	@Autowired
-	private DbmsServiceImpl dbmsService;
+	private DbmsDetailServiceImpl dbmsDetailService;
 
 	// VIEW 디테일 COLUMNS 조회
 	@RequestMapping("/viewDetailsColumns")
 	public List<Map<String, Object>> viewDetailsColumns(DbObjectDTO dto, String userId) throws Exception {
-		return dbmsService.viewDetailsColumns(dto, userId);
+		return dbmsDetailService.viewDetailsColumns(dto, userId);
 	}
 
 	// VIEW 디테일 SCRIPT 조회
 	@RequestMapping("/viewDetailsScript")
 	public List<Map<String, Object>> viewDetailsScript(DbObjectDTO dto, String userId) throws Exception {
-		return dbmsService.viewDetailsScript(dto, userId);
+		return dbmsDetailService.viewDetailsScript(dto, userId);
 	}
 }
