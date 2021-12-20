@@ -63,7 +63,7 @@ public class DbmsSQL {
 	// 전체 스키마 리스트 조회
 	public List<TreeDTO> allSchemas(DbDTO db) throws JYException {
 		// ID는 SCHEMA로 고정
-		String sql = "SELECT USERNAME AS TEXT FROM ALL_USERS ORDER BY USERNAME";
+		String selectSQL = "SELECT USERNAME AS TEXT FROM ALL_USERS ORDER BY USERNAME";
 
 		List<TreeDTO> list = new ArrayList<TreeDTO>();
 
@@ -74,7 +74,7 @@ public class DbmsSQL {
 		try {
 			Class.forName(driver);
 			conn = DriverManager.getConnection(url, db.getDbId(), db.getDbPw());
-			pre = conn.prepareStatement(sql);
+			pre = conn.prepareStatement(selectSQL);
 			result = pre.executeQuery();
 			TreeDTO tree;
 
@@ -103,7 +103,7 @@ public class DbmsSQL {
 
 	// 스키마 항목 카운트 조회
 	public TreeDTO getSchemaInfo(String owner, String objectType, DbDTO db) throws JYException {
-		String sql = "SELECT COUNT(*) FROM all_objects WHERE OWNER = ? AND OBJECT_TYPE = ?";
+		String selectSQL = "SELECT COUNT(*) FROM all_objects WHERE OWNER = ? AND OBJECT_TYPE = ?";
 
 		TreeDTO tree = new TreeDTO();
 		tree.setIconCls("tree-schemaInfo");
@@ -123,7 +123,7 @@ public class DbmsSQL {
 
 			Class.forName(driver);
 			conn = DriverManager.getConnection(url, db.getDbId(), db.getDbPw());
-			pre = conn.prepareStatement(sql);
+			pre = conn.prepareStatement(selectSQL);
 			pre.setString(1, owner);
 			pre.setString(2, objectType);
 			result = pre.executeQuery();
@@ -154,7 +154,7 @@ public class DbmsSQL {
 
 	// 오브젝트 항목 조회
 	public List<TreeDTO> getObjectInfo(DbObjectDTO dto, DbDTO db) throws JYException {
-		String sql = "SELECT OBJECT_TYPE, OBJECT_NAME FROM all_objects WHERE OWNER = ? AND OBJECT_TYPE = ?";
+		String selectSQL = "SELECT OBJECT_TYPE, OBJECT_NAME FROM all_objects WHERE OWNER = ? AND OBJECT_TYPE = ?";
 		String iconCls = "tree-" + dto.getObjectType().toLowerCase();
 
 		List<TreeDTO> list = new ArrayList<TreeDTO>();
@@ -167,7 +167,7 @@ public class DbmsSQL {
 		try {
 			Class.forName(driver);
 			conn = DriverManager.getConnection(url, db.getDbId(), db.getDbPw());
-			pre = conn.prepareStatement(sql);
+			pre = conn.prepareStatement(selectSQL);
 			pre.setString(1, dto.getSchemaName());
 			pre.setString(2, dto.getObjectType());
 			result = pre.executeQuery();
@@ -198,7 +198,7 @@ public class DbmsSQL {
 
 	// Table 불러오기
 	public List<Map<String, Object>> loadObjectTable(DbObjectDTO dto, DbDTO db) throws JYException {
-		String sql = "SELECT * FROM " + dto.getSchemaName() + "." + dto.getTableName();
+		String selectSQL = "SELECT * FROM " + dto.getSchemaName() + "." + dto.getTableName();
 		List<Map<String, Object>> list = new ArrayList<>();
 
 		Connection conn = null;
@@ -208,7 +208,7 @@ public class DbmsSQL {
 		try {
 			Class.forName(driver);
 			conn = DriverManager.getConnection(url, db.getDbId(), db.getDbPw());
-			pre = conn.prepareStatement(sql);
+			pre = conn.prepareStatement(selectSQL);
 			result = pre.executeQuery();
 
 			ResultSetMetaData metaData = result.getMetaData();
@@ -239,14 +239,14 @@ public class DbmsSQL {
 
 	// Table 하위 목록 조회 (column, constraint, index)
 	public List<Map<String, Object>> selectTableChild(String type, DbObjectDTO dto, DbDTO db) throws JYException {
-		String sql = "";
+		String selectSQL = "";
 		if (Objects.equals(type, "column")) {
-			sql = "SELECT OWNER, TABLE_NAME, COLUMN_NAME, DATA_TYPE, DATA_LENGTH "
+			selectSQL = "SELECT OWNER, TABLE_NAME, COLUMN_NAME, DATA_TYPE, DATA_LENGTH "
 					+ "FROM all_tab_columns WHERE OWNER = ? AND TABLE_NAME = ?";
 		} else if (Objects.equals(type, "index")) {
-			sql = "SELECT INDEX_NAME FROM (SELECT * FROM all_ind_columns WHERE INDEX_OWNER = ? AND TABLE_NAME = ?) GROUP BY INDEX_NAME";
+			selectSQL = "SELECT INDEX_NAME FROM (SELECT * FROM all_ind_columns WHERE INDEX_OWNER = ? AND TABLE_NAME = ?) GROUP BY INDEX_NAME";
 		} else {
-			sql = "SELECT CONSTRAINT_NAME FROM (SELECT * FROM all_cons_columns WHERE OWNER = ? AND TABLE_NAME = ?) GROUP BY CONSTRAINT_NAME";
+			selectSQL = "SELECT CONSTRAINT_NAME FROM (SELECT * FROM all_cons_columns WHERE OWNER = ? AND TABLE_NAME = ?) GROUP BY CONSTRAINT_NAME";
 		}
 
 		List<Map<String, Object>> list = new ArrayList<>();
@@ -258,7 +258,7 @@ public class DbmsSQL {
 		try {
 			Class.forName(driver);
 			conn = DriverManager.getConnection(url, db.getDbId(), db.getDbPw());
-			pre = conn.prepareStatement(sql);
+			pre = conn.prepareStatement(selectSQL);
 			pre.setString(1, dto.getSchemaName());
 			pre.setString(2, dto.getTableName());
 			result = pre.executeQuery();
@@ -388,7 +388,7 @@ public class DbmsSQL {
 
 	// 카프카로 받은 데이터 스케줄러 테이블에 저장
 	public void userSchedulerSave(String data) throws JYException {
-		String sql = "insert into userScheduler values(USERS_SEQ.NEXTVAL, \'" + data + "\', sysdate, 'N')";
+		String insertSQL = "insert into userScheduler values(USERS_SEQ.NEXTVAL, \'" + data + "\', sysdate, 'N')";
 
 		Connection conn = null;
 		PreparedStatement pre = null;
@@ -396,7 +396,7 @@ public class DbmsSQL {
 		try {
 			Class.forName(driver);
 			conn = DriverManager.getConnection(url, username, password);
-			pre = conn.prepareStatement(sql);
+			pre = conn.prepareStatement(insertSQL);
 			pre.executeUpdate();
 			pre.close();
 			conn.close();
@@ -412,7 +412,7 @@ public class DbmsSQL {
 	public List<String> getChartYears() throws JYException {
 		List<String> list = new ArrayList<String>();
 
-		String sql = "select year from ACTIONDATA group by year order by year desc";
+		String selectSQL = "select year from ACTIONDATA group by year order by year desc";
 
 		Connection conn = null;
 		PreparedStatement pre = null;
@@ -421,7 +421,7 @@ public class DbmsSQL {
 		try {
 			Class.forName(driver);
 			conn = DriverManager.getConnection(url, username, password);
-			pre = conn.prepareStatement(sql);
+			pre = conn.prepareStatement(selectSQL);
 			result = pre.executeQuery();
 
 			while (result.next()) {
@@ -444,7 +444,7 @@ public class DbmsSQL {
 	public List<String> getChartMonth(String year) throws JYException {
 		List<String> list = new ArrayList<String>();
 
-		String sql = "select month from (select * from ACTIONDATA where year = ?) group by month order by month desc";
+		String selectSQL = "select month from (select * from ACTIONDATA where year = ?) group by month order by month desc";
 
 		Connection conn = null;
 		PreparedStatement pre = null;
@@ -453,7 +453,7 @@ public class DbmsSQL {
 		try {
 			Class.forName(driver);
 			conn = DriverManager.getConnection(url, username, password);
-			pre = conn.prepareStatement(sql);
+			pre = conn.prepareStatement(selectSQL);
 			pre.setString(1, year);
 			result = pre.executeQuery();
 
@@ -477,7 +477,7 @@ public class DbmsSQL {
 	public List<JSONObject> getActionData(String year, String action) throws JYException {
 		List<JSONObject> list = new ArrayList<JSONObject>();
 
-		String sql = "select * from ACTIONDATA where action = ? and year = ? order by 1 desc, 2, 3, 4";
+		String selectSQL = "select * from ACTIONDATA where action = ? and year = ? order by 1 desc, 2, 3, 4";
 
 		Connection conn = null;
 		PreparedStatement pre = null;
@@ -486,7 +486,7 @@ public class DbmsSQL {
 		try {
 			Class.forName(driver);
 			conn = DriverManager.getConnection(url, username, password);
-			pre = conn.prepareStatement(sql);
+			pre = conn.prepareStatement(selectSQL);
 			pre.setString(1, action);
 			pre.setString(2, year);
 			result = pre.executeQuery();
@@ -523,7 +523,7 @@ public class DbmsSQL {
 	public List<JSONObject> getActionData(String year, String month, String action) throws JYException {
 		List<JSONObject> list = new ArrayList<JSONObject>();
 
-		String sql = "select * from ACTIONDATA where action = ? and year = ? and month = ? order by 1 desc, 2, 3, 4";
+		String selectSQL = "select * from ACTIONDATA where action = ? and year = ? and month = ? order by 1 desc, 2, 3, 4";
 
 		Connection conn = null;
 		PreparedStatement pre = null;
@@ -532,7 +532,7 @@ public class DbmsSQL {
 		try {
 			Class.forName(driver);
 			conn = DriverManager.getConnection(url, username, password);
-			pre = conn.prepareStatement(sql);
+			pre = conn.prepareStatement(selectSQL);
 			pre.setString(1, action);
 			pre.setString(2, year);
 			pre.setString(3, month);

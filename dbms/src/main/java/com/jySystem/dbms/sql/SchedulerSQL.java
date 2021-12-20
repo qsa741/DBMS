@@ -37,9 +37,9 @@ public class SchedulerSQL {
 	// Action 데이터 저장
 	@SuppressWarnings("resource")
 	public void saveActionData(String action, JSONObject json) throws JYException {
-		String select = "select * from ACTIONDATA where year = ? and month = ? and day = ? and action = ?";
-		String insert = "insert into ACTIONDATA values(?,?,?,?,?, sysdate)";
-		String update = "update ACTIONDATA set count = ? where year = ? and month = ? and day = ? and action = ?";
+		String selectSQL = "select * from ACTIONDATA where year = ? and month = ? and day = ? and action = ?";
+		String insertSQL = "insert into ACTIONDATA values(?,?,?,?,?, sysdate)";
+		String updateSQL = "update ACTIONDATA set count = ? where year = ? and month = ? and day = ? and action = ?";
 		Connection conn = null;
 		PreparedStatement pre = null;
 		ResultSet rs = null;
@@ -49,7 +49,7 @@ public class SchedulerSQL {
 			conn = DriverManager.getConnection(url, username, password);
 
 			// 해당 일에 데이터가 있는지 확인
-			pre = conn.prepareStatement(select);
+			pre = conn.prepareStatement(selectSQL);
 			pre.setString(1, json.getString("year"));
 			pre.setString(2, json.getString("month"));
 			pre.setString(3, json.getString("day"));
@@ -59,14 +59,14 @@ public class SchedulerSQL {
 
 			// 데이터가 있으면 Update, 없으면 Insert
 			if (rs.next()) {
-				pre = conn.prepareStatement(update);
+				pre = conn.prepareStatement(updateSQL);
 				pre.setInt(1, json.getInt("count"));
 				pre.setString(2, json.getString("year"));
 				pre.setString(3, json.getString("month"));
 				pre.setString(4, json.getString("day"));
 				pre.setString(5, action);
 			} else {
-				pre = conn.prepareStatement(insert);
+				pre = conn.prepareStatement(insertSQL);
 				pre.setString(1, json.getString("year"));
 				pre.setString(2, json.getString("month"));
 				pre.setString(3, json.getString("day"));
@@ -93,9 +93,9 @@ public class SchedulerSQL {
 	public List<Map<String, Object>> actionScheduler() throws JYException {
 		List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();
 		// 스케줄러가 읽지 않은 데이터 찾기
-		String sql = "select * from actionScheduler where readCheck = 'N'";
+		String selectSQL = "select * from actionScheduler where readCheck = 'N'";
 		// 스케줄러가 읽은 데이터 readCheck = 'Y'로 업데이트
-		String sql2 = "update actionScheduler set executeTime = sysdate, readCheck = 'Y' where scheduleNum = ?";
+		String updateSQL = "update actionScheduler set executeTime = sysdate, readCheck = 'Y' where scheduleNum = ?";
 
 		Connection conn = null;
 		PreparedStatement pre = null;
@@ -104,7 +104,7 @@ public class SchedulerSQL {
 		try {
 			Class.forName(driver);
 			conn = DriverManager.getConnection(url, username, password);
-			pre = conn.prepareStatement(sql);
+			pre = conn.prepareStatement(selectSQL);
 			result = pre.executeQuery();
 
 			ResultSetMetaData metaData = result.getMetaData();
@@ -119,7 +119,7 @@ public class SchedulerSQL {
 					map.put(col, result.getString(col));
 				}
 				list.add(map);
-				pre = conn.prepareStatement(sql2);
+				pre = conn.prepareStatement(updateSQL);
 				pre.setString(1, (String) map.get("SCHEDULENUM"));
 				pre.executeUpdate();
 			}
