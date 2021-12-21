@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import com.jySystem.dbms.dto.ChartDataSetDTO;
 import com.jySystem.dbms.sql.DbmsSQL;
 import com.jySystem.exception.JYException;
+import com.jySystem.kafka.config.Action;
 
 @Service
 public class DbmsChartServiceImpl implements DbmsChartService {
@@ -39,10 +40,10 @@ public class DbmsChartServiceImpl implements DbmsChartService {
 		Map<String, Object> result = new HashMap<String, Object>();
 
 		// action별로 데이터 생성
-		List<JSONObject> create = dbmsSQL.getActionData(year, "C");
-		List<JSONObject> read = dbmsSQL.getActionData(year, "R");
-		List<JSONObject> update = dbmsSQL.getActionData(year, "U");
-		List<JSONObject> delete = dbmsSQL.getActionData(year, "D");
+		List<JSONObject> create = dbmsSQL.getActionData(year, Action.CREATE.name());
+		List<JSONObject> read = dbmsSQL.getActionData(year, Action.READ.name());
+		List<JSONObject> update = dbmsSQL.getActionData(year, Action.UPDATE.name());
+		List<JSONObject> delete = dbmsSQL.getActionData(year, Action.DELETE.name());
 
 		String[] monthArray = { "01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12" };
 
@@ -101,10 +102,10 @@ public class DbmsChartServiceImpl implements DbmsChartService {
 		Map<String, Object> result = new HashMap<String, Object>();
 
 		// action별로 데이터 세팅
-		List<JSONObject> create = dbmsSQL.getActionData(year, month, "C");
-		List<JSONObject> read = dbmsSQL.getActionData(year, month, "R");
-		List<JSONObject> update = dbmsSQL.getActionData(year, month, "U");
-		List<JSONObject> delete = dbmsSQL.getActionData(year, month, "D");
+		List<JSONObject> create = dbmsSQL.getActionData(year, month, Action.CREATE.name());
+		List<JSONObject> read = dbmsSQL.getActionData(year, month, Action.READ.name());
+		List<JSONObject> update = dbmsSQL.getActionData(year, month, Action.UPDATE.name());
+		List<JSONObject> delete = dbmsSQL.getActionData(year, month, Action.DELETE.name());
 
 		List<String> labels = new ArrayList<String>();
 		// 31일까지 있는 달

@@ -250,10 +250,16 @@ public class DbmsServiceImpl implements DbmsService {
 		}
 		sqls = sqls.replace("\r", "").replace("\n", "").replace("\t", "");
 		String[] array = sqls.split(";", -1);
+		int last = array.length;
+		
+		if(array[array.length - 1].length() < 4) {
+			last -= 1;
+		}
 		
 		List<Map<String, Object>> list = new ArrayList<>();
 		int count = 0;
-		for (int i = 0; i < array.length; i++) {
+		
+		for (int i = 0; i < last; i++) {
 			String sql = array[i];
 			String type = sql.split(" ")[0].toUpperCase();
 			
@@ -266,6 +272,5 @@ public class DbmsServiceImpl implements DbmsService {
 
 		return list;
 	}
-
 
 }

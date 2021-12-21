@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import com.jySystem.dbms.sql.DbmsSQL;
 import com.jySystem.kafka.KafkaProducer;
+import com.jySystem.network.config.SAVE;
 
 @Service
 public class NetworkServiceImpl implements NetworkService {
@@ -51,9 +52,9 @@ public class NetworkServiceImpl implements NetworkService {
 	// type이 kafka일 경우 saveUser에 명령어 저장
 	@Override
 	public void saveUser(JSONObject data) throws Exception {
-		if (Objects.equals(data.get("type"), "DB")) {
+		if (Objects.equals(data.get("type"), SAVE.DB.name())) {
 			dbmsSQL.userSchedulerSave((String) data.get("data"));
-		} else if (Objects.equals(data.get("type"), "KAFKA")) {
+		} else if (Objects.equals(data.get("type"), SAVE.KAFKA.name())) {
 			JSONObject json = new JSONObject();
 			json.put("id", saveAgentId + "-02");
 			json.put("data", (String) data.get("data"));
@@ -69,9 +70,9 @@ public class NetworkServiceImpl implements NetworkService {
 		JSONObject json = new JSONObject();
 		json.put("id", actionAgentId);
 		if (networkCheck(actionAgentNetwork)) {
-			json.put("type", "DB");
+			json.put("type", SAVE.DB.name());
 		} else {
-			json.put("type", "KAFKA");
+			json.put("type", SAVE.KAFKA.name());
 		}
 		json.put("time", new Date().toString());
 

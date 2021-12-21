@@ -34,5 +34,4 @@ public interface DbmsService {
 	// SQL 전체 실행
 	public List<Map<String, Object>> runAllSQL(String sql, String userId) throws JYException;
 
-
 }

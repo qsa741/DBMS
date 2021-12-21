@@ -12,6 +12,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import com.jySystem.dbms.sql.SchedulerSQL;
+import com.jySystem.kafka.config.Action;
 import com.jySystem.network.service.NetworkServiceImpl;
 
 @Service
@@ -46,15 +47,15 @@ public class ScheduleServiceImpl implements ScheduleService {
 
 			JSONObject json = new JSONObject((String) map.get("DATA"));
 
-			JSONObject create = new JSONObject(json.getString("create"));
-			JSONObject read = new JSONObject(json.getString("read"));
-			JSONObject update = new JSONObject(json.getString("update"));
-			JSONObject delete = new JSONObject(json.getString("delete"));
+			JSONObject create = new JSONObject(json.getString(Action.CREATE.name()));
+			JSONObject read = new JSONObject(json.getString(Action.READ.name()));
+			JSONObject update = new JSONObject(json.getString(Action.UPDATE.name()));
+			JSONObject delete = new JSONObject(json.getString(Action.DELETE.name()));
 
-			schedulerSQL.saveActionData("C", create);
-			schedulerSQL.saveActionData("R", read);
-			schedulerSQL.saveActionData("U", update);
-			schedulerSQL.saveActionData("D", delete);
+			schedulerSQL.saveActionData(Action.CREATE.name(), create);
+			schedulerSQL.saveActionData(Action.READ.name(), read);
+			schedulerSQL.saveActionData(Action.UPDATE.name(), update);
+			schedulerSQL.saveActionData(Action.DELETE.name(), delete);
 
 		}
 	}
