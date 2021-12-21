@@ -1,6 +1,6 @@
 package com.jySystem.network.config;
 
-public enum SAVE {
+public enum Network {
 	DB,
 	KAFKA
 }
