@@ -47,6 +47,7 @@ public class SchedulerSQL {
 		try {
 			Class.forName(driver);
 			conn = DriverManager.getConnection(url, username, password);
+			conn.setAutoCommit(false);
 
 			// 해당 일에 데이터가 있는지 확인
 			pre = conn.prepareStatement(selectSQL);
@@ -78,10 +79,17 @@ public class SchedulerSQL {
 
 			rs.close();
 			pre.close();
+			
+			conn.commit();
 			conn.close();
 		} catch (ClassNotFoundException cnfe) {
 			throw new JYException("Class Not Found Exception", cnfe);
 		} catch (SQLException se) {
+			try {
+				conn.rollback();
+			} catch (SQLException e) {
+				throw new JYException("SQL Exception", e);
+			}
 			throw new JYException("SQL Exception", se);
 		} catch (JSONException je) {
 			throw new JYException("JSON Exception", je);
@@ -104,6 +112,8 @@ public class SchedulerSQL {
 		try {
 			Class.forName(driver);
 			conn = DriverManager.getConnection(url, username, password);
+			conn.setAutoCommit(false);
+			
 			pre = conn.prepareStatement(selectSQL);
 			result = pre.executeQuery();
 
@@ -126,10 +136,16 @@ public class SchedulerSQL {
 
 			result.close();
 			pre.close();
+			conn.commit();
 			conn.close();
 		} catch (ClassNotFoundException cnfe) {
 			throw new JYException("Class Not Found Exception", cnfe);
 		} catch (SQLException se) {
+			try {
+				conn.rollback();
+			} catch (SQLException e) {
+				throw new JYException("SQL Exception", e);
+			}
 			throw new JYException("SQL Exception", se);
 		}
 

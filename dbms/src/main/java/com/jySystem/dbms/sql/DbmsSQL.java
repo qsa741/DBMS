@@ -13,6 +13,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+import javax.transaction.Transactional;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.configurationprocessor.json.JSONException;
 import org.springframework.boot.configurationprocessor.json.JSONObject;
@@ -303,7 +305,7 @@ public class DbmsSQL {
 
 		map.put("type", type);
 		map.put("sql", sql);
-		map.put("key", key);
+		map.put("key", key + index);
 
 		Connection conn = null;
 		PreparedStatement pre = null;
@@ -314,6 +316,7 @@ public class DbmsSQL {
 		try {
 			Class.forName(driver);
 			conn = DriverManager.getConnection(url, db.getDbId(), db.getDbPw());
+			conn.setAutoCommit(false);
 			pre = conn.prepareStatement(sql);
 
 			// SELECT 일 경우
@@ -347,7 +350,8 @@ public class DbmsSQL {
 
 				row.put("Row", index);
 				row.put("ExecutionTime", time);
-
+				
+				
 				// 결과에 따라 row 등록 DDL DML DCL
 				if (Objects.equals(type, "CREATE") || Objects.equals(type, "DROP") || Objects.equals(type,"ALTER") || Objects.equals(type,"TRUNCATE")) {
 					row.put("DbmsOutput", type.toLowerCase() + " " + sql.split(" ")[1].toLowerCase() + ".");
@@ -355,30 +359,36 @@ public class DbmsSQL {
 					row.put("DbmsOutput", count + " rows " + type.toLowerCase() + ".");
 				} else if (Objects.equals(type,"GRANT") || Objects.equals(type,"REVOKE")) {
 					row.put("DbmsOutput", "commends complated successfully.");
+				} else if (Objects.equals(type, "COMMIT")) {
+					row.put("DbmsOutput", "Commitment Succeeded");
 				}
 				data.add(row);
 			}
+			
+			conn.commit();
 
 			result.close();
 			pre.close();
 			conn.close();
 
 			// 에러 발생시 에러메세지 추가
-		} catch (SQLException e) {
+		} catch (SQLException se) {
 			long stopTime = System.nanoTime();
 			double time = (double) (stopTime - startTime) / 1000000;
 			row = new LinkedHashMap<>();
 			row.put("Row", index);
-			row.put("DbmsOutput", e.getMessage());
+			row.put("DbmsOutput", se.getMessage());
 			row.put("ExecutionTime", time);
 
 			data.add(row);
-			throw new JYException("SQL Exception", e);
+			conn.rollback();
+			throw new JYException("SQL Exception", se);
 
 			// 에러 메세지를 보내기위해 finally에서 return
 		} catch (ClassNotFoundException cnfe) {
 			throw new JYException("Class Not Found Exception", cnfe);
 		} finally {
+			
 			map.put("size", size);
 			map.put("data", data);
 
@@ -396,15 +406,25 @@ public class DbmsSQL {
 		try {
 			Class.forName(driver);
 			conn = DriverManager.getConnection(url, username, password);
+			conn.setAutoCommit(false);
+			
 			pre = conn.prepareStatement(insertSQL);
 			pre.executeUpdate();
 			pre.close();
+			
+			conn.commit();
 			conn.close();
+			
 		} catch (ClassNotFoundException cnfe) {
 			throw new JYException("Class Not Found Exception", cnfe);
 		} catch (SQLException se) {
+			try {
+				conn.rollback();
+			} catch (SQLException e) {
+				throw new JYException("SQL Exception", e);
+			}
 			throw new JYException("SQL Exception", se);
-		}
+		} 
 
 	}
 
@@ -565,5 +585,5 @@ public class DbmsSQL {
 
 		return list;
 	}
-
+	
 }
