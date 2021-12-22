@@ -90,7 +90,6 @@ public class DbmsDetailServiceImpl implements DbmsDetailService {
 		for (String s : parameters) {
 			Map<String, Object> map = new HashMap<String, Object>();
 			map.put("VALUE", info.get(s));
-			s = s.replace("_", " ");
 			String parameter = s.substring(0, 1) + s.substring(1).toLowerCase();
 			map.put("PARAMETER", parameter);
 			rows.add(map);
@@ -175,7 +174,6 @@ public class DbmsDetailServiceImpl implements DbmsDetailService {
 		Set<String> parameters = info.keySet();
 		for (String s : parameters) {
 			Map<String, Object> map = new HashMap<String, Object>();
-			s = s.replace("_", " ");
 			String parameter = s.substring(0, 1) + s.substring(1).toLowerCase();
 
 			map.put("VALUE", info.get(s));
