@@ -13,13 +13,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-import javax.transaction.Transactional;
-
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.configurationprocessor.json.JSONException;
 import org.springframework.boot.configurationprocessor.json.JSONObject;
 import org.springframework.stereotype.Service;
 
+import com.jySystem.common.util.ConvertSqlToString;
 import com.jySystem.dbms.dto.DbDTO;
 import com.jySystem.dbms.dto.DbObjectDTO;
 import com.jySystem.dbms.dto.TreeDTO;
@@ -41,6 +41,9 @@ public class DbmsSQL {
 	@Value("${spring.datasource.password}")
 	private String password;
 
+	@Autowired
+	private ConvertSqlToString converter;
+	
 	// DB 커넥션 테스트
 	@SuppressWarnings({ "finally", "unused" })
 	public boolean connectionTest(DbDTO dto) throws JYException {
@@ -65,7 +68,7 @@ public class DbmsSQL {
 	// 전체 스키마 리스트 조회
 	public List<TreeDTO> allSchemas(DbDTO db) throws JYException {
 		// ID는 SCHEMA로 고정
-		String selectSQL = "SELECT USERNAME AS TEXT FROM ALL_USERS ORDER BY USERNAME";
+		String selectSQL = converter.Convert("sql/DbmsSQL/allSchemas.sql");;
 
 		List<TreeDTO> list = new ArrayList<TreeDTO>();
 
@@ -105,7 +108,7 @@ public class DbmsSQL {
 
 	// 스키마 항목 카운트 조회
 	public TreeDTO getSchemaInfo(String owner, String objectType, DbDTO db) throws JYException {
-		String selectSQL = "SELECT COUNT(*) FROM all_objects WHERE OWNER = ? AND OBJECT_TYPE = ?";
+		String selectSQL = converter.Convert("sql/DbmsSQL/getSchemaInfo.sql");
 
 		TreeDTO tree = new TreeDTO();
 		tree.setIconCls("tree-schemaInfo");
@@ -156,7 +159,7 @@ public class DbmsSQL {
 
 	// 오브젝트 항목 조회
 	public List<TreeDTO> getObjectInfo(DbObjectDTO dto, DbDTO db) throws JYException {
-		String selectSQL = "SELECT OBJECT_TYPE, OBJECT_NAME FROM all_objects WHERE OWNER = ? AND OBJECT_TYPE = ?";
+		String selectSQL = converter.Convert("sql/DbmsSQL/getObjectInfo.sql");
 		String iconCls = "tree-" + dto.getObjectType().toLowerCase();
 
 		List<TreeDTO> list = new ArrayList<TreeDTO>();
@@ -200,7 +203,7 @@ public class DbmsSQL {
 
 	// Table 불러오기
 	public List<Map<String, Object>> loadObjectTable(DbObjectDTO dto, DbDTO db) throws JYException {
-		String selectSQL = "SELECT * FROM " + dto.getSchemaName() + "." + dto.getTableName();
+		String selectSQL = converter.Convert("sql/DbmsSQL/loadObjectTable.sql") + " " + dto.getSchemaName() + "." + dto.getTableName();
 		List<Map<String, Object>> list = new ArrayList<>();
 
 		Connection conn = null;
@@ -211,6 +214,8 @@ public class DbmsSQL {
 			Class.forName(driver);
 			conn = DriverManager.getConnection(url, db.getDbId(), db.getDbPw());
 			pre = conn.prepareStatement(selectSQL);
+//			pre.setString(1, "\"" + dto.getSchemaName() + "\"");
+//			pre.setString(2, "\"" + dto.getTableName() + "\"");
 			result = pre.executeQuery();
 
 			ResultSetMetaData metaData = result.getMetaData();
@@ -243,12 +248,11 @@ public class DbmsSQL {
 	public List<Map<String, Object>> selectTableChild(String type, DbObjectDTO dto, DbDTO db) throws JYException {
 		String selectSQL = "";
 		if (Objects.equals(type, "column")) {
-			selectSQL = "SELECT OWNER, TABLE_NAME, COLUMN_NAME, DATA_TYPE, DATA_LENGTH "
-					+ "FROM all_tab_columns WHERE OWNER = ? AND TABLE_NAME = ?";
+			selectSQL = converter.Convert("sql/DbmsSQL/selectTableChildColumn.sql");
 		} else if (Objects.equals(type, "index")) {
-			selectSQL = "SELECT INDEX_NAME FROM (SELECT * FROM all_ind_columns WHERE INDEX_OWNER = ? AND TABLE_NAME = ?) GROUP BY INDEX_NAME";
+			selectSQL = converter.Convert("sql/DbmsSQL/selectTableChildIndex.sql");
 		} else {
-			selectSQL = "SELECT CONSTRAINT_NAME FROM (SELECT * FROM all_cons_columns WHERE OWNER = ? AND TABLE_NAME = ?) GROUP BY CONSTRAINT_NAME";
+			selectSQL = converter.Convert("sql/DbmsSQL/selectTableChildConstraint.sql");
 		}
 
 		List<Map<String, Object>> list = new ArrayList<>();
@@ -301,7 +305,7 @@ public class DbmsSQL {
 
 		// div id로 설정하기 위해 특수문자 지우기
 		String key = sql.replace("\'", "").replace(" ", "").replace("=", "").replace("<", "").replace(">", "")
-				.replace(",", "").replace("*", "");
+				.replace(",", "").replace("*", "").replace(".", "");
 
 		map.put("type", type);
 		map.put("sql", sql);
@@ -398,7 +402,7 @@ public class DbmsSQL {
 
 	// 카프카로 받은 데이터 스케줄러 테이블에 저장
 	public void userSchedulerSave(String data) throws JYException {
-		String insertSQL = "insert into userScheduler values(USERS_SEQ.NEXTVAL, \'" + data + "\', sysdate, 'N')";
+		String insertSQL = converter.Convert("sql/DbmsSQL/userSchedulerSave.sql");
 
 		Connection conn = null;
 		PreparedStatement pre = null;
@@ -409,6 +413,7 @@ public class DbmsSQL {
 			conn.setAutoCommit(false);
 			
 			pre = conn.prepareStatement(insertSQL);
+			pre.setString(1, data);
 			pre.executeUpdate();
 			pre.close();
 			
@@ -432,7 +437,7 @@ public class DbmsSQL {
 	public List<String> getChartYears() throws JYException {
 		List<String> list = new ArrayList<String>();
 
-		String selectSQL = "select year from ACTIONDATA group by year order by year desc";
+		String selectSQL = converter.Convert("sql/DbmsSQL/getChartYears.sql");
 
 		Connection conn = null;
 		PreparedStatement pre = null;
@@ -464,7 +469,7 @@ public class DbmsSQL {
 	public List<String> getChartMonth(String year) throws JYException {
 		List<String> list = new ArrayList<String>();
 
-		String selectSQL = "select month from (select * from ACTIONDATA where year = ?) group by month order by month desc";
+		String selectSQL = converter.Convert("sql/DbmsSQL/getChartMonth.sql");
 
 		Connection conn = null;
 		PreparedStatement pre = null;
@@ -497,7 +502,7 @@ public class DbmsSQL {
 	public List<JSONObject> getActionData(String year, String action) throws JYException {
 		List<JSONObject> list = new ArrayList<JSONObject>();
 
-		String selectSQL = "select * from ACTIONDATA where action = ? and year = ? order by 1 desc, 2, 3, 4";
+		String selectSQL = converter.Convert("sql/DbmsSQL/getActionDataYear.sql");
 
 		Connection conn = null;
 		PreparedStatement pre = null;
@@ -543,7 +548,7 @@ public class DbmsSQL {
 	public List<JSONObject> getActionData(String year, String month, String action) throws JYException {
 		List<JSONObject> list = new ArrayList<JSONObject>();
 
-		String selectSQL = "select * from ACTIONDATA where action = ? and year = ? and month = ? order by 1 desc, 2, 3, 4";
+		String selectSQL = converter.Convert("sql/DbmsSQL/getActionDataMonth.sql");
 
 		Connection conn = null;
 		PreparedStatement pre = null;

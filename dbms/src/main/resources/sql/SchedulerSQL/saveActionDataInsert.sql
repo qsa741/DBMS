@@ -1,0 +1,3 @@
+INSERT 
+INTO ACTIONDATA
+VALUES ( ?, ?, ? ,? ,?, SYSDATE)

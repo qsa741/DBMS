@@ -12,9 +12,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import com.jySystem.common.util.ConvertSqlToString;
 import com.jySystem.dbms.dto.DbDTO;
 import com.jySystem.dbms.dto.DbObjectDTO;
 import com.jySystem.exception.JYException;
@@ -35,9 +37,12 @@ public class DbmsDetailSQL {
 	@Value("${spring.datasource.password}")
 	private String password;
 	
+	@Autowired
+	private ConvertSqlToString converter;
+	
 	// 현재 내 권한 조회
 	public String getGrant(DbDTO db) throws JYException {
-		String selectSQL = "SELECT GRANTED_ROLE FROM user_role_privs";
+		String selectSQL = converter.Convert("sql/DbmsDetailSQL/getGrant.sql");
 		String grant = null;
 
 		Connection conn = null;
@@ -73,13 +78,12 @@ public class DbmsDetailSQL {
 
 	// 스키마 디테일 Info 조회
 	public Map<String, Object> getSchemaDetailsInfo(DbObjectDTO dto, DbDTO db) throws JYException {
-		String selectSQL = "SELECT * FROM all_users WHERE USERNAME = ?";
+		String selectSQL = converter.Convert("sql/DbmsDetailSQL/SchemaDetails/getSchemaDetailsInfoDefault.sql");
 		if (Objects.equals(getGrant(db), "DBA")) {
-			selectSQL = "SELECT USERNAME, USER_ID, ACCOUNT_STATUS, LOCK_DATE, EXPIRY_DATE, DEFAULT_TABLESPACE, CREATED "
-					+ "FROM dba_users WHERE USERNAME = ?";
+			selectSQL = converter.Convert("sql/DbmsDetailSQL/SchemaDetails/getSchemaDetailsInfoDBA.sql");
 			// 권한이 DBA가 아닐때 자기 자신 조회시 추가 정보있음
 		} else if (Objects.equals(dto.getSchemaName(), db.getDbId().toUpperCase())) {
-			selectSQL = "SELECT * FROM USER_USERS WHERE USERNAME = ?";
+			selectSQL = converter.Convert("sql/DbmsDetailSQL/SchemaDetails/getSchemaDetailsInfoMyself.sql");
 		}
 
 		Map<String, Object> map = new LinkedHashMap<>();
@@ -126,9 +130,9 @@ public class DbmsDetailSQL {
 
 	// 스키마 디테일 Role Grants 조회
 	public List<Map<String, Object>> getSchemaDetailsRoleGrants(DbObjectDTO dto, DbDTO db) throws JYException {
-		String selectSQL = "SELECT * FROM user_role_privs WHERE GRANTEE = ?";
+		String selectSQL = converter.Convert("sql/DbmsDetailSQL/SchemaDetails/getSchemaDetailsRoleGrantsDefault.sql");
 		if (getGrant(db).equals("DBA")) {
-			selectSQL = "SELECT * FROM dba_role_privs WHERE GRANTEE = ?";
+			selectSQL = converter.Convert("sql/DbmsDetailSQL/SchemaDetails/getSchemaDetailsRoleGrantsDBA.sql");
 		}
 
 		List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();
@@ -173,9 +177,9 @@ public class DbmsDetailSQL {
 
 	// 스키마 디테일 System Privileges 조회
 	public List<Map<String, Object>> getSchemaDetailsSystemPrivileges(DbObjectDTO dto, DbDTO db) throws JYException {
-		String selectSQL = "SELECT PRIVILEGE, ADMIN_OPTION, USERNAME AS GRANTEE, 'USER' AS TYPE FROM user_sys_privs WHERE USERNAME = ?";
+		String selectSQL = converter.Convert("sql/DbmsDetailSQL/SchemaDetails/getSchemaDetailsSystemPrivilegesDefault.sql");
 		if (Objects.equals(getGrant(db), "DBA")) {
-			selectSQL = "SELECT PRIVILEGE, ADMIN_OPTION, GRANTEE, 'USER' AS TYPE FROM dba_sys_privs WHERE GRANTEE = ?";
+			selectSQL = converter.Convert("sql/DbmsDetailSQL/SchemaDetails/getSchemaDetailsSystemPrivilegesDBA.sql");
 		}
 
 		List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();
@@ -225,10 +229,10 @@ public class DbmsDetailSQL {
 
 	// 스키마 디테일 Extends 조회
 	public List<Map<String, Object>> getSchemaDetailsExtents(DbObjectDTO dto, DbDTO db) throws JYException {
-		String selectSQL = "SELECT SEGMENT_TYPE AS TABLESPACE, '' AS SEGMENT_NAME, SEGMENT_NAME AS OBJECT_NAME, '' AS FILE_ID, '' AS BLOCK_ID, BLOCKS FROM user_extents ORDER BY SEGMENT_NAME";
+		String selectSQL = converter.Convert("sql/DbmsDetailSQL/SchemaDetails/getSchemaDetailsExtentsDefault.sql");
 		String grant = getGrant(db);
 		if (Objects.equals(grant, "DBA")) {
-			selectSQL = "SELECT SEGMENT_TYPE AS TABLESPACE, '' AS SEGMENT_NAME, SEGMENT_NAME AS OBJECT_NAME, FILE_ID, BLOCK_ID, BLOCKS FROM dba_extents WHERE OWNER = ? ORDER BY SEGMENT_NAME";
+			selectSQL = converter.Convert("sql/DbmsDetailSQL/SchemaDetails/getSchemaDetailsExtentsDBA.sql");
 		}
 		List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();
 
@@ -278,9 +282,7 @@ public class DbmsDetailSQL {
 
 	// 테이블 디테일 Table 조회
 	public Map<String, Object> getTableDetailsTable(DbObjectDTO dto, DbDTO db) throws JYException {
-		String selectSQL = "select T.TABLE_NAME AS NAME, C.COMMENTS, T.OWNER, T.PCT_FREE, T.INI_TRANS, T.LOGGING, T.NUM_ROWS, T.BLOCKS, T.AVG_ROW_LEN, "
-				+ "T.SAMPLE_SIZE, T.LAST_ANALYZED, T.DURATION, T.BUFFER_POOL, T.TABLESPACE_NAME, T.COMPRESSION, T.IOT_TYPE, T.MAX_EXTENTS "
-				+ " from ALL_TABLES T, ALL_TAB_COMMENTS C where T.OWNER = ? and T.TABLE_NAME = ?";
+		String selectSQL = converter.Convert("sql/DbmsDetailSQL/TableDetails/getTableDetailsTable.sql");
 
 		Map<String, Object> map = null;
 
@@ -322,13 +324,9 @@ public class DbmsDetailSQL {
 
 	// 테이블 디테일 Columns 조회
 	public List<Map<String, Object>> getTableDetailsColumns(DbObjectDTO dto, DbDTO db) throws JYException {
-		String pkSQL = "select acc.column_name from all_constraints ac, all_cons_columns acc "
-				+ "where ac.owner = ? and ac.table_name = ? and ac.con_type = 'PRIMARY KEY' and ac.constraint_name = acc.constraint_name";
+		String pkSQL = converter.Convert("sql/DbmsDetailSQL/TableDetails/getTableDetailsColumnsPK.sql");
 
-		String selectSQL = "select TC.COLUMN_NAME, TC.COLUMN_ID, TC.DATA_TYPE, TC.NULLABLE, TC.DATA_DEFAULT, CC.COMMENTS "
-				+ "from all_tab_columns TC, all_col_comments CC "
-				+ "where TC.TABLE_NAME = CC.TABLE_NAME and TC.COLUMN_NAME = CC.COLUMN_NAME and TC.owner = ? and TC.TABLE_NAME = ? "
-				+ "order by 2";
+		String selectSQL = converter.Convert("sql/DbmsDetailSQL/TableDetails/getTableDetailsColumns.sql");
 
 		List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();
 		List<String> pkList = new ArrayList<String>();
@@ -393,9 +391,8 @@ public class DbmsDetailSQL {
 
 	// 테이블 디테일 Index Top 조회
 	public List<Map<String, Object>> getTableDetailsIndexesTop(DbObjectDTO dto, DbDTO db) throws JYException {
-		String selectSQL = "select * from all_cons_columns ACC, all_indexes AI "
-				+ "where ACC.owner = ? and ACC.TABLE_NAME = ? and ACC.constraint_name = AI.index_name";
-
+		String selectSQL = converter.Convert("sql/DbmsDetailSQL/TableDetails/getTableDetailsIndexesTop.sql");
+		
 		List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();
 
 		Map<String, Object> map = new LinkedHashMap<>();
@@ -439,8 +436,7 @@ public class DbmsDetailSQL {
 
 	// 테이블 디테일 Index Bottom 조회
 	public Map<String, Object> getTableDetailsIndexesBottom(DbObjectDTO dto, DbDTO db) throws JYException {
-		String selectSQL = "select UNIQUENESS, INDEX_NAME, INDEX_TYPE, TABLE_OWNER, TABLE_NAME, TABLE_TYPE, TABLESPACE_NAME, INI_TRANS, PCT_FREE, INITIAL_EXTENT, NEXT_EXTENT, DISTINCT_KEYS "
-				+ " from all_indexes where INDEX_NAME = ?";
+		String selectSQL = converter.Convert("sql/DbmsDetailSQL/TableDetails/getTableDetailsIndexesBottom.sql");
 
 		Map<String, Object> map = new LinkedHashMap<>();
 
@@ -480,9 +476,7 @@ public class DbmsDetailSQL {
 
 	// 테이블 디테일 Index Top 조회
 	public List<Map<String, Object>> getTableDetailsConstraints(DbObjectDTO dto, DbDTO db) throws JYException {
-		String selectSQL = "select ACC.CONSTRAINT_NAME, AC.CON_TYPE, ACC.COLUMN_NAME, ACC.POSITION, AC.DELETE_RULE, AC.R_CONSTRAINT_NAME, AC.SEARCH_CONDITION, AC.R_OWNER "
-				+ "from ALL_CONS_COLUMNS ACC, ALL_CONSTRAINTS AC where ACC.OWNER = ? and ACC.TABLE_NAME = ? and ACC.CONSTRAINT_NAME = AC.CONSTRAINT_NAME "
-				+ "order by ACC.CONSTRAINT_NAME";
+		String selectSQL = converter.Convert("sql/DbmsDetailSQL/TableDetails/getTableDetailsConstraints.sql");
 
 		List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();
 
@@ -527,9 +521,7 @@ public class DbmsDetailSQL {
 
 	// 테이블 디테일 Script 조회
 	public String getTableDetailsScript(DbObjectDTO dto, DbDTO db) throws JYException {
-		String selectSQL = "select dbms_lob.substr(dbms_metadata.get_DDL('TABLE', table_name, owner) "
-				+ ",dbms_lob.getlength(dbms_metadata.get_DDL('TABLE', table_name, owner))) from all_tables "
-				+ "where owner = ? and table_name = ?";
+		String selectSQL = converter.Convert("sql/DbmsDetailSQL/TableDetails/getTableDetailsScript.sql");
 
 		String script = "";
 
@@ -563,7 +555,7 @@ public class DbmsDetailSQL {
 
 	// 인덱스 디테일 Columns 조회
 	public List<Map<String, Object>> getIndexDetailsColumns(DbObjectDTO dto, DbDTO db) throws JYException {
-		String selectSQL = "select * from all_ind_columns WHERE index_name = ?";
+		String selectSQL = converter.Convert("sql/DbmsDetailSQL/IndexDetails/getIndexDetailsColumns.sql");
 
 		List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();
 		Map<String, Object> map = null;
@@ -606,7 +598,7 @@ public class DbmsDetailSQL {
 
 	// 시퀀스 디테일 Info 조회
 	public Map<String, Object> getSequenceDetailsInfo(DbObjectDTO dto, DbDTO db) throws JYException {
-		String selectSQL = "select INCREMENT_BY, MIN_VALUE, MAX_VALUE, CYCLE_FLAG, LAST_NUMBER, CACHE_SIZE, ORDER_FLAG from all_sequences WHERE sequence_name = ?";
+		String selectSQL = converter.Convert("sql/DbmsDetailSQL/SequenceDetails/getSequenceDetailsInfo.sql");
 
 		Map<String, Object> map = null;
 
@@ -647,9 +639,8 @@ public class DbmsDetailSQL {
 
 	// 뷰 디테일 Columns 조회
 	public List<Map<String, Object>> getViewDetailsColumns(DbObjectDTO dto, DbDTO db) throws JYException {
-		String selectSQL = "select at.column_name, at.column_id, at.data_type, at.nullable, au.updatable, au.insertable, au.deletable, ac.comments "
-				+ "from ALL_TAB_COLUMNS at, ALL_UPDATABLE_COLUMNS au , ALL_COL_COMMENTS ac where at.owner = ? and at.table_name = ? and at.column_name = au.column_name and at.table_name = au.table_name and at.column_name = ac.column_name and at.table_name = ac.table_name order by at.column_id";
-
+		String selectSQL = converter.Convert("sql/DbmsDetailSQL/ViewDetails/getViewDetailsColumns.sql");
+		
 		List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();
 		Map<String, Object> map = null;
 
@@ -692,7 +683,7 @@ public class DbmsDetailSQL {
 
 	// 뷰 디테일 Script 조회
 	public List<Map<String, Object>> getViewDetailsScript(DbObjectDTO dto, DbDTO db) throws JYException {
-		String selectSQL = "select TEXT from ALL_VIEWS where owner = ? and view_name = ?";
+		String selectSQL = converter.Convert("sql/DbmsDetailSQL/ViewDetails/getViewDetailsScript.sql");
 
 		List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();
 		Map<String, Object> map = null;
@@ -737,7 +728,7 @@ public class DbmsDetailSQL {
 	// function, package, type, package body, undefined, trigger, type body 디테일 Code
 	// 조회
 	public List<Map<String, Object>> getDetailsCode(DbObjectDTO dto, DbDTO db) throws JYException {
-		String selectSQL = "select * from all_source where owner = ? and type = ? and name = ? order by line";
+		String selectSQL = converter.Convert("sql/DbmsDetailSQL/getDetailsCode.sql");
 
 		List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();
 		Map<String, Object> map = null;

@@ -11,11 +11,13 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.configurationprocessor.json.JSONException;
 import org.springframework.boot.configurationprocessor.json.JSONObject;
 import org.springframework.stereotype.Service;
 
+import com.jySystem.common.util.ConvertSqlToString;
 import com.jySystem.exception.JYException;
 
 @Service
@@ -34,12 +36,16 @@ public class SchedulerSQL {
 	@Value("${spring.datasource.password}")
 	private String password;
 
+	@Autowired
+	private ConvertSqlToString converter;
+	
 	// Action 데이터 저장
 	@SuppressWarnings("resource")
 	public void saveActionData(String action, JSONObject json) throws JYException {
-		String selectSQL = "select * from ACTIONDATA where year = ? and month = ? and day = ? and action = ?";
-		String insertSQL = "insert into ACTIONDATA values(?,?,?,?,?, sysdate)";
-		String updateSQL = "update ACTIONDATA set count = ? where year = ? and month = ? and day = ? and action = ?";
+		String selectSQL = converter.Convert("sql/SchedulerSQL/saveActionDataSelect.sql");
+		String insertSQL = converter.Convert("sql/SchedulerSQL/saveActionDataInsert.sql");
+		String updateSQL = converter.Convert("sql/SchedulerSQL/saveActionDataUpdate.sql");
+		
 		Connection conn = null;
 		PreparedStatement pre = null;
 		ResultSet rs = null;
@@ -101,9 +107,9 @@ public class SchedulerSQL {
 	public List<Map<String, Object>> actionScheduler() throws JYException {
 		List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();
 		// 스케줄러가 읽지 않은 데이터 찾기
-		String selectSQL = "select * from actionScheduler where readCheck = 'N'";
+		String selectSQL = converter.Convert("sql/SchedulerSQL/actionSchedulerSelect.sql");
 		// 스케줄러가 읽은 데이터 readCheck = 'Y'로 업데이트
-		String updateSQL = "update actionScheduler set executeTime = sysdate, readCheck = 'Y' where scheduleNum = ?";
+		String updateSQL = converter.Convert("sql/SchedulerSQL/actionSchedulerUpdate.sql");
 
 		Connection conn = null;
 		PreparedStatement pre = null;
