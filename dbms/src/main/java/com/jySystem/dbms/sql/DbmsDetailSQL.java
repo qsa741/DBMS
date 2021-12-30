@@ -725,7 +725,7 @@ public class DbmsDetailSQL {
 		return list;
 	}
 
-	// function, package, type, package body, undefined, trigger, type body 디테일 Code
+	// function, package, type, package body, trigger, type body, procedure 디테일 Code
 	// 조회
 	public List<Map<String, Object>> getDetailsCode(DbObjectDTO dto, DbDTO db) throws JYException {
 		String selectSQL = converter.Convert("sql/DbmsDetailSQL/getDetailsCode.sql");
@@ -751,6 +751,8 @@ public class DbmsDetailSQL {
 				pre.setString(3, dto.getTypeName());
 			} else if (Objects.equals(dto.getObjectType(),"TRIGGER")) {
 				pre.setString(3, dto.getTriggerName());
+			} else if (Objects.equals(dto.getObjectType(),"PROCEDURE")) {
+				pre.setString(3, dto.getProcedureName());
 			}
 			result = pre.executeQuery();
 
