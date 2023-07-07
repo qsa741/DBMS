@@ -47,6 +47,7 @@ public class DbmsSQL {
 	// DB 커넥션 테스트
 	@SuppressWarnings({ "finally", "unused" })
 	public boolean connectionTest(DbDTO dto) throws JYException {
+		System.out.println("CONNECTION TEST");
 		boolean result = false;
 		Connection conn = null;
 		try {
